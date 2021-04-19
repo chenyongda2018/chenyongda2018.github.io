@@ -6,7 +6,16 @@
     <description>Recent content on Dada&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 16 Apr 2021 20:24:08 +0800</lastBuildDate><atom:link href="https://chenyongda2018.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 19 Apr 2021 11:01:05 +0800</lastBuildDate><atom:link href="https://chenyongda2018.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Test Markdown</title>
+      <link>https://chenyongda2018.github.io/posts/test-markdown/</link>
+      <pubDate>Mon, 19 Apr 2021 11:01:05 +0800</pubDate>
+      
+      <guid>https://chenyongda2018.github.io/posts/test-markdown/</guid>
+      <description>all you ok ? </description>
+    </item>
+    
     <item>
       <title>My First Blog</title>
       <link>https://chenyongda2018.github.io/posts/my-first-blog/</link>
