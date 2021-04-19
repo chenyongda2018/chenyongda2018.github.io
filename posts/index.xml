@@ -5,8 +5,17 @@
     <link>https://chenyongda2018.github.io/posts/</link>
     <description>Recent content in Posts on Dada&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language>
-    <lastBuildDate>Mon, 19 Apr 2021 11:01:05 +0800</lastBuildDate><atom:link href="https://chenyongda2018.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <language>zh-cn</language>
+    <lastBuildDate>Mon, 19 Apr 2021 13:01:49 +0800</lastBuildDate><atom:link href="https://chenyongda2018.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Test Android Blog</title>
+      <link>https://chenyongda2018.github.io/posts/android/test-android-blog/</link>
+      <pubDate>Mon, 19 Apr 2021 13:01:49 +0800</pubDate>
+      
+      <guid>https://chenyongda2018.github.io/posts/android/test-android-blog/</guid>
+      <description>The first android blog. just test.</description>
+    </item>
+    
     <item>
       <title>Test Markdown</title>
       <link>https://chenyongda2018.github.io/posts/test-markdown/</link>
