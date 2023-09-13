@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1">
+
+  
+    
+    
+      <link href="/css/fonts.css" rel="stylesheet" type="text/css">
+    
+  
+
+  
+  <title>记一次在Android中调用百度的OCR接口的经历</title>
+
+  
+  
+  <link rel="stylesheet" href="/css/hugo-octopress.css">
+
+  
+  
+
+  
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+  
+
+  
+  
+    <link href="https://chenyongda2018.github.io/newfav.png" rel="icon">
+  
+
+  
+  
+
+  <meta name="description" content="" />
+  <meta name="keywords" content="">
+  <meta name="author" content="Petrichor">
+
+  
+  <meta name="generator" content="Hugo 0.115.1">
+
+  
+  
+
+  
+  
+
+
+
+</head>
+<body>
+
+
+<header role="banner">
+<hgroup>
+  
+  <h1><a href="https://chenyongda2018.github.io/">Petrichor&#39;s blog</a></h1>
+    <h2>Android developer.</h2>
+</hgroup></header>
+
+
+<nav role="navigation">
+<fieldset class="mobile-nav">
+  
+  <select onchange="location = this.value;">
+    <option value="">Navigate…</option>
+      
+        <option value="https://chenyongda2018.github.io/">» 主页</option>
+      
+  </select>
+</fieldset>
+
+
+<ul class="main-navigation">
+  
+  
+    
+      <li><a href="https://chenyongda2018.github.io/" title="主页">主页</a></li>
+    
+  
+</ul>
+
+<ul class="subscription">
+  
+    
+        <a href="https://chenyongda2018.github.io/index.xml" target="_blank" type="application/rss+xml" title="RSS" rel="noopener noreferrer"><i class="fa fa-rss-square fa-lg"></i></a>
+    
+  
+</ul>
+
+
+  <form action="https://www.google.com/search" method="get" target="_blank" rel="noopener noreferrer">
+    <fieldset role="search">
+      <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+      <input type="hidden" name="q" value="site:https://chenyongda2018.github.io/" />
+    </fieldset>
+  </form>
+
+</nav>
+
+
+<div id="main">
+  <div id="content">
+    <div>
+      <article class="hentry" role="article">
+
+        
+        
+
+<header>
+  <p class="meta">May 10, 2019
+     - 2 minute read 
+    
+
+    
+    
+      - <a class="label" href="https://chenyongda2018.github.io/categories/android/">Android </a><a class="label" href="https://chenyongda2018.github.io/categories/ocr/">OCR </a>
+    
+  </p>
+  <h1 class="entry-title">
+     记一次在Android中调用百度的OCR接口的经历 
+  </h1>
+</header>
+
+
+        <div class="entry-content">
+          
+          
+          
+          <h1 id="前言">前言</h1>
+<p>最近实验室开了个新项目，是一个通过扫描单词后把扫描过的单词生成游戏来让小朋友记单词的APP，扫描单词这个功能需要用到OCR.<br>
+现在常用的OCR有</p>
+<ul>
+<li>
+<p>
+<a href="https://github.com/tesseract-ocr/tesseract" target="_blank" rel="noopener">Tesseract</a> 这个用的人比较多，而且开源，目前google正在维护，但是我尝试了一下，发现识别准确率不是特别理想。</p>
+</li>
+<li>
+<p>微软的Azure上的
+<a href="https://www.azure.cn/zh-cn/home/features/cognitive-services/computer-vision/" target="_blank" rel="noopener">认知服务</a> 识别率很高，但是收费，现在有1元体验的套餐，而且不需要验证信用卡，感兴趣的同学可以试试。</p>
+</li>
+<li>
+<p>百度的
+<a href="https://cloud.baidu.com/doc/OCR/OCR-API.html#.E8.AF.B7.E6.B1.82.E8.AF.B4.E6.98.8E" target="_blank" rel="noopener">文字识别</a> 之所以用这个是因为免费，不过有每天的限制次数，对于学生项目来说够用，还要什么自行车。</p>
+</li>
+</ul>
+<p>下面进入正文</p>
+<h1 id="如何在android-中调用百度的ocr进行文字识别">如何在Android 中调用百度的OCR进行文字识别</h1>
+<h2 id="1获取百度文字识别产品服务的-aksk">1.获取百度文字识别产品服务的 Ak/Sk</h2>
+<p>1.在
+<a href="http://ai.baidu.com/tech/ocr" target="_blank" rel="noopener">百度AI开放平台</a>中进入控制台</p>
+<p><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/5/10/16aa0c3207893f26~tplv-t2oaga2asx-image.image" alt=""></p>
+<p>2.找到文字识别 产品服务<br>
+<img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/5/10/16aa0c33733f10e6~tplv-t2oaga2asx-image.image" alt=""></p>
+<p>3,创建应用<br>
+<img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/5/10/16aa0c3205d91865~tplv-t2oaga2asx-image.image" alt=""></p>
+<p>4,填写信息，<strong>注意这里的包名一定要和项目的包名一致</strong><br>
+<img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/5/10/16aa0c32077c3cb0~tplv-t2oaga2asx-image.image" alt=""><br>
+<img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/5/10/16aa0c3208e59688~tplv-t2oaga2asx-image.image" alt=""></p>
+<p>5.获得AK/SK<br>
+<img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/5/10/16aa0c320ae4cfd7~tplv-t2oaga2asx-image.image" alt=""></p>
+<p>6.下载license文件，在项目中如果直接用AK/SK明文调用百度的OCR，很不安全，可能会被别人反编译之后获得你的AK.SK<br>
+license文件集成了AK/SK 放在项目中可以防止别人破解。
+<img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/5/10/16aa0c32bfbe0ac0~tplv-t2oaga2asx-image.image" alt=""></p>
+<p>7.下载之后将获得的api.license文件放入main目录下的assets目录中<br>
+<img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/5/10/16aa0c32321a5ee2~tplv-t2oaga2asx-image.image" alt=""></p>
+<h2 id="2添加百度ocr的sdk到项目中">2.添加百度OCR的SDK到项目中</h2>
+<p>1.下载 
+<a href="https://ai.baidu.com/sdk#ocr" target="_blank" rel="noopener">百度OCR的android Sdk</a></p>
+<p><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/5/10/16aa0c33207fef3d~tplv-t2oaga2asx-image.image" alt=""><br>
+2.下载的SDK压缩包将其解压，并将libs下的ocr-sdk的jar包放入项目的libs目录下 <br>
+<img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/5/10/16aa0c332114fc9f~tplv-t2oaga2asx-image.image" alt=""><br>
+<img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/5/10/16aa0c3327d5bc7b~tplv-t2oaga2asx-image.image" alt=""></p>
+<p>3.在main目录下新建jniLibs目录，并将libs文件夹中的其他文件放入其中<br>
+<img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/5/10/16aa0c33330971ce~tplv-t2oaga2asx-image.image" alt="">
+<img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/5/10/16aa0c333ab33813~tplv-t2oaga2asx-image.image" alt=""></p>
+<p>4.在app下的build,gradle中添加<br>
+<img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/5/10/16aa0c339602cd1c~tplv-t2oaga2asx-image.image" alt=""><br>
+将添加在libs下的sdk JAR包编译</p>
+<p>5.这里下载的压缩包中包括了百度提供的相机扫描时的UI，在拍完照有裁剪框，比较方便，这里我们可以作为module引入项目中
+<img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/5/10/16aa0c33a2e8f5e2~tplv-t2oaga2asx-image.image" alt=""><br>
+<img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/5/10/16aa0c339b46cc37~tplv-t2oaga2asx-image.image" alt=""></p>
+<h2 id="3调用百度ocr">3.调用百度OCR</h2>
+<p>做完准备工作我们就可以开始调用百度的OCR接口了。</p>
+<p>首先在我们需要进行识别的页面所在的文件中创建 根据License文件初始化OCR实例的函数，并在onCreate()方法中调用</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#586e75">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">     * 自定义license的文件路径和文件名称，以license文件方式初始化
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">     */</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">private</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">initAccessTokenLicenseFile</span><span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        OCR<span style="color:#719e07">.</span>getInstance<span style="color:#719e07">(</span>mActivity<span style="color:#719e07">.</span>getApplicationContext<span style="color:#719e07">()).</span>initAccessToken<span style="color:#719e07">(</span><span style="color:#719e07">new</span> OnResultListener<span style="color:#719e07">&lt;</span>AccessToken<span style="color:#719e07">&gt;()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onResult</span><span style="color:#719e07">(</span>AccessToken accessToken<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                String token <span style="color:#719e07">=</span> accessToken<span style="color:#719e07">.</span>getAccessToken<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>                Log<span style="color:#719e07">.</span>d<span style="color:#719e07">(</span>TAG<span style="color:#719e07">,</span>token<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                hasGotToken <span style="color:#719e07">=</span> <span style="color:#cb4b16">true</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onError</span><span style="color:#719e07">(</span>OCRError error<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                error<span style="color:#719e07">.</span>printStackTrace<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>                alertText<span style="color:#719e07">(</span><span style="color:#2aa198">&#34;自定义文件路径licence方式获取token失败&#34;</span><span style="color:#719e07">,</span> error<span style="color:#719e07">.</span>getMessage<span style="color:#719e07">());</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">},</span> <span style="color:#2aa198">&#34;aip.license&#34;</span><span style="color:#719e07">,</span> mActivity<span style="color:#719e07">.</span>getApplicationContext<span style="color:#719e07">());</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span></code></pre></div><p><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/5/10/16aa0c33cd0b0b3a~tplv-t2oaga2asx-image.image" alt=""></p>
+<p>定义我们的打开相机事件</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#586e75">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">     * 打开相机，进入的相机页面是借用百度OCR 官方DEMO中的相机页面
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">     * 能够在相机中裁剪图片，和进入图库
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">     * @author cyd
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">     */</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">private</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">openCameraForResult</span><span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">if</span> <span style="color:#719e07">(!</span>checkTokenStatus<span style="color:#719e07">())</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">return</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>        Intent intent <span style="color:#719e07">=</span> <span style="color:#719e07">new</span> Intent<span style="color:#719e07">(</span>mActivity<span style="color:#719e07">,</span> CameraActivity<span style="color:#719e07">.</span>class<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        intent<span style="color:#719e07">.</span>putExtra<span style="color:#719e07">(</span>CameraActivity<span style="color:#719e07">.</span>KEY_OUTPUT_FILE_PATH<span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>                FileUtil<span style="color:#719e07">.</span>getSaveFile<span style="color:#719e07">(</span>getActivity<span style="color:#719e07">()).</span>getAbsolutePath<span style="color:#719e07">());</span>
+</span></span><span style="display:flex;"><span>        intent<span style="color:#719e07">.</span>putExtra<span style="color:#719e07">(</span>CameraActivity<span style="color:#719e07">.</span>KEY_CONTENT_TYPE<span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>                CameraActivity<span style="color:#719e07">.</span>CONTENT_TYPE_GENERAL<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        startActivityForResult<span style="color:#719e07">(</span>intent<span style="color:#719e07">,</span> REQUEST_CODE_GENERAL_BASIC<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>这里的CameraActivity用的是引入OCR_UI中的相机活动，自带剪裁框</p>
+<p>接下来需要我们新建一个可以存放OCR的识别方法的类RecognizeService</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#719e07">**</span>
+</span></span><span style="display:flex;"><span> <span style="color:#719e07">*</span> 这个类是用于将拍摄或者图库中获得的图片进行识别，返回JSON格式的字符串。
+</span></span><span style="display:flex;"><span> <span style="color:#719e07">*/</span>
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">public</span> <span style="color:#268bd2">class</span> <span style="color:#268bd2">RecognizeService</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#268bd2">public</span> <span style="color:#268bd2">interface</span> <span style="color:#268bd2">ServiceListener</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onResult</span><span style="color:#719e07">(</span>String result<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#586e75">//高精度版
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#268bd2">public</span> <span style="color:#268bd2">static</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">recAccurateBasic</span><span style="color:#719e07">(</span>Context ctx<span style="color:#719e07">,</span> String filePath<span style="color:#719e07">,</span> <span style="color:#268bd2">final</span> ServiceListener listener<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        GeneralParams param <span style="color:#719e07">=</span> <span style="color:#719e07">new</span> GeneralParams<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>        param<span style="color:#719e07">.</span>setDetectDirection<span style="color:#719e07">(</span><span style="color:#cb4b16">true</span><span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        param<span style="color:#719e07">.</span>setVertexesLocation<span style="color:#719e07">(</span><span style="color:#cb4b16">true</span><span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        param<span style="color:#719e07">.</span>setLanguageType<span style="color:#719e07">(</span>GeneralBasicParams<span style="color:#719e07">.</span>ENGLISH<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        param<span style="color:#719e07">.</span>setRecognizeGranularity<span style="color:#719e07">(</span>GeneralParams<span style="color:#719e07">.</span>GRANULARITY_SMALL<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        param<span style="color:#719e07">.</span>setImageFile<span style="color:#719e07">(</span><span style="color:#719e07">new</span> File<span style="color:#719e07">(</span>filePath<span style="color:#719e07">));</span>
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">//这里的recognizeAccurateBasic方法为百度OCR识别的核心方法
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>        OCR<span style="color:#719e07">.</span>getInstance<span style="color:#719e07">(</span>ctx<span style="color:#719e07">).</span>recognizeAccurateBasic<span style="color:#719e07">(</span>param<span style="color:#719e07">,</span> <span style="color:#719e07">new</span> OnResultListener<span style="color:#719e07">&lt;</span>GeneralResult<span style="color:#719e07">&gt;()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onResult</span><span style="color:#719e07">(</span>GeneralResult result<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                StringBuilder sb <span style="color:#719e07">=</span> <span style="color:#719e07">new</span> StringBuilder<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">for</span> <span style="color:#719e07">(</span>WordSimple wordSimple <span style="color:#719e07">:</span> result<span style="color:#719e07">.</span>getWordList<span style="color:#719e07">())</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                    WordSimple word <span style="color:#719e07">=</span> wordSimple<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>                    sb<span style="color:#719e07">.</span>append<span style="color:#719e07">(</span>word<span style="color:#719e07">.</span>getWords<span style="color:#719e07">());</span>
+</span></span><span style="display:flex;"><span>                    sb<span style="color:#719e07">.</span>append<span style="color:#719e07">(</span><span style="color:#2aa198">&#34;\n&#34;</span><span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>                listener<span style="color:#719e07">.</span>onResult<span style="color:#719e07">(</span>result<span style="color:#719e07">.</span>getJsonRes<span style="color:#719e07">());</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onError</span><span style="color:#719e07">(</span>OCRError error<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                listener<span style="color:#719e07">.</span>onResult<span style="color:#719e07">(</span>error<span style="color:#719e07">.</span>getMessage<span style="color:#719e07">());</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">});</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>在onActivityResult方法中，我们调用刚刚新建的类的recAccurateBasic方法，此方法接收三个参数，分别是context,拍照获取的图片路径，和在RecognizeService类中定义的监听接口，这里的获取图片路径方法，我用的是百度官方DEMO中的方法</p>
+<p>在onResult方法中，返回的result字符串即为识别结果的json字符串，只需要对JSON解析一下就能得到识别结果啦</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onActivityResult</span><span style="color:#719e07">(</span><span style="color:#dc322f">int</span> requestCode<span style="color:#719e07">,</span> <span style="color:#dc322f">int</span> resultCode<span style="color:#719e07">,</span> Intent data<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">super</span><span style="color:#719e07">.</span>onActivityResult<span style="color:#719e07">(</span>requestCode<span style="color:#719e07">,</span> resultCode<span style="color:#719e07">,</span> data<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">switch</span> <span style="color:#719e07">(</span>requestCode<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">case</span> REQUEST_CODE_GENERAL_BASIC<span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>resultCode <span style="color:#719e07">==</span> Activity<span style="color:#719e07">.</span>RESULT_OK<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                    RecognizeService<span style="color:#719e07">.</span>recAccurateBasic<span style="color:#719e07">(</span>mActivity<span style="color:#719e07">,</span> FileUtil<span style="color:#719e07">.</span>getSaveFile<span style="color:#719e07">(</span>mActivity<span style="color:#719e07">.</span>getApplicationContext<span style="color:#719e07">()).</span>getAbsolutePath<span style="color:#719e07">(),</span>
+</span></span><span style="display:flex;"><span>                            <span style="color:#719e07">new</span> RecognizeService<span style="color:#719e07">.</span>ServiceListener<span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                                <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>                                <span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onResult</span><span style="color:#719e07">(</span>String result<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                                    Bundle bundle <span style="color:#719e07">=</span> <span style="color:#719e07">new</span> Bundle<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>                                    bundle<span style="color:#719e07">.</span>putString<span style="color:#719e07">(</span><span style="color:#2aa198">&#34;wordResultJson&#34;</span><span style="color:#719e07">,</span>result <span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                                    Intent intent <span style="color:#719e07">=</span> <span style="color:#719e07">new</span> Intent<span style="color:#719e07">(</span>mActivity<span style="color:#719e07">,</span>SelectWordsActivity<span style="color:#719e07">.</span>class<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                                    intent<span style="color:#719e07">.</span>putExtra<span style="color:#719e07">(</span><span style="color:#2aa198">&#34;wordResultBundle&#34;</span><span style="color:#719e07">,</span>bundle <span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                                    startActivity<span style="color:#719e07">(</span>intent<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                                <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>                            <span style="color:#719e07">});</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">break</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">default</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>                Log<span style="color:#719e07">.</span>d<span style="color:#719e07">(</span>TAG<span style="color:#719e07">,</span> <span style="color:#2aa198">&#34;onActivityResult: &#34;</span><span style="color:#719e07">+</span><span style="color:#2aa198">&#34;run in default&#34;</span><span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">break</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>FileUtil类</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">public</span> <span style="color:#268bd2">class</span> <span style="color:#268bd2">FileUtil</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">public</span> <span style="color:#268bd2">static</span> File <span style="color:#268bd2">getSaveFile</span><span style="color:#719e07">(</span>Context context<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        File file <span style="color:#719e07">=</span> <span style="color:#719e07">new</span> File<span style="color:#719e07">(</span>context<span style="color:#719e07">.</span>getFilesDir<span style="color:#719e07">(),</span> <span style="color:#2aa198">&#34;pic.jpg&#34;</span><span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">return</span> file<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
+</span></span></code></pre></div><hr>
+<p>(完~)<br>
+<img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/5/10/16aa0c99f8e04575~tplv-t2oaga2asx-image.image" alt=""></p>
+
+        </div>
+        
+
+<footer>
+  <p class="meta">
+    <span class="byline author vcard">Posted by <span class="fn">Petrichor</span></span>
+    
+    <time>May 10, 2019</time>
+    
+      <span class="categories">
+        Tags:
+        
+          <a class="category" href="https://chenyongda2018.github.io/tags/android">Android</a>  <a class="category" href="https://chenyongda2018.github.io/tags/ocr">OCR</a>  
+    
+    </span>
+  </p>
+
+  
+
+  <p class="meta">
+    
+        <a class="basic-alignment left" href="https://chenyongda2018.github.io/posts/android/android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90/" title="Android消息机制全面解析">Android消息机制全面解析</a>
+    
+
+    
+      <a class="basic-alignment right" href="https://chenyongda2018.github.io/posts/android/glide_study/" title="Glide学习笔记">Glide学习笔记</a>
+    
+  </p>
+  
+</footer>
+
+      </article>
+    </div>
+    
+
+<aside class="sidebar thirds">
+  <section class="first odd">
+
+    
+
+    <p>
+      
+    </p>
+  </section>
+
+  
+  
+
+
+
+<ul class="sidebar-nav">
+  <li class="sidebar-nav-item">
+    <a target="_blank" rel="noopener noreferrer" href="https://github.com/chenyongda2018" title="https://github.com/chenyongda2018"><i class="fa fa-github fa-3x"></i></a>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+  
+  
+  </li>
+</ul>
+
+  
+
+  
+    
+      <section class="odd">
+        
+        
+          <li>
+            <a href="https://chenyongda2018.github.io/categories/" title="分类" >分类</a>
+          </li>
+        
+      </section>
+    
+  
+
+  
+  
+  
+    
+      <section class="even">
+        <h1>Recent Posts</h1>
+        <ul id="recent_posts">
+          
+          
+        </ul>
+      </section>
+    
+  
+</aside>
+
+  </div>
+</div>
+
+    <footer role="contentinfo">
+      <p>Copyright &copy; 2023 Petrichor - <a href="https://chenyongda2018.github.io/license/">License</a> -
+        <span class="credit">Powered by <a target="_blank" href="https://gohugo.io" rel="noopener noreferrer">Hugo</a> and <a target="_blank" href="https://github.com/parsiya/hugo-octopress/" rel="noopener noreferrer">Hugo-Octopress</a> theme.
+      </p>
+    </footer>
+
+    
+    
+
+
+
+    
+    
+    
+
+    
+  </body>
+</html>
+

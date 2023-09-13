@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1">
+
+  
+    
+    
+      <link href="/css/fonts.css" rel="stylesheet" type="text/css">
+    
+  
+
+  
+  <title>对象回收判定与垃圾回收算法 JVM学习笔记[1]</title>
+
+  
+  
+  <link rel="stylesheet" href="/css/hugo-octopress.css">
+
+  
+  
+
+  
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+  
+
+  
+  
+    <link href="https://chenyongda2018.github.io/newfav.png" rel="icon">
+  
+
+  
+  
+
+  <meta name="description" content="" />
+  <meta name="keywords" content="">
+  <meta name="author" content="Petrichor">
+
+  
+  <meta name="generator" content="Hugo 0.115.1">
+
+  
+  
+
+  
+  
+
+
+
+</head>
+<body>
+
+
+<header role="banner">
+<hgroup>
+  
+  <h1><a href="https://chenyongda2018.github.io/">Petrichor&#39;s blog</a></h1>
+    <h2>Android developer.</h2>
+</hgroup></header>
+
+
+<nav role="navigation">
+<fieldset class="mobile-nav">
+  
+  <select onchange="location = this.value;">
+    <option value="">Navigate…</option>
+      
+        <option value="https://chenyongda2018.github.io/">» 主页</option>
+      
+  </select>
+</fieldset>
+
+
+<ul class="main-navigation">
+  
+  
+    
+      <li><a href="https://chenyongda2018.github.io/" title="主页">主页</a></li>
+    
+  
+</ul>
+
+<ul class="subscription">
+  
+    
+        <a href="https://chenyongda2018.github.io/index.xml" target="_blank" type="application/rss+xml" title="RSS" rel="noopener noreferrer"><i class="fa fa-rss-square fa-lg"></i></a>
+    
+  
+</ul>
+
+
+  <form action="https://www.google.com/search" method="get" target="_blank" rel="noopener noreferrer">
+    <fieldset role="search">
+      <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+      <input type="hidden" name="q" value="site:https://chenyongda2018.github.io/" />
+    </fieldset>
+  </form>
+
+</nav>
+
+
+<div id="main">
+  <div id="content">
+    <div>
+      <article class="hentry" role="article">
+
+        
+        
+
+<header>
+  <p class="meta">Jan 13, 2020
+     - 2 minute read 
+    
+
+    
+    
+      - <a class="label" href="https://chenyongda2018.github.io/categories/java/">Java </a>
+    
+  </p>
+  <h1 class="entry-title">
+     对象回收判定与垃圾回收算法 JVM学习笔记[1] 
+  </h1>
+</header>
+
+
+        <div class="entry-content">
+          
+          
+          
+          <p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h1 id="本章要探究的问题-">本章要探究的问题 :</h1>
+<p>GC在回收内存时 :</p>
+<ol>
+<li>怎么判断哪些内存需要回收 ？</li>
+<li>什么时候回收？</li>
+</ol>
+<p>在几个线程私有的运行时区域:<!-- raw HTML omitted --><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/6/17/16b64d8a41ca08fb~tplv-t2oaga2asx-image.image" alt="image.png"></p>
+<ul>
+<li>虚拟机栈</li>
+<li>程序计数器</li>
+<li>本地方法栈</li>
+</ul>
+<p>它们的内存分配和回收<strong>大多</strong>都具有确定性，随着线程的创建而产生，随着线程的停止而被回收。栈帧中的内存大小基本在类的结构确定下来时就已知。</p>
+<p>而在线程共有的 <code>Java堆(Heap)</code> 和 <code>方法区(Class(Method) Area)</code> 这两个区域则不同：</p>
+<p><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/6/17/16b64d8a42c57ecf~tplv-t2oaga2asx-image.image" alt="image.png"></p>
+<p>比如，一个接口有不同的实现类(类的信息在方法区中)，这几个实现类的内存大小肯定不一，没法在运行前就已知需要多大的内存，只有在运行期间才知道创建的对象的大小。</p>
+<hr>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h2 id="heading"></h2>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h2 id="一哪些内存需要回收">一，哪些内存需要回收？</h2>
+<p>在知道哪些内存需要回收之前，我们要知道怎么判断一个对象是否还存活，当它不再存活时，就回收它。<!-- raw HTML omitted -->而 <code>引用计数算法</code> 就是用来判断对象是否存活的一个算法。</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="1引用计数算法reference-counting">1，引用计数算法（Reference Counting）</h3>
+<p>算法描述：给对象添加一个引用计数器，当有一个地方引用了它，计数器+1，当引用失效，计数器-1，在任何时刻，计数器为0时此对象将不能再被使用。</p>
+<p>引用计数法在大多数情况下表现都不错，也有被很多公司采用的应用案例。但是在JVM中并没有采用这种算法，原因是：<strong>无法解决对象之间存在相互引用的问题</strong>。</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">public</span> <span style="color:#268bd2">class</span> <span style="color:#268bd2">Person</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    Object instance <span style="color:#719e07">=</span> <span style="color:#cb4b16">null</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">public</span> <span style="color:#268bd2">static</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">main</span><span style="color:#719e07">(</span>String<span style="color:#719e07">[]</span> args<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        Person a <span style="color:#719e07">=</span> <span style="color:#719e07">new</span> Person<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>        Person b <span style="color:#719e07">=</span> <span style="color:#719e07">new</span> Person<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        a<span style="color:#719e07">.</span>instance <span style="color:#719e07">=</span> b<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>        b<span style="color:#719e07">.</span>instance <span style="color:#719e07">=</span> a<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        a <span style="color:#719e07">=</span> <span style="color:#cb4b16">null</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>        b <span style="color:#719e07">=</span> <span style="color:#cb4b16">null</span><span style="color:#719e07">;</span><span style="color:#586e75">// 正常情况下在这里GC就会把a,b回收掉
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>正常情况下在执行11-12行代码时，JVM的GC会把a,b两个对象回收，但是在引用计数算法的情况下：</p>
+<ul>
+<li>执行 <code>a=null</code> 时,a的引用计数器值为1，因为b对象在引用它。</li>
+<li>执行 <code>b=null</code> 时,b的引用计数器值为1，因为a对象在引用它。</li>
+</ul>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="2可达性分析reachability-analysis算法">2，可达性分析(Reachability Analysis)算法</h3>
+<p>在Java语言中是通过可达性分析来判断对象是否存活。  <!-- raw HTML omitted -->算法描述 : 通过一系列的 <code>GC Roots</code> 作为起始点，从这些起始点开始向下搜索，能搜索的到的对象说明其可用，不会被GC回收掉，搜索所走过的路径称为 <code>引用链(Reference Chain)</code> 。相反，如果一个对象没有到达GC Roots的路径，则说明它不可用，被判定为可被GC回收的对象。</p>
+<p><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/6/17/16b64d8a4381d473~tplv-t2oaga2asx-image.image" alt="image.png"></p>
+<p>如图 : 1区域的对象虽然互相关联，但是它们不可到达GC Roots,所以他们会被回收掉，而2区域的对象与GC Roots之间是有可到达路径的，所以它们不会被回收。</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h4 id="什么是gc-roots-">什么是GC Roots ?</h4>
+<ul>
+<li>虚拟机栈(栈帧中的本地变量表)中引用的对象</li>
+<li>方法区中类的静态属性引用的对象</li>
+<li>方法区中常量引用的对象</li>
+<li>本地方法栈中JNI(Native方法)引用的对象</li>
+</ul>
+<p>这些都可作为GC Roots.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="3什么是引用reference">3，什么是引用（Reference）</h3>
+<p>我们在上面的 <code>引用计数算法</code> 和 <code>可达性分析</code> 中，都提到了 对象之间的<code>引用</code> 关系。</p>
+<p>在Java1.2之前,关于 <code>引用</code> 的定义 :</p>
+<blockquote>
+<p>如果 <code>reference</code> 类型的数据存储的数值代表的是另一块内存的起始地址，就说这块内存代表一个引用。</p>
+</blockquote>
+<p>JDK1,2之后,又引入了 <code>强引用</code> ， <code>软引用</code> ， <code>弱引用</code> ， <code>虚引用</code> ,这四个概念，并且这四种表现的引用关系越来越弱。</p>
+<ul>
+<li>强引用(Strong Reference) :</li>
+</ul>
+<p>例:</p>
+<pre tabindex="0"><code>Object o = new Object();
+</code></pre><p><!-- raw HTML omitted -->只要强引用还在，GC永远不会回收掉被引用的对象。</p>
+<ul>
+<li>软引用(Soft Reference) :</li>
+</ul>
+<p>有用，但非必须，在将要发生内存溢出时，会把 <code>软引用</code> 的对象回收掉，如果内存依然不够用，则抛出OOM异常。</p>
+<ul>
+<li>弱引用(Weak Reference):</li>
+</ul>
+<p>非必需对象，只要GC发生了垃圾回收，不管此时内存是否充足， <code>弱引用</code> 的对象都会被回收掉。</p>
+<ul>
+<li>虚引用(Phantom Reference):
+<ul>
+<li>最弱的引用关系</li>
+<li>无法通过虚引用构造市实例。</li>
+<li>唯一的作用就是在虚引用关联的对象被GC回收掉时，可以接受到一个信号。</li>
+</ul>
+</li>
+</ul>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="4如何判断一个对象可回收已死">4，如何判断一个对象可回收(已死)？</h3>
+<p>一个对象仅仅通过上面说的可达性分析看它没有与GC ROOTS关联来判定这个对象是否可被回收是不够的。</p>
+<p>一个对象要经过下面一段判断过程来判断它是否要被回收(建议收藏(<em>^__^</em>) 嘻嘻……):</p>
+<p><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/6/17/16b64d8a43f0e816~tplv-t2oaga2asx-image.image" alt="image.png">
+<!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h2 id="heading-1"></h2>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="5方法区的回收">5，方法区的回收</h3>
+<p>上面我们说的是存在于Java堆中的对象的回收，但其实在方法区还要回收以下东西：</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h4 id="-回收废弃常量">① 回收废弃常量</h4>
+<p>假如常量池中有一个字符串 &ldquo;abc&rdquo; ,但是系统中没有一个String 对象指向它，也就是这个常量没有被引用，<!-- raw HTML omitted -->当GC在回收时会回收此字面量。</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h4 id="-回收废弃的类无用的类">② 回收废弃的类(无用的类)</h4>
+<ol>
+<li>该类的实例都已被回收，Java堆中不存在任何该类的实例。</li>
+<li>加载该类的ClassLoader已经被回收。</li>
+<li>该类的Java.lang.class对象没有被引用(在反射中会被用到这点)。</li>
+</ol>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h4 id="-方法区的回收策略">③ 方法区的回收策略:</h4>
+<p>GC在回收方法区时会采用一下2种方式:</p>
+<ul>
+<li>标记-整理</li>
+<li>标记-清除</li>
+</ul>
+<hr>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted -->
+<!-- raw HTML omitted --></p>
+<h2 id="二如何回收">二，如何回收？</h2>
+<p>GC在回收内存时会采用多种垃圾收集算法，这些算法各有优劣。</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="1标记-清除mark-sweep算法">1.标记-清除(Mark-Sweep)算法</h3>
+<p>此算法是最基础也是最古老的垃圾回收算法，该算法主要经过2个过程
+<!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h4 id="-算法描述">① 算法描述</h4>
+<ol>
+<li>标记阶段:经过
+<a href="https://www.yuque.com/henudada/kir653/hl39eo#fyTai" target="_blank" rel="noopener">如何判断一个对象可被回收</a>所述，对可被回收的对象进行标记。</li>
+<li>清除阶段:将被标记的对象统一回收。</li>
+</ol>
+<p><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/6/17/16b64d8a44d49bd2~tplv-t2oaga2asx-image.image" alt=""></p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h4 id="-算法缺陷">② 算法缺陷</h4>
+<ol>
+<li>效率问题:此种算法标记和清除的效率都不高。</li>
+<li>标记清除后产生大量不连续的内存空间碎片。</li>
+</ol>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="2复制copying算法">2.复制(Copying)算法</h3>
+<p>复制算法针对效率问题进行了优化，它将内存区域划分为2块，每次只使用其中一块。</p>
+<ul>
+<li>活动区域</li>
+<li>空闲区域</li>
+</ul>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h4 id="-算法描述-1">① 算法描述</h4>
+<p><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/6/17/16b64d8a46f2181b~tplv-t2oaga2asx-image.image" alt="image.png"></p>
+<p>如图:</p>
+<ul>
+<li>回收前 : 内存被划分为左右两侧区域，右侧为空闲区域，暂时不使用它</li>
+<li>回收时 : 将左侧要被回收的部分(黑色) 回收掉，然后将4个存活对象(淡灰色)移动到右侧的空闲区域，并且做了2件事
+<ul>
+<li>将移动到空闲区域的存活对象按内存地址进行排列。</li>
+<li>将存活对象指向的旧地址指向新内存地址。</li>
+</ul>
+</li>
+<li>回收后 : 原先的右侧空闲区域变为活动区域，左侧的活动区域变为空闲区域。</li>
+</ul>
+<p>左右两侧的区域状态在每一次回收后都来回转换&hellip;</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h4 id="-算法缺陷-1">② 算法缺陷</h4>
+<ol>
+<li>很显然，这种算法浪费了一般内存。</li>
+<li>当活动区域的100%的对象都还在活跃，那么在回收时需要将全部的对象复制到右侧的空闲区域，此时的效率就很低。</li>
+</ol>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h4 id="-算法应用">③ 算法应用</h4>
+<p>IBM公司经研究表明，Java堆新生代种的对象98%是 &lsquo;朝生夕死&rsquo; 的对象，比如临时变量等作用域很少的对象。<!-- raw HTML omitted -->所以现在的虚拟机并不会按照 1:1的比例划分两个区域。</p>
+<p><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/6/17/16b64d8a9103bd34~tplv-t2oaga2asx-image.image" alt="image.png"></p>
+<p>现在的JVM虚拟机中，将新生代划分为一块 <code>Eden</code> 区域，和2块较小的 <code>Survivor</code> 区域(from ,to区)。<!-- raw HTML omitted -->每次使用Eden区和1块Survivor区(from区)最为活动区域，当发生内存回收时，将这2块内存中的存活对象复制到另一块Survivor区(to区)。</p>
+<p>在 <code>HotSpot</code> 虚拟机中，Eden区和Survivor的划分是: 8: 1，这样，活动区域占新生代的 (8+1)/10 *100% = 90%，只有10%的内存浪费。</p>
+<p><strong>老年代</strong> : 当将存活对象从活动区域(Eden,from) 复制到 to区时，如果to区不够用，则将剩下的存活对象放到<strong>老年代。</strong><!-- raw HTML omitted --><strong><!-- raw HTML omitted --></strong>
+<!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="3标记-整理算法">3.标记-整理算法</h3>
+<p>标记-整理主要运用于老年代中。</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h4 id="-算法描述-2">① 算法描述</h4>
+<p><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/6/17/16b64d8aa34e6440~tplv-t2oaga2asx-image.image" alt="image.png"></p>
+<p>此算法与<strong>标记-清除算法</strong>类似，也是经历2个阶段:</p>
+<ol>
+<li>标记阶段:此阶段于标记-清除中的标记阶段相同，都是标记出要回收的对象。</li>
+<li>整理阶段:把所有存活的对像，按内存地址排列移动到内存区域的一端，将端边界以外的区域进行回收。</li>
+</ol>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h4 id="-算法应用-1">② 算法应用</h4>
+<p>由于老年代的特点，对象的存活率较高，没有额外的空闲区域，所以 老年代适用 标记-清除和标记-整理算法。</p>
+<!-- raw HTML omitted -->
+<p><em><strong>Reference</strong>:</em><!-- raw HTML omitted -->
+<a href="https://book.douban.com/subject/24722612/" target="_blank" rel="noopener">深入理解Java虚拟机</a></p>
+<p><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/6/17/16b64d8aa7475751~tplv-t2oaga2asx-image.image" alt="image.png"></p>
+
+        </div>
+        
+
+<footer>
+  <p class="meta">
+    <span class="byline author vcard">Posted by <span class="fn">Petrichor</span></span>
+    
+    <time>Jan 13, 2020</time>
+    
+      <span class="categories">
+        Tags:
+        
+          <a class="category" href="https://chenyongda2018.github.io/tags/java">Java</a>  <a class="category" href="https://chenyongda2018.github.io/tags/jvm">JVM</a>  
+    
+    </span>
+  </p>
+
+  
+
+  <p class="meta">
+    
+        <a class="basic-alignment left" href="https://chenyongda2018.github.io/posts/android/glide_study/" title="Glide学习笔记">Glide学习笔记</a>
+    
+
+    
+      <a class="basic-alignment right" href="https://chenyongda2018.github.io/posts/java/jvm%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%9B%9E%E6%94%B6%E7%AD%96%E7%95%A5%E9%80%89%E6%8B%A9-jvm%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B02/" title="JVM内存分配机制与回收策略选择 JVM学习笔记[2]">JVM内存分配机制与回收策略选择 JVM学习笔记[2]</a>
+    
+  </p>
+  
+</footer>
+
+      </article>
+    </div>
+    
+
+<aside class="sidebar thirds">
+  <section class="first odd">
+
+    
+
+    <p>
+      
+    </p>
+  </section>
+
+  
+  
+
+
+
+<ul class="sidebar-nav">
+  <li class="sidebar-nav-item">
+    <a target="_blank" rel="noopener noreferrer" href="https://github.com/chenyongda2018" title="https://github.com/chenyongda2018"><i class="fa fa-github fa-3x"></i></a>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+  
+  
+  </li>
+</ul>
+
+  
+
+  
+    
+      <section class="odd">
+        
+        
+          <li>
+            <a href="https://chenyongda2018.github.io/categories/" title="分类" >分类</a>
+          </li>
+        
+      </section>
+    
+  
+
+  
+  
+  
+    
+      <section class="even">
+        <h1>Recent Posts</h1>
+        <ul id="recent_posts">
+          
+          
+        </ul>
+      </section>
+    
+  
+</aside>
+
+  </div>
+</div>
+
+    <footer role="contentinfo">
+      <p>Copyright &copy; 2023 Petrichor - <a href="https://chenyongda2018.github.io/license/">License</a> -
+        <span class="credit">Powered by <a target="_blank" href="https://gohugo.io" rel="noopener noreferrer">Hugo</a> and <a target="_blank" href="https://github.com/parsiya/hugo-octopress/" rel="noopener noreferrer">Hugo-Octopress</a> theme.
+      </p>
+    </footer>
+
+    
+    
+
+
+
+    
+    
+    
+
+    
+  </body>
+</html>
+

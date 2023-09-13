@@ -1,3 +1,6 @@
+
+
+
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
@@ -14,7 +17,7 @@
   
 
   
-  <title>Android颜色格式区别</title>
+  <title>OCR</title>
 
   
   
@@ -33,7 +36,7 @@
   
 
   
-  
+  <link href="/tags/ocr/index.xml" rel="alternate" type="application/rss+xml" title="Petrichor&#39;s blog" />
 
   <meta name="description" content="" />
   <meta name="keywords" content="">
@@ -105,86 +108,47 @@
 <div id="main">
   <div id="content">
     <div>
-      <article class="hentry" role="article">
-
-        
-        
-
-<header>
-  <p class="meta">Sep 13, 2022
-     - 1 minute read 
-    
-
-    
-    
-      - <a class="label" href="https://chenyongda2018.github.io/categories/android/">Android </a>
-    
-  </p>
-  <h1 class="entry-title">
-     Android颜色格式区别 
-  </h1>
-</header>
-
-
-        <div class="entry-content">
+      <article role="article">
+        <header>
+          <h1 class="entry-title">
+            Tag: OCR
+          </h1>
+        </header>
+        <div id="blog-archives" class="category">
           
-          
-          
-          <h3 id="argb">ARGB</h3>
-<p>A 是 alpha，透明度。
-RGB 是 Red、Green、Blue，红色、绿色、蓝色，三种原色。</p>
-<h4 id="bitmapconfig-有四种枚举类型">Bitmap.Config 有四种枚举类型。</h4>
-<ul>
-<li><strong>ARGB_8888</strong>：ARGB 四个通道的值都是 8 位，加起来 32 位，也就是 4 个字节。每个像素点占用 4 个字节的大小。</li>
-<li><strong>ARGB_4444</strong>：ARGB 四个通道的值都是 4 位，加起来 16 位，也就是 2 个字节。每个像素点占用 2 个字节的大小。</li>
-<li><strong>RGB_565</strong>：RGB 三个通道分别是 5 位、6 位、5 位，没有 A 通道，加起来 16 位，也就是 2 个字节。每个像素点占用 2 个字节的大小。</li>
-<li><strong>ALPHA_8</strong>：只有 A 通道，占 8 位，1 个字节。每个像素点占用 1 个字节的大小。</li>
-</ul>
-<h4 id="那到底用哪个呢">那到底用哪个呢？</h4>
-<p>很明显 ARGB_8888 的图片是质量最高的，但也是占用内存最大的。</p>
-<p>如果想要节省内存，可以使用 ARGB_4444 或者 RGB_565。它们相比 ARGB_8888 内存占用都小了一半。
-ARGB_4444 图片的失真是比较严重的。
-RGB_565 图片的失真虽然很小，但是没有透明度。</p>
-<p>ALPHA_8 只有透明度，没有颜色值。对于在图片上设置遮盖的效果的是有很有用。</p>
-<p>总结一下！
-ARGB_4444 图片失真严重，基本不用！
-ALPHA_8 使用场景比较特殊！
-如果不设置透明度，RGB_565是个不错选择！
-既要设置透明度，对图片质量要求又高的化，那就用 ARGB_8888 !</p>
+          <h2>
+            2019
+          </h2>
+          <article>
+            <h1>
+              <a href="https://chenyongda2018.github.io/posts/android/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%9C%A8android%E4%B8%AD%E8%B0%83%E7%94%A8%E7%99%BE%E5%BA%A6%E7%9A%84ocr%E6%8E%A5%E5%8F%A3%E7%9A%84%E7%BB%8F%E5%8E%86/" title="记一次在Android中调用百度的OCR接口的经历">记一次在Android中调用百度的OCR接口的经历</a>
+            </h1>
+            <time>
+              <span class="month">May</span>
+              <span class="day">10</span>
+            </time>
+            <footer>
+              <span class="categories"> 
+                
+                
+                posted in:
+                 <a class="category" href="https://chenyongda2018.github.io/categories/android">Android</a> <a class="category" href="https://chenyongda2018.github.io/categories/ocr">OCR</a>
+              </br>
+                
 
+                
+                
+                tags:
+                 <a class="category" href="https://chenyongda2018.github.io/tags/android">Android</a> <a class="category" href="https://chenyongda2018.github.io/tags/ocr">OCR</a>
+                
+              </span>
+            </footer>
+          </article>
+          
         </div>
-        
-
-<footer>
-  <p class="meta">
-    <span class="byline author vcard">Posted by <span class="fn">Petrichor</span></span>
-    
-    <time>Sep 13, 2022</time>
-    
-      <span class="categories">
-        Tags:
-        
-          <a class="category" href="https://chenyongda2018.github.io/tags/bitmap">Bitmap</a>  
-    
-    </span>
-  </p>
-
-  
-
-  <p class="meta">
-    
-        <a class="basic-alignment left" href="https://chenyongda2018.github.io/posts/android/android_memory_leak/" title="Android内存泄漏探究">Android内存泄漏探究</a>
-    
-
-    
-      <a class="basic-alignment right" href="https://chenyongda2018.github.io/posts/android/eventbus%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3%E5%8F%8A%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" title="EventBus使用详解及源码解析">EventBus使用详解及源码解析</a>
-    
-  </p>
-  
-</footer>
-
       </article>
     </div>
+
     
 
 <aside class="sidebar thirds">

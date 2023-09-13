@@ -6,7 +6,22 @@
     <description>Recent content in Android on Petrichor&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 14 May 2022 15:26:58 +0800</lastBuildDate><atom:link href="https://chenyongda2018.github.io/tags/android/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 05 Jan 2023 20:29:31 +0800</lastBuildDate><atom:link href="https://chenyongda2018.github.io/tags/android/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>EventBus使用详解及源码解析</title>
+      <link>https://chenyongda2018.github.io/posts/android/eventbus%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3%E5%8F%8A%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/</link>
+      <pubDate>Thu, 05 Jan 2023 20:29:31 +0800</pubDate>
+      
+      <guid>https://chenyongda2018.github.io/posts/android/eventbus%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3%E5%8F%8A%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/</guid>
+      <description>EventBus是一个消息订阅/发布的开源框架。
+如上图所示 , EventBus框架中主要有2个角色 :
+Publisher : 发布消息的, 被观察者 Subscriber : 接收消息的 , 观察者 Publisher(被观察者) 通过 post() 将一个事件/消息(Event) 发送到事件的集中地,也就是图中的 EventBus ，EventBus 再将事件/消息(Event)发给Subcriber观察者。
+使用这样的框架，能够使Activity/Fragment等组件之间的通信简化 , 不用再像以前一直使用 intent 来传送数据 , 从而提升开发效率。
+1.配置依赖 在app层的 build.gradle 中添加 :
+implementation &amp;#39;org.greenrobot:eventbus:3.1.1&amp;#39; 2.初步使用 根据官方文档 , 首先要定义一个Event(消息)的POJO类 :
+public class MessageEvent { private String message ; public MessageEvent(String message) { this.message = message; } public String getMessage() { return message; } public void setMessage(String message) { this.message = message; } } 然后 , 我们要明确哪个组件是 Subsriber(观察者), 哪个组件是Publisher(被观察者) , 在这里 , 我们通过EventBus演示一个传送消息的demo。</description>
+    </item>
+    
     <item>
       <title>Android内存泄漏探究</title>
       <link>https://chenyongda2018.github.io/posts/android/android_memory_leak/</link>
@@ -65,6 +80,63 @@ public interface OnClickListener { void onClick(View v); } 我们在给View设�
       <description>一.使用 1.配置依赖 在 app 层 build.gradle 中添加依赖 : dependencies { ... implementation &amp;#39;com.github.bumptech.glide:glide:4.9.0&amp;#39; annotationProcessor &amp;#39;com.github.bumptech.glide:compiler:4.9.0&amp;#39; annotationProcessor &amp;#39;androidx.annotation:annotation:1.1.0&amp;#39; ... } 添加必要权限 : &amp;lt;uses-permission android:name=&amp;#34;android.permission.INTERNET&amp;#34;/&amp;gt; &amp;lt;uses-permission android:name=&amp;#34;android.permission.ACCESS_NETWORK_STATE&amp;#34;/&amp;gt; &amp;lt;uses-permission android:name=&amp;#34;android.permission.READ_EXTERNAL_STORAGE&amp;#34; /&amp;gt; &amp;lt;uses-permission android:name=&amp;#34;android.permission.WRITE_EXTERNAL_STORAGE&amp;#34; /&amp;gt; 2.初步上手 代码 : Glide.with(context) .asBitmap() //把动图当作静止图片处理,也就是只显示gif图的第一帧 .load(&amp;#34;https://pic2.zhimg.com/v2-c4970ee756c55333b7b871c5b617d9ed_b.gif&amp;#34;)//图片url .placeholder(R.mipmap.ic_launcher) //占位符,在加载图片完成之前显示的图片 .error(R.drawable.ic_launcher_background) //加载失败时显示的图片 .fitCenter() //当图片长宽大于ImageView时,缩放图片 .fallback(R.mipmap.ic_launcher) //图片url为Null时显示的图片 .into(image1); // 放入到ImageView中 效果图 :
 🎈Tips : fitCenter()与CenterCrop()区别 : fitCenter() : 效果如上图,缩放原图至ImageView大小。 CenterCrop():如下图,保持原图不变，只根据ImageView大小显示对应部分。 3.配合RecyclerView显示图片列表 1.需要加载的图片url数据源
 String[] mImageList = { &amp;#34;https://gss0.bdstatic.com/94o3dSag_xI4khGkpoWK1HF6hhy/baike/crop%3D0%2C231%2C438%&amp;#34; + &amp;#34;2C219%3BeWH%3D800%2C400/sign=b9c61bb42b3fb80e189e3b970be1031c/d50735fae6cd7b89267e2d06052442a7d9330e20.jpg&amp;#34;, &amp;#34;https://s3.ifanr.com/wp-content/uploads/2018/02/https_2F2Fhk.hypebeast.com2Ffiles2F20182F012Fdragon-ball-super-ending-anime-details-01-1.jpg&amp;#34;, &amp;#34;https://gss2.bdstatic.com/-fo3dSag_xI4khGkpoWK1HF6hhy/baike/s%3D220/sign=999dccfe8082b90139adc431438ca97e/a1ec08fa513d26970f8fef845ffbb2fb4216d88f.jpg&amp;#34;, &amp;#34;http://img5.</description>
+    </item>
+    
+    <item>
+      <title>记一次在Android中调用百度的OCR接口的经历</title>
+      <link>https://chenyongda2018.github.io/posts/android/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%9C%A8android%E4%B8%AD%E8%B0%83%E7%94%A8%E7%99%BE%E5%BA%A6%E7%9A%84ocr%E6%8E%A5%E5%8F%A3%E7%9A%84%E7%BB%8F%E5%8E%86/</link>
+      <pubDate>Fri, 10 May 2019 20:25:04 +0800</pubDate>
+      
+      <guid>https://chenyongda2018.github.io/posts/android/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%9C%A8android%E4%B8%AD%E8%B0%83%E7%94%A8%E7%99%BE%E5%BA%A6%E7%9A%84ocr%E6%8E%A5%E5%8F%A3%E7%9A%84%E7%BB%8F%E5%8E%86/</guid>
+      <description>前言 最近实验室开了个新项目，是一个通过扫描单词后把扫描过的单词生成游戏来让小朋友记单词的APP，扫描单词这个功能需要用到OCR.
+现在常用的OCR有
+Tesseract 这个用的人比较多，而且开源，目前google正在维护，但是我尝试了一下，发现识别准确率不是特别理想。
+微软的Azure上的认知服务 识别率很高，但是收费，现在有1元体验的套餐，而且不需要验证信用卡，感兴趣的同学可以试试。
+百度的文字识别 之所以用这个是因为免费，不过有每天的限制次数，对于学生项目来说够用，还要什么自行车。
+下面进入正文
+如何在Android 中调用百度的OCR进行文字识别 1.获取百度文字识别产品服务的 Ak/Sk 1.在百度AI开放平台中进入控制台
+2.找到文字识别 产品服务
+3,创建应用
+4,填写信息，注意这里的包名一定要和项目的包名一致
+5.获得AK/SK
+6.下载license文件，在项目中如果直接用AK/SK明文调用百度的OCR，很不安全，可能会被别人反编译之后获得你的AK.SK
+license文件集成了AK/SK 放在项目中可以防止别人破解。 7.下载之后将获得的api.license文件放入main目录下的assets目录中
+2.添加百度OCR的SDK到项目中 1.下载 百度OCR的android Sdk
+2.下载的SDK压缩包将其解压，并将libs下的ocr-sdk的jar包放入项目的libs目录下 3.在main目录下新建jniLibs目录，并将libs文件夹中的其他文件放入其中
+4.在app下的build,gradle中添加
+将添加在libs下的sdk JAR包编译
+5.这里下载的压缩包中包括了百度提供的相机扫描时的UI，在拍完照有裁剪框，比较方便，这里我们可以作为module引入项目中 3.调用百度OCR 做完准备工作我们就可以开始调用百度的OCR接口了。
+首先在我们需要进行识别的页面所在的文件中创建 根据License文件初始化OCR实例的函数，并在onCreate()方法中调用
+/** * 自定义license的文件路径和文件名称，以license文件方式初始化 */ private void initAccessTokenLicenseFile() { OCR.getInstance(mActivity.getApplicationContext()).initAccessToken(new OnResultListener&amp;lt;AccessToken&amp;gt;() { @Override public void onResult(AccessToken accessToken) { String token = accessToken.getAccessToken(); Log.d(TAG,token); hasGotToken = true; } @Override public void onError(OCRError error) { error.</description>
+    </item>
+    
+    <item>
+      <title>Android消息机制全面解析</title>
+      <link>https://chenyongda2018.github.io/posts/android/android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90/</link>
+      <pubDate>Fri, 19 Apr 2019 20:27:16 +0800</pubDate>
+      
+      <guid>https://chenyongda2018.github.io/posts/android/android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90/</guid>
+      <description>(1),Android消息机制概述 Android中的消息机制主要指 Handler的运行机制 以及 MessageQueue，Looper的工作过程 ，三者相互协作，保证着消息的接收，发送，处理，执行。
+​ 图片来自郭神的《第一行代码》
+先简单的介绍一下 Android 中 消息机制大家庭的主要成员 :
+Handler : 是Android消息机制的上层接口，最为大家常用，相当于Android消息机制的入口，我们通过使用Handler发送消息来引起消息机制的循环。通常用于:在子线程执行完耗时任务完后，更新UI。
+MessageQueue : 存储 消息(Message) 对象的消息队列，实则是单链表结构.
+Looper : 用于无限的从 MessageQueue中取出消息，相当于消息的永动机，如果有新的消息，则处理执行，若没有，则就一直等待，堵塞。Looper** 所在的线程是 创建 Handler 时所在的线程。
+主线程创建Handler时，会自动创建一个Looper,但是子线程并不会自动创建Looper
+ThreadLocal : 在每个线程互不干扰的存储，提供数据，以此来获取当前线程的Looper
+ActivityThread : Android 的主线程，也叫UI线程，主线程被创建时 自动初始化主线程的 Looper对象。
+问题 : 大家都知道只有在UI线程才能对UI元素进行操作，在子线程更改UI就会报错，为什么？ 看完《Android艺术开发探索》 这本书的第10章之后我也才明白
+Android中的UI控件不是线程安全的，如果在子线程中也能修改UI元素，那多线程的时，共同访问同一个UI元素，就会导致这个UI元素处于我们不可预知的状态，这个线程让它往左一点，那个线程让它往右一点，UI该听谁的，好tm乱。。 干脆我就只听主线程的把。 问题 : 那为什么不通过对访问UI控件的子线程加上锁机制呢 ？ 这个很简单了，如果为不同的线程访问同一UI元素加上锁机制，那我们程序员写相关代码的时候会变得超级麻烦。。。 改个UI还得考虑它是不是已经被别的线程占用了，被占用了，还得让那个线程释放锁。。。线程再多一点的话，大大地加大了程序员地工作量.
+而且加上锁机制无疑会由于线程堵塞地原因降低访问UI的效率，帧率降低，体验也会不友好。
+让UI元素只能再主线程访问就会省下很多事，创建一个Handler就行了。
+下面从整体概述一下 消息机制的整个工作过程 :
+Handler 创建时会采用当前线程的 Looper来构建内部的消息循环系统，如果Handler在子线程，则一开始是没有Looper对象的(解决方法稍后介绍)，主线程ActivityThread默认有一个Looper。
+Handler创建完毕，通过 post方法传入Runnable对象，或者通过sendMessage(Message msg)发送消息。
+post()方法里也是通过调用send()实现的
+send()方法被调用后，调用 MessageQueue的enqueueMessage()方法将消息发送到消息队列中，等待被处理。
+Looper对象运行在Handler所在的线程，从MessageQueue消息队列中不断地取出消息，处理，所以业务逻辑(通常是更新UI)就运行在Looper的线程中。
+接下来从局部来分析消息机制的每个成员。
+(2),ThreadLocal 工作原理 1, 什么是ThreadLocal？ ThreadLocal是一个线程内部的数据存储类，通过它可以在指定的线程中获得存储数据，获得数据，线程之间的ThreadLocal相互独立，且无法获得另一个线程的TheadLocal.</description>
     </item>
     
   </channel>

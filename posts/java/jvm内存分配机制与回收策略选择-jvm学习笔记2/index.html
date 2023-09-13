@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1">
+
+  
+    
+    
+      <link href="/css/fonts.css" rel="stylesheet" type="text/css">
+    
+  
+
+  
+  <title>JVM内存分配机制与回收策略选择 JVM学习笔记[2]</title>
+
+  
+  
+  <link rel="stylesheet" href="/css/hugo-octopress.css">
+
+  
+  
+
+  
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+  
+
+  
+  
+    <link href="https://chenyongda2018.github.io/newfav.png" rel="icon">
+  
+
+  
+  
+
+  <meta name="description" content="" />
+  <meta name="keywords" content="">
+  <meta name="author" content="Petrichor">
+
+  
+  <meta name="generator" content="Hugo 0.115.1">
+
+  
+  
+
+  
+  
+
+
+
+</head>
+<body>
+
+
+<header role="banner">
+<hgroup>
+  
+  <h1><a href="https://chenyongda2018.github.io/">Petrichor&#39;s blog</a></h1>
+    <h2>Android developer.</h2>
+</hgroup></header>
+
+
+<nav role="navigation">
+<fieldset class="mobile-nav">
+  
+  <select onchange="location = this.value;">
+    <option value="">Navigate…</option>
+      
+        <option value="https://chenyongda2018.github.io/">» 主页</option>
+      
+  </select>
+</fieldset>
+
+
+<ul class="main-navigation">
+  
+  
+    
+      <li><a href="https://chenyongda2018.github.io/" title="主页">主页</a></li>
+    
+  
+</ul>
+
+<ul class="subscription">
+  
+    
+        <a href="https://chenyongda2018.github.io/index.xml" target="_blank" type="application/rss+xml" title="RSS" rel="noopener noreferrer"><i class="fa fa-rss-square fa-lg"></i></a>
+    
+  
+</ul>
+
+
+  <form action="https://www.google.com/search" method="get" target="_blank" rel="noopener noreferrer">
+    <fieldset role="search">
+      <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+      <input type="hidden" name="q" value="site:https://chenyongda2018.github.io/" />
+    </fieldset>
+  </form>
+
+</nav>
+
+
+<div id="main">
+  <div id="content">
+    <div>
+      <article class="hentry" role="article">
+
+        
+        
+
+<header>
+  <p class="meta">Apr 13, 2020
+     - 1 minute read 
+    
+
+    
+    
+      - <a class="label" href="https://chenyongda2018.github.io/categories/java/">Java </a>
+    
+  </p>
+  <h1 class="entry-title">
+     JVM内存分配机制与回收策略选择 JVM学习笔记[2] 
+  </h1>
+</header>
+
+
+        <div class="entry-content">
+          
+          
+          
+          <blockquote>
+<p>Java体系中的自动内存管理主要包括了2个方面:</p>
+<ol>
+<li>自动地给对象分配内存。</li>
+<li>自动地回收分配给对象地内存。</li>
+</ol>
+</blockquote>
+<p>本文也围绕这两个点展开
+<!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h2 id="一-内存分配规则">一. 内存分配规则</h2>
+<p><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/6/24/16b8975973c1114c~tplv-t2oaga2asx-image.image" alt=""></p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="1优先在eden区分配">1.优先在Eden区分配</h3>
+<p>大多数情况下，JVM会在 <code>Eden</code> 区优先分配对象，如果 <code>Eden</code> 没有足够的空间，则进行一次 <code>Minor GC</code> 。通过参数 <code>-XX:+PrintGCDetails</code> 可以让虚拟机在进行垃圾回收时打印日志，方便我们看到回收前后的内存占用情况。</p>
+<p>例: 假如现在内存大小指定如下:</p>
+<ul>
+<li>新生代 -&gt;10M
+<ul>
+<li>Eden区 -&gt; 8M</li>
+<li>from区 -&gt; 1M</li>
+<li>to 区 -&gt; 1M</li>
+</ul>
+</li>
+<li>老年代 -&gt; 10M</li>
+</ul>
+<p>然后我们又先后在代码中创建4个对象:</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#dc322f">byte</span><span style="color:#719e07">[]</span> byte1 <span style="color:#719e07">=</span> <span style="color:#719e07">new</span> <span style="color:#dc322f">byte</span><span style="color:#719e07">[</span><span style="color:#2aa198">2</span>MB<span style="color:#719e07">];</span>
+</span></span><span style="display:flex;"><span><span style="color:#dc322f">byte</span><span style="color:#719e07">[]</span> byte2 <span style="color:#719e07">=</span> <span style="color:#719e07">new</span> <span style="color:#dc322f">byte</span><span style="color:#719e07">[</span><span style="color:#2aa198">2</span>MB<span style="color:#719e07">];</span>
+</span></span><span style="display:flex;"><span><span style="color:#dc322f">byte</span><span style="color:#719e07">[]</span> byte3 <span style="color:#719e07">=</span> <span style="color:#719e07">new</span> <span style="color:#dc322f">byte</span><span style="color:#719e07">[</span><span style="color:#2aa198">2</span>MB<span style="color:#719e07">];</span>
+</span></span><span style="display:flex;"><span><span style="color:#dc322f">byte</span><span style="color:#719e07">[]</span> byte4 <span style="color:#719e07">=</span> <span style="color:#719e07">new</span> <span style="color:#dc322f">byte</span><span style="color:#719e07">[</span><span style="color:#2aa198">4</span>MB<span style="color:#719e07">];</span>
+</span></span></code></pre></div><p>当创建完第三个对象后，Eden区已经用掉了6M的空间来存放 byte1,byte2,byte3 三个对象，再创建第四个对象时,Eden区加上一个from区已经放不下了，如先前所述，此时会触发一次 <code>MinorGC</code> ,将三个2MB的对象转移到老年代中，腾出Eden区的空间给 第四个对象。</p>
+<p>所以，执行后的内存情况如下:</p>
+<ul>
+<li>新生代 -&gt; 10M 
+<ul>
+<li>Eden 区 -&gt; 8M (剩余4M) 存放 byte4</li>
+<li>from区  -&gt; 1M</li>
+<li>to区      -&gt; 1M</li>
+</ul>
+</li>
+<li>老年代 -&gt; 10M (剩余4M) 存放byte1,byte2,byte3。</li>
+</ul>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="2大对象直接进入老年代">2.大对象直接进入老年代</h3>
+<p>通过 <code>-XX:PretentureSizeThreshold</code> 参数设置大于这个值的对象直接分配到老年代。</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h3 id="3长期存活的对象进入老年代">3.长期存活的对象进入老年代</h3>
+<blockquote>
+<p>怎么算是长期存活 ?</p>
+</blockquote>
+<p>JVM给每个对象定义了一个 <code>对象年龄计数器</code> 。当对象一开始被分配到新生代Eden区，经过一次  <code>MniorGC</code> <!-- raw HTML omitted -->后仍然存活，并且Survivor区能够容纳它，则此对象被转移到 <code>Survivor</code> 区，年龄变为1。<!-- raw HTML omitted -->在 <code>Survivor</code> 区中的对象没熬过一次 <code>MniorGC</code> ,年龄就涨1，当年龄达到我们设定的年龄阈值(JVM默认设定15)时，就会进入老年代。15岁就已经步入老年&hellip;.<!-- raw HTML omitted -->年龄阈值可通过参数 <code>-XX:MaxTenuringThreshold = 指定值</code> 来设定。<!-- raw HTML omitted --></p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h4 id="对对象年龄判定的优化">对对象年龄判定的优化</h4>
+<p>JVM中，如果<strong>Survivor区</strong>中的<strong>相同年龄</strong>的<strong>所有对象的大小</strong>总和大于<strong>Survivor空间</strong>的一半，那么这些同窗们就直接进入老年代。无须等到上面的年龄阈值。<!-- raw HTML omitted -->
+<!-- raw HTML omitted --></p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h2 id="二-空间分配担保机制与回收策略mnior-gc还是full-gc">二. 空间分配担保机制与回收策略(Mnior GC还是Full GC)</h2>
+<p>首先介绍一下 <code>Mnior GC</code>  和 <code>Full GC</code>  的区别:</p>
+<blockquote>
+<p>MniorGC :  发生在新生代的垃圾回收活动，由于新生代的Java对象 短命的特性，这种垃圾回收活动频繁，回收速度较快。(就像扫碎纸屑)
+Full GC : 发生在老年的垃圾回收活动，不过出现一次  Full GC,也会伴随着一次 MniorGC,由于老年代中的对象基本都是大对象，长命，所以Full GC的速度比Mnior GC 的速度慢10倍以上。(就像搬大石头)</p>
+</blockquote>
+<p>新生代的垃圾回收算法采用的是 
+<a href="https://www.yuque.com/henudada/kir653/hl39eo#vxPl5" target="_blank" rel="noopener">复制算法</a> ,当进行一次 <code>Mnior GC</code> 时，会将新生代的活动区域( <code>Eden区</code> 和Survivor中的 <code>From区</code> )中的存活对象复制到 Survivor中的 <code>to区</code> ,如果 to 区的内存不足以放下这些对象，那么这时就需要老年代出马，进行分配担保机制,将放不下的对象放到老年代。<!-- raw HTML omitted -->    所以，在进行 <code>Monior GC</code>  前，JVM会做以下流程的检查，以确认老年代是否能够放得下那些对象，来选择进行 <code> Mnior GC</code>  还是  <code>Full GC</code> 。</p>
+<p><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/6/24/16b8975970bb9584~tplv-t2oaga2asx-image.image" alt="image.png"></p>
+<p><em>Reference:</em><!-- raw HTML omitted -->
+<a href="https://book.douban.com/subject/24722612/" target="_blank" rel="noopener">深入理解Java虚拟机</a> </p>
+<p><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/6/24/16b897598641ce69~tplv-t2oaga2asx-image.image" alt="image.png"></p>
+
+        </div>
+        
+
+<footer>
+  <p class="meta">
+    <span class="byline author vcard">Posted by <span class="fn">Petrichor</span></span>
+    
+    <time>Apr 13, 2020</time>
+    
+      <span class="categories">
+        Tags:
+        
+          <a class="category" href="https://chenyongda2018.github.io/tags/java">Java</a>  <a class="category" href="https://chenyongda2018.github.io/tags/jvm">JVM</a>  
+    
+    </span>
+  </p>
+
+  
+
+  <p class="meta">
+    
+        <a class="basic-alignment left" href="https://chenyongda2018.github.io/posts/java/%E5%AF%B9%E8%B1%A1%E5%9B%9E%E6%94%B6%E5%88%A4%E5%AE%9A%E4%B8%8E%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%AE%97%E6%B3%95-jvm%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B01/" title="对象回收判定与垃圾回收算法 JVM学习笔记[1]">对象回收判定与垃圾回收算法 JVM学习笔记[1]</a>
+    
+
+    
+      <a class="basic-alignment right" href="https://chenyongda2018.github.io/posts/android/kotlin_lamdba/" title="Kotlin Lambda">Kotlin Lambda</a>
+    
+  </p>
+  
+</footer>
+
+      </article>
+    </div>
+    
+
+<aside class="sidebar thirds">
+  <section class="first odd">
+
+    
+
+    <p>
+      
+    </p>
+  </section>
+
+  
+  
+
+
+
+<ul class="sidebar-nav">
+  <li class="sidebar-nav-item">
+    <a target="_blank" rel="noopener noreferrer" href="https://github.com/chenyongda2018" title="https://github.com/chenyongda2018"><i class="fa fa-github fa-3x"></i></a>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+  
+  
+  </li>
+</ul>
+
+  
+
+  
+    
+      <section class="odd">
+        
+        
+          <li>
+            <a href="https://chenyongda2018.github.io/categories/" title="分类" >分类</a>
+          </li>
+        
+      </section>
+    
+  
+
+  
+  
+  
+    
+      <section class="even">
+        <h1>Recent Posts</h1>
+        <ul id="recent_posts">
+          
+          
+        </ul>
+      </section>
+    
+  
+</aside>
+
+  </div>
+</div>
+
+    <footer role="contentinfo">
+      <p>Copyright &copy; 2023 Petrichor - <a href="https://chenyongda2018.github.io/license/">License</a> -
+        <span class="credit">Powered by <a target="_blank" href="https://gohugo.io" rel="noopener noreferrer">Hugo</a> and <a target="_blank" href="https://github.com/parsiya/hugo-octopress/" rel="noopener noreferrer">Hugo-Octopress</a> theme.
+      </p>
+    </footer>
+
+    
+    
+
+
+
+    
+    
+    
+
+    
+  </body>
+</html>
+

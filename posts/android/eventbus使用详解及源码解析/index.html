@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1">
+
+  
+    
+    
+      <link href="/css/fonts.css" rel="stylesheet" type="text/css">
+    
+  
+
+  
+  <title>EventBus使用详解及源码解析</title>
+
+  
+  
+  <link rel="stylesheet" href="/css/hugo-octopress.css">
+
+  
+  
+
+  
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+  
+
+  
+  
+    <link href="https://chenyongda2018.github.io/newfav.png" rel="icon">
+  
+
+  
+  
+
+  <meta name="description" content="" />
+  <meta name="keywords" content="">
+  <meta name="author" content="Petrichor">
+
+  
+  <meta name="generator" content="Hugo 0.115.1">
+
+  
+  
+
+  
+  
+
+
+
+</head>
+<body>
+
+
+<header role="banner">
+<hgroup>
+  
+  <h1><a href="https://chenyongda2018.github.io/">Petrichor&#39;s blog</a></h1>
+    <h2>Android developer.</h2>
+</hgroup></header>
+
+
+<nav role="navigation">
+<fieldset class="mobile-nav">
+  
+  <select onchange="location = this.value;">
+    <option value="">Navigate…</option>
+      
+        <option value="https://chenyongda2018.github.io/">» 主页</option>
+      
+  </select>
+</fieldset>
+
+
+<ul class="main-navigation">
+  
+  
+    
+      <li><a href="https://chenyongda2018.github.io/" title="主页">主页</a></li>
+    
+  
+</ul>
+
+<ul class="subscription">
+  
+    
+        <a href="https://chenyongda2018.github.io/index.xml" target="_blank" type="application/rss+xml" title="RSS" rel="noopener noreferrer"><i class="fa fa-rss-square fa-lg"></i></a>
+    
+  
+</ul>
+
+
+  <form action="https://www.google.com/search" method="get" target="_blank" rel="noopener noreferrer">
+    <fieldset role="search">
+      <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+      <input type="hidden" name="q" value="site:https://chenyongda2018.github.io/" />
+    </fieldset>
+  </form>
+
+</nav>
+
+
+<div id="main">
+  <div id="content">
+    <div>
+      <article class="hentry" role="article">
+
+        
+        
+
+<header>
+  <p class="meta">Jan 5, 2023
+     - 7 minute read 
+    
+
+    
+    
+      - <a class="label" href="https://chenyongda2018.github.io/categories/android/">Android </a>
+    
+  </p>
+  <h1 class="entry-title">
+     EventBus使用详解及源码解析 
+  </h1>
+</header>
+
+
+        <div class="entry-content">
+          
+          
+          
+          <p>EventBus是一个消息订阅/发布的开源框架。</p>
+<p><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/11/15/16e6cfac7adeac21~tplv-t2oaga2asx-image.image" alt=""></p>
+<p>如上图所示 , EventBus框架中主要有2个角色 :</p>
+<ul>
+<li>Publisher : 发布消息的, 被观察者</li>
+<li>Subscriber : 接收消息的 , 观察者</li>
+</ul>
+<p><code>Publisher(被观察者)</code> 通过 <code>post()</code> 将一个事件/消息(<code>Event</code>) 发送到事件的集中地,也就是图中的 <code>EventBus</code> ，<code>EventBus</code> 再将事件/消息(<code>Event</code>)发给<code>Subcriber</code>观察者。</p>
+<p>使用这样的框架，能够使Activity/Fragment等组件之间的通信简化 , 不用再像以前一直使用 <code>intent</code> 来传送数据 , 从而提升开发效率。</p>
+<h2 id="1配置依赖">1.配置依赖</h2>
+<p>在app层的 <code>build.gradle</code> 中添加 :</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>implementation &#39;org<span style="color:#719e07">.</span>greenrobot<span style="color:#719e07">:</span>eventbus<span style="color:#719e07">:</span><span style="color:#2aa198">3.1.1</span>&#39;
+</span></span></code></pre></div><h2 id="2初步使用">2.初步使用</h2>
+<p>根据官方文档 , 首先要定义一个<code>Event(消息)</code>的POJO类 :</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">public</span> <span style="color:#268bd2">class</span> <span style="color:#268bd2">MessageEvent</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">private</span>  String message <span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">public</span> <span style="color:#268bd2">MessageEvent</span><span style="color:#719e07">(</span>String message<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">this</span><span style="color:#719e07">.</span>message <span style="color:#719e07">=</span> message<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">public</span> String <span style="color:#268bd2">getMessage</span><span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">return</span> message<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">setMessage</span><span style="color:#719e07">(</span>String message<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">this</span><span style="color:#719e07">.</span>message <span style="color:#719e07">=</span> message<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>然后 , 我们要明确哪个组件是 <code>Subsriber(观察者)</code>,  哪个组件是<code>Publisher(被观察者)</code> ,  在这里 , 我们通过EventBus演示一个传送消息的demo。</p>
+<p><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/11/15/16e6cfabf89f1600~tplv-t2oaga2asx-image.image" alt=""></p>
+<p>首先 , 观察者要注册EventBus , 在这里 因为当前活动就是接收消息的,所以当前活动就是 <code>观察者(接收事件的一方)</code> ,</p>
+<p>并且用 <code>@Subscribe</code> 注解定义一个处理接收事件的方法 ， 这里我们简单地把收到的事件内容用Toast弹出。</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">public</span> <span style="color:#268bd2">class</span> <span style="color:#268bd2">ToastActivity</span> <span style="color:#268bd2">extends</span> AppCompatActivity <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">protected</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onCreate</span><span style="color:#719e07">(</span>Bundle savedInstanceState<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">super</span><span style="color:#719e07">.</span>onCreate<span style="color:#719e07">(</span>savedInstanceState<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        setContentView<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>layout<span style="color:#719e07">.</span>activity_toast<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">//注册
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>        EventBus<span style="color:#719e07">.</span>getDefault<span style="color:#719e07">().</span>register<span style="color:#719e07">(</span><span style="color:#719e07">this</span><span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">protected</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onDestroy</span><span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">//解除注册
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>        EventBus<span style="color:#719e07">.</span>getDefault<span style="color:#719e07">().</span>unregister<span style="color:#719e07">(</span><span style="color:#719e07">this</span><span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">super</span><span style="color:#719e07">.</span>onDestroy<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>     <span style="color:#586e75">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">     * 接收事件
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">     * @param msg
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">     */</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">@Subscribe</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onMessageEvent</span><span style="color:#719e07">(</span>Message msg<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        Toast<span style="color:#719e07">.</span>makeText<span style="color:#719e07">(</span><span style="color:#719e07">this</span><span style="color:#719e07">,</span> msg<span style="color:#719e07">.</span>getMessage<span style="color:#719e07">(),</span> Toast<span style="color:#719e07">.</span>LENGTH_SHORT<span style="color:#719e07">).</span>show<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>最后 , 我们要实现点击按钮,通过EventBus发送事件 , 所以当前活动也作为被 <code>观察者(发送事件的一方)</code> , 发送消息通过 <code>post()</code> 即可。</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">public</span> <span style="color:#268bd2">class</span> <span style="color:#268bd2">ToastActivity</span> <span style="color:#268bd2">extends</span> AppCompatActivity <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    EditText mMsgEt<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">protected</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onCreate</span><span style="color:#719e07">(</span>Bundle savedInstanceState<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">super</span><span style="color:#719e07">.</span>onCreate<span style="color:#719e07">(</span>savedInstanceState<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        setContentView<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>layout<span style="color:#719e07">.</span>activity_toast<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        EventBus<span style="color:#719e07">.</span>getDefault<span style="color:#719e07">().</span>register<span style="color:#719e07">(</span><span style="color:#719e07">this</span><span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        mMsgEt <span style="color:#719e07">=</span> <span style="color:#719e07">(</span>EditText<span style="color:#719e07">)</span> findViewById<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>id<span style="color:#719e07">.</span>message_et<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        findViewById<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>id<span style="color:#719e07">.</span>send_msg_btn<span style="color:#719e07">).</span>setOnClickListener<span style="color:#719e07">(</span><span style="color:#719e07">new</span> View<span style="color:#719e07">.</span>OnClickListener<span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onClick</span><span style="color:#719e07">(</span>View v<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#586e75">//发送事件
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>                EventBus<span style="color:#719e07">.</span>getDefault<span style="color:#719e07">().</span>post<span style="color:#719e07">(</span><span style="color:#719e07">new</span> Message<span style="color:#719e07">(</span>mMsgEt<span style="color:#719e07">.</span>getText<span style="color:#719e07">().</span>toString<span style="color:#719e07">()));</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">});</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#586e75">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">     * 接收事件
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">     * @param msg
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">     */</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">@Subscribe</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onMessageEvent</span><span style="color:#719e07">(</span>Message msg<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        Toast<span style="color:#719e07">.</span>makeText<span style="color:#719e07">(</span><span style="color:#719e07">this</span><span style="color:#719e07">,</span> msg<span style="color:#719e07">.</span>getMessage<span style="color:#719e07">(),</span> Toast<span style="color:#719e07">.</span>LENGTH_SHORT<span style="color:#719e07">).</span>show<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">protected</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onDestroy</span><span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        EventBus<span style="color:#719e07">.</span>getDefault<span style="color:#719e07">().</span>unregister<span style="color:#719e07">(</span><span style="color:#719e07">this</span><span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">super</span><span style="color:#719e07">.</span>onDestroy<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
+</span></span></code></pre></div><h2 id="3threadmode">3.ThreadMode</h2>
+<p>在EventBus中, 我们可以设置观察者处理接收到消息的函数所在的线程。</p>
+<h4 id="1threadmodeposting">1.ThreadMode.POSTING</h4>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">@Subscribe</span><span style="color:#719e07">(</span>threadMode <span style="color:#719e07">=</span> ThreadMode<span style="color:#719e07">.</span>POSTING<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onMessage</span><span style="color:#719e07">(</span>MessageEvent event<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    log<span style="color:#719e07">(</span>event<span style="color:#719e07">.</span>message<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>这是eventBus的<strong>默认模式</strong> , 接收消息的函数会在发送消息所在的线程中被调用。这种模式下避免了发送事件和处理事件间的线程切换，开销最小。</p>
+<p>但是当发送事件在主线程时，应避免处理事件的函数发生堵塞，否则会引起卡顿。</p>
+<h4 id="2threadmodemain">2.ThreadMode.MAIN</h4>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">@Subscribe</span><span style="color:#719e07">(</span>threadMode <span style="color:#719e07">=</span> ThreadMode<span style="color:#719e07">.</span>MAIN<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onMessage</span><span style="color:#719e07">(</span>MessageEvent event<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    log<span style="color:#719e07">(</span>event<span style="color:#719e07">.</span>message<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>这种模式下处理事件的函数将在主线程中执行 , 所以也应该避免在处理函数中发生堵塞。</p>
+<h4 id="3threadmodemain_ordered">3.ThreadMode.MAIN_ORDERED</h4>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">@Subscribe</span><span style="color:#719e07">(</span>threadMode <span style="color:#719e07">=</span> ThreadMode<span style="color:#719e07">.</span>MAIN_ORDERED<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onMessage</span><span style="color:#719e07">(</span>MessageEvent event<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    log<span style="color:#719e07">(</span>event<span style="color:#719e07">.</span>message<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>这种模式下  , 事件的处理函数不仅在主线程 , 当有被观察者发送了多个事件的时候 , 事件将按照发送的顺序依次被处理 , 保证了事件之间的顺序性。</p>
+<h4 id="4theadmodebackground">4.TheadMode.BACKGROUND</h4>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">@Subscribe</span><span style="color:#719e07">(</span>threadMode <span style="color:#719e07">=</span> ThreadMode<span style="color:#719e07">.</span>BACKGROUND<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onMessage</span><span style="color:#719e07">(</span>MessageEvent event<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    log<span style="color:#719e07">(</span>event<span style="color:#719e07">.</span>message<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
+</span></span></code></pre></div><ol>
+<li>
+<p>当发送事件所在线程是子线程 , 则事件也在统一子线程处理。</p>
+</li>
+<li>
+<p>当发送事件所在线程是主线车工 , 则eventBus会在后台新开一个线程调用事件处理函数。</p>
+</li>
+</ol>
+<h4 id="5threadmodeasync">5.ThreadMode.ASYNC</h4>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">@Subscribe</span><span style="color:#719e07">(</span>threadMode <span style="color:#719e07">=</span> ThreadMode<span style="color:#719e07">.</span>ASYNC<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onMessage</span><span style="color:#719e07">(</span>MessageEvent event<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    log<span style="color:#719e07">(</span>event<span style="color:#719e07">.</span>message<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>在此模式下 , 事件处理函数始终在与发送事件所在线程之外的子线程中执行 , 也就是两者所在线程相互独立。</p>
+<h2 id="4粘性事件">4.粘性事件</h2>
+<p>普通的事件需要接收方先注册,发送方再发送消息,才能完成消息的发送和处理。</p>
+<p>而粘性事件的作用就是,发送方可以先发送事件 , 接收方在之后进行注册时再完成消息的处理。</p>
+<h4 id="1简单使用">1.简单使用</h4>
+<p>现在我们做一个注册-&gt;登陆流程的demo ,我们想要实现 :</p>
+<p><strong>用户首先在注册页面填写账号&amp;密码信息 , 再进入登陆页面时, 就不用再重复输入账号密码了</strong>。</p>
+<p>效果图 :</p>
+<p><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/11/15/16e6cfabf8782ede~tplv-t2oaga2asx-image.image" alt=""></p>
+<p>代码 :</p>
+<p>注册页面 :</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">public</span> <span style="color:#268bd2">class</span> <span style="color:#268bd2">RegisterActivity</span> <span style="color:#268bd2">extends</span> AppCompatActivity <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    EditText mUsernameEditText<span style="color:#719e07">;</span><span style="color:#586e75">//用户名编辑框
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    EditText mPasswordEditText<span style="color:#719e07">;</span><span style="color:#586e75">//密码编辑框
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">protected</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onCreate</span><span style="color:#719e07">(</span>Bundle savedInstanceState<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">super</span><span style="color:#719e07">.</span>onCreate<span style="color:#719e07">(</span>savedInstanceState<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        setContentView<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>layout<span style="color:#719e07">.</span>activity_register<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        mUsernameEditText <span style="color:#719e07">=</span> <span style="color:#719e07">(</span>EditText<span style="color:#719e07">)</span> findViewById<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>id<span style="color:#719e07">.</span>register_username_text_input_layout<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        mPasswordEditText <span style="color:#719e07">=</span> <span style="color:#719e07">(</span>EditText<span style="color:#719e07">)</span> findViewById<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>id<span style="color:#719e07">.</span>register_activity_password_et<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">//点击注册
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>        findViewById<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>id<span style="color:#719e07">.</span>register_btn<span style="color:#719e07">).</span>setOnClickListener<span style="color:#719e07">(</span><span style="color:#719e07">new</span> View<span style="color:#719e07">.</span>OnClickListener<span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onClick</span><span style="color:#719e07">(</span>View v<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                String username <span style="color:#719e07">=</span> mUsernameEditText<span style="color:#719e07">.</span>getText<span style="color:#719e07">().</span>toString<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>                String password <span style="color:#719e07">=</span> mPasswordEditText<span style="color:#719e07">.</span>getText<span style="color:#719e07">().</span>toString<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>                Toast<span style="color:#719e07">.</span>makeText<span style="color:#719e07">(</span>RegisterActivity<span style="color:#719e07">.</span>this<span style="color:#719e07">,</span> <span style="color:#2aa198">&#34;注册成功 , 快去登陆~&#34;</span><span style="color:#719e07">,</span> Toast<span style="color:#719e07">.</span>LENGTH_SHORT<span style="color:#719e07">).</span>show<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#586e75">//发送粘性事件
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>                EventBus<span style="color:#719e07">.</span>getDefault<span style="color:#719e07">().</span>postSticky<span style="color:#719e07">(</span><span style="color:#719e07">new</span> MessageEvent<span style="color:#719e07">(</span>username<span style="color:#719e07">,</span>password<span style="color:#719e07">));</span>
+</span></span><span style="display:flex;"><span>                startActivity<span style="color:#719e07">(</span><span style="color:#719e07">new</span> Intent<span style="color:#719e07">(</span>RegisterActivity<span style="color:#719e07">.</span>this<span style="color:#719e07">,</span> LoginActivity<span style="color:#719e07">.</span>class<span style="color:#719e07">));</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">});</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>通过 <code>postSticky()</code> 发送一个粘性事件。</p>
+<p>登陆页面 :</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">public</span> <span style="color:#268bd2">class</span> <span style="color:#268bd2">LoginActivity</span> <span style="color:#268bd2">extends</span> AppCompatActivity <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    EditText mUsernameEd<span style="color:#719e07">;</span><span style="color:#586e75">//用户名编辑框
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    EditText mPasswordEd<span style="color:#719e07">;</span><span style="color:#586e75">//密码编辑框
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">protected</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onCreate</span><span style="color:#719e07">(</span>Bundle savedInstanceState<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">super</span><span style="color:#719e07">.</span>onCreate<span style="color:#719e07">(</span>savedInstanceState<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        setContentView<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>layout<span style="color:#719e07">.</span>activity_login<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        EventBus<span style="color:#719e07">.</span>getDefault<span style="color:#719e07">().</span>register<span style="color:#719e07">(</span><span style="color:#719e07">this</span><span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        mUsernameEd <span style="color:#719e07">=</span> <span style="color:#719e07">(</span>EditText<span style="color:#719e07">)</span>findViewById<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>id<span style="color:#719e07">.</span>login_username_text_input_layout<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        mPasswordEd <span style="color:#719e07">=</span> <span style="color:#719e07">(</span>EditText<span style="color:#719e07">)</span>findViewById<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>id<span style="color:#719e07">.</span>login_password_editText<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#586e75">//接收粘性事件 , 将注册页面的信息赋值到编辑框中
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#268bd2">@Subscribe</span><span style="color:#719e07">(</span>sticky <span style="color:#719e07">=</span> <span style="color:#cb4b16">true</span><span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onEvent</span><span style="color:#719e07">(</span>MessageEvent event<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        mUsernameEd<span style="color:#719e07">.</span>setText<span style="color:#719e07">(</span>event<span style="color:#719e07">.</span>getUsername<span style="color:#719e07">());</span>
+</span></span><span style="display:flex;"><span>        mPasswordEd<span style="color:#719e07">.</span>setText<span style="color:#719e07">(</span>event<span style="color:#719e07">.</span>getPassword<span style="color:#719e07">());</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">protected</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onDestroy</span><span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        EventBus<span style="color:#719e07">.</span>getDefault<span style="color:#719e07">().</span>unregister<span style="color:#719e07">(</span><span style="color:#719e07">this</span><span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">super</span><span style="color:#719e07">.</span>onDestroy<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
+</span></span></code></pre></div><h4 id="2-获取移除粘性消息">2. 获取/移除粘性消息</h4>
+<p>当我们发送了一个粘性消息 , 但这个消息尚未被订阅者接收处理时 , 我们可以通过 <code>getStickyEvent()</code> 拿到这个消息。</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#586e75">//获取已经发送的但未处理的粘性消息
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>MessageEvent stickyEvent <span style="color:#719e07">=</span> EventBus<span style="color:#719e07">.</span>getDefault<span style="color:#719e07">().</span>getStickyEvent<span style="color:#719e07">(</span>MessageEvent<span style="color:#719e07">.</span>class<span style="color:#719e07">);</span>
+</span></span></code></pre></div><p>并且可以通过 <code>removeStickyEvent()</code> 移除这个事件 , 这样之后订阅之注册之后也不会收到这个事件。</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#586e75">//移除消息
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>EventBus<span style="color:#719e07">.</span>getDefault<span style="color:#719e07">().</span>removeStickyEvent<span style="color:#719e07">(</span>stickyEvent<span style="color:#719e07">);</span>
+</span></span></code></pre></div><p>现在试验一下,  我们在前面的demo中进行修改 , 在注册页面点击注册按钮时 , 移除粘性事件。</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">public</span> <span style="color:#268bd2">class</span> <span style="color:#268bd2">RegisterActivity</span> <span style="color:#268bd2">extends</span> AppCompatActivity <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">...</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">protected</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onCreate</span><span style="color:#719e07">(</span>Bundle savedInstanceState<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">super</span><span style="color:#719e07">.</span>onCreate<span style="color:#719e07">(</span>savedInstanceState<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        setContentView<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>layout<span style="color:#719e07">.</span>activity_register<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">...</span>
+</span></span><span style="display:flex;"><span>        findViewById<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>id<span style="color:#719e07">.</span>register_btn<span style="color:#719e07">).</span>setOnClickListener<span style="color:#719e07">(</span><span style="color:#719e07">new</span> View<span style="color:#719e07">.</span>OnClickListener<span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onClick</span><span style="color:#719e07">(</span>View v<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                String username <span style="color:#719e07">=</span> mUsernameEditText<span style="color:#719e07">.</span>getText<span style="color:#719e07">().</span>toString<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>                String password <span style="color:#719e07">=</span> mPasswordEditText<span style="color:#719e07">.</span>getText<span style="color:#719e07">().</span>toString<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#586e75">//发送粘性消息
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>                EventBus<span style="color:#719e07">.</span>getDefault<span style="color:#719e07">().</span>postSticky<span style="color:#719e07">(</span><span style="color:#719e07">new</span> MessageEvent<span style="color:#719e07">(</span>username<span style="color:#719e07">,</span> password<span style="color:#719e07">));</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#586e75">//获取已经发送的但未处理的粘性消息
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>                MessageEvent stickyEvent <span style="color:#719e07">=</span> EventBus<span style="color:#719e07">.</span>getDefault<span style="color:#719e07">().</span>getStickyEvent<span style="color:#719e07">(</span>MessageEvent<span style="color:#719e07">.</span>class<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>stickyEvent <span style="color:#719e07">!=</span> <span style="color:#cb4b16">null</span><span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#586e75">//移除消息
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>                    EventBus<span style="color:#719e07">.</span>getDefault<span style="color:#719e07">().</span>removeStickyEvent<span style="color:#719e07">(</span>stickyEvent<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>                startActivity<span style="color:#719e07">(</span><span style="color:#719e07">new</span> Intent<span style="color:#719e07">(</span>RegisterActivity<span style="color:#719e07">.</span>this<span style="color:#719e07">,</span> LoginActivity<span style="color:#719e07">.</span>class<span style="color:#719e07">));</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">});</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>这样 , 在跳转到登陆页面时 , 自动填充用户名&amp;密码的效果就消失了。</p>
+<!-- raw HTML omitted -->
+<h2 id="5源码学习">5.源码学习</h2>
+<blockquote>
+<p>在看EventBus源码之前 , 要先想清楚我们想要得到什么反馈 , 看源码能弄明白什么问题。</p>
+</blockquote>
+<ul>
+<li>EventBus是如何实现订阅者在事件到来时执行对应方法的 , 在register(),post()时发生了什么？</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span> EventBus<span style="color:#719e07">.</span>getDefault<span style="color:#719e07">().</span>register<span style="color:#719e07">(</span><span style="color:#719e07">this</span><span style="color:#719e07">);</span>
+</span></span></code></pre></div><h3 id="1register-">1.register() :</h3>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>    <span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">register</span><span style="color:#719e07">(</span>Object subscriber<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">//1.获得订阅者(Activity,fragment)的Class对象
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>        Class<span style="color:#719e07">&lt;?&gt;</span> subscriberClass <span style="color:#719e07">=</span> subscriber<span style="color:#719e07">.</span>getClass<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">//2.根据订阅者的Class对象查找它用@Subcribe注解的方法集合 , 对于SubcriberMethodFinder的类暂时先不用管
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>        List<span style="color:#719e07">&lt;</span>SubscriberMethod<span style="color:#719e07">&gt;</span> subscriberMethods <span style="color:#719e07">=</span> subscriberMethodFinder<span style="color:#719e07">.</span>findSubscriberMethods<span style="color:#719e07">(</span>subscriberClass<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">synchronized</span> <span style="color:#719e07">(</span><span style="color:#719e07">this</span><span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#586e75">//3.将Class对象与它里面的@Subcribe方法进行注册绑定
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>            <span style="color:#719e07">for</span> <span style="color:#719e07">(</span>SubscriberMethod subscriberMethod <span style="color:#719e07">:</span> subscriberMethods<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                subscribe<span style="color:#719e07">(</span>subscriber<span style="color:#719e07">,</span> subscriberMethod<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>register()方法中做了3件事情 :</p>
+<ol>
+<li>获得订阅者(Activity,fragment)的Class对象</li>
+<li>根据订阅者的Class对象查找它用@Subcribe注解的方法集合</li>
+<li>将Class对象与它里面的@Subcribe方法进行注册绑定</li>
+</ol>
+<p>##subcribe()方法 : 在注释中已经写清楚代码的作用 , 按照顺序阅读应该很容易理解。</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>    <span style="color:#586e75">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">     * @param subscriber       订阅者(Activity,fragment等组件)的Class对象
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">     * @param subscriberMethod 订阅者中用@Subcribe注解的方法
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">     */</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">private</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">subscribe</span><span style="color:#719e07">(</span>Object subscriber<span style="color:#719e07">,</span> SubscriberMethod subscriberMethod<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">//1.获得订阅方法所对应的Event类型
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>        Class<span style="color:#719e07">&lt;?&gt;</span> eventType <span style="color:#719e07">=</span> subscriberMethod<span style="color:#719e07">.</span>eventType<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">//2.将订阅者和订阅方法打包到一个包装类
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>        Subscription newSubscription <span style="color:#719e07">=</span> <span style="color:#719e07">new</span> Subscription<span style="color:#719e07">(</span>subscriber<span style="color:#719e07">,</span> subscriberMethod<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">//3.获得这个Event所有的&lt;订阅者,订阅方法&gt;集合，集合中也可能包含参数中订阅者以外的订阅者
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>        CopyOnWriteArrayList<span style="color:#719e07">&lt;</span>Subscription<span style="color:#719e07">&gt;</span> subscriptions <span style="color:#719e07">=</span> subscriptionsByEventType<span style="color:#719e07">.</span>get<span style="color:#719e07">(</span>eventType<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">//4.若&lt;订阅者,订阅方法&gt;集合为空 , 说明接收该Event的若干组件还未调用register()
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>        <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>subscriptions <span style="color:#719e07">==</span> <span style="color:#cb4b16">null</span><span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            subscriptions <span style="color:#719e07">=</span> <span style="color:#719e07">new</span> CopyOnWriteArrayList<span style="color:#719e07">&lt;&gt;();</span>
+</span></span><span style="display:flex;"><span>            subscriptionsByEventType<span style="color:#719e07">.</span>put<span style="color:#719e07">(</span>eventType<span style="color:#719e07">,</span> subscriptions<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">}</span> <span style="color:#719e07">else</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#586e75">//5.如果这个Event对应的的&lt;订阅者,订阅方法&gt;集合中已经包含了当前这个&lt;订阅者,订阅方法&gt;，则说明当前组件重复调用register()了.
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>            <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>subscriptions<span style="color:#719e07">.</span>contains<span style="color:#719e07">(</span>newSubscription<span style="color:#719e07">))</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">throw</span> <span style="color:#719e07">new</span> EventBusException<span style="color:#719e07">(</span><span style="color:#2aa198">&#34;Subscriber &#34;</span> <span style="color:#719e07">+</span> subscriber<span style="color:#719e07">.</span>getClass<span style="color:#719e07">()</span> <span style="color:#719e07">+</span> <span style="color:#2aa198">&#34; already registered to event &#34;</span>
+</span></span><span style="display:flex;"><span>                        <span style="color:#719e07">+</span> eventType<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#dc322f">int</span> size <span style="color:#719e07">=</span> subscriptions<span style="color:#719e07">.</span>size<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">//6.将订阅方法按照优先级大小排序
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>        <span style="color:#719e07">for</span> <span style="color:#719e07">(</span><span style="color:#dc322f">int</span> i <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span><span style="color:#719e07">;</span> i <span style="color:#719e07">&lt;=</span> size<span style="color:#719e07">;</span> i<span style="color:#719e07">++)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>i <span style="color:#719e07">==</span> size <span style="color:#719e07">||</span> subscriberMethod<span style="color:#719e07">.</span>priority <span style="color:#719e07">&gt;</span> subscriptions<span style="color:#719e07">.</span>get<span style="color:#719e07">(</span>i<span style="color:#719e07">).</span>subscriberMethod<span style="color:#719e07">.</span>priority<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                subscriptions<span style="color:#719e07">.</span>add<span style="color:#719e07">(</span>i<span style="color:#719e07">,</span> newSubscription<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">break</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">//7.获取这个订阅者订阅的所有Event集合
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>        List<span style="color:#719e07">&lt;</span>Class<span style="color:#719e07">&lt;?&gt;&gt;</span> subscribedEvents <span style="color:#719e07">=</span> typesBySubscriber<span style="color:#719e07">.</span>get<span style="color:#719e07">(</span>subscriber<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>subscribedEvents <span style="color:#719e07">==</span> <span style="color:#cb4b16">null</span><span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            subscribedEvents <span style="color:#719e07">=</span> <span style="color:#719e07">new</span> ArrayList<span style="color:#719e07">&lt;&gt;();</span>
+</span></span><span style="display:flex;"><span>            typesBySubscriber<span style="color:#719e07">.</span>put<span style="color:#719e07">(</span>subscriber<span style="color:#719e07">,</span> subscribedEvents<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">//8.将当前@Subcribe方法的Event类型添加到这个订阅者的Event集合中
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>        subscribedEvents<span style="color:#719e07">.</span>add<span style="color:#719e07">(</span>eventType<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">//9.如果@Subcribe()方法中sticky = true ,则获得这个粘性事件
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>        <span style="color:#586e75">//注意如果当前事件是普通事件 , 则不做任何处理。
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>        <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>subscriberMethod<span style="color:#719e07">.</span>sticky<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>eventInheritance<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                Set<span style="color:#719e07">&lt;</span>Map<span style="color:#719e07">.</span>Entry<span style="color:#719e07">&lt;</span>Class<span style="color:#719e07">&lt;?&gt;,</span> Object<span style="color:#719e07">&gt;&gt;</span> entries <span style="color:#719e07">=</span> stickyEvents<span style="color:#719e07">.</span>entrySet<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">for</span> <span style="color:#719e07">(</span>Map<span style="color:#719e07">.</span>Entry<span style="color:#719e07">&lt;</span>Class<span style="color:#719e07">&lt;?&gt;,</span> Object<span style="color:#719e07">&gt;</span> entry <span style="color:#719e07">:</span> entries<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#586e75">//先获得粘性事件Event的Class对象
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>                    Class<span style="color:#719e07">&lt;?&gt;</span> candidateEventType <span style="color:#719e07">=</span> entry<span style="color:#719e07">.</span>getKey<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#586e75">//找到当前Subscribe()方法订阅的粘性事件
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>                    <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>eventType<span style="color:#719e07">.</span>isAssignableFrom<span style="color:#719e07">(</span>candidateEventType<span style="color:#719e07">))</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                        <span style="color:#586e75">//得到粘性事件
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>                        Object stickyEvent <span style="color:#719e07">=</span> entry<span style="color:#719e07">.</span>getValue<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                        checkPostStickyEventToSubscription<span style="color:#719e07">(</span>newSubscription<span style="color:#719e07">,</span> stickyEvent<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">}</span> <span style="color:#719e07">else</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                Object stickyEvent <span style="color:#719e07">=</span> stickyEvents<span style="color:#719e07">.</span>get<span style="color:#719e07">(</span>eventType<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#586e75">//10.对sticky事件判空,并执行订阅方法
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>                checkPostStickyEventToSubscription<span style="color:#719e07">(</span>newSubscription<span style="color:#719e07">,</span> stickyEvent<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>看一下第10步的方法 <code>checkPostStickyEventToSubsctiption()</code> :</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>    <span style="color:#586e75">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">     * 对事件进行判空 
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">     * @param newSubscription (订阅者,订阅方法)
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">     * @param stickyEvent 粘性事件
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">     */</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">private</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">checkPostStickyEventToSubscription</span><span style="color:#719e07">(</span>Subscription newSubscription<span style="color:#719e07">,</span> Object stickyEvent<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>stickyEvent <span style="color:#719e07">!=</span> <span style="color:#cb4b16">null</span><span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#586e75">// If the subscriber is trying to abort the event, it will fail (event is not tracked in posting state)
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>            <span style="color:#586e75">// --&gt; Strange corner case, which we don&#39;t take care of here.
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>            postToSubscription<span style="color:#719e07">(</span>newSubscription<span style="color:#719e07">,</span> stickyEvent<span style="color:#719e07">,</span> isMainThread<span style="color:#719e07">());</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>##postToSubscription() :</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>    <span style="color:#268bd2">private</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">postToSubscription</span><span style="color:#719e07">(</span>Subscription subscription<span style="color:#719e07">,</span> Object event<span style="color:#719e07">,</span> <span style="color:#dc322f">boolean</span> isMainThread<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">//根据对应的ThreadMode,在对应的线程中执行
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>        <span style="color:#719e07">switch</span> <span style="color:#719e07">(</span>subscription<span style="color:#719e07">.</span>subscriberMethod<span style="color:#719e07">.</span>threadMode<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">case</span> POSTING<span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>                invokeSubscriber<span style="color:#719e07">(</span>subscription<span style="color:#719e07">,</span> event<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">break</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">case</span> MAIN<span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>isMainThread<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                    invokeSubscriber<span style="color:#719e07">(</span>subscription<span style="color:#719e07">,</span> event<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">}</span> <span style="color:#719e07">else</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                    mainThreadPoster<span style="color:#719e07">.</span>enqueue<span style="color:#719e07">(</span>subscription<span style="color:#719e07">,</span> event<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">break</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">case</span> MAIN_ORDERED<span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>mainThreadPoster <span style="color:#719e07">!=</span> <span style="color:#cb4b16">null</span><span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                    mainThreadPoster<span style="color:#719e07">.</span>enqueue<span style="color:#719e07">(</span>subscription<span style="color:#719e07">,</span> event<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">}</span> <span style="color:#719e07">else</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#586e75">// temporary: technically not correct as poster not decoupled from subscriber
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>                    invokeSubscriber<span style="color:#719e07">(</span>subscription<span style="color:#719e07">,</span> event<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">break</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">case</span> BACKGROUND<span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>isMainThread<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                    backgroundPoster<span style="color:#719e07">.</span>enqueue<span style="color:#719e07">(</span>subscription<span style="color:#719e07">,</span> event<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">}</span> <span style="color:#719e07">else</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                    invokeSubscriber<span style="color:#719e07">(</span>subscription<span style="color:#719e07">,</span> event<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">break</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">case</span> ASYNC<span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>                asyncPoster<span style="color:#719e07">.</span>enqueue<span style="color:#719e07">(</span>subscription<span style="color:#719e07">,</span> event<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">break</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">default</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">throw</span> <span style="color:#719e07">new</span> IllegalStateException<span style="color:#719e07">(</span><span style="color:#2aa198">&#34;Unknown thread mode: &#34;</span> <span style="color:#719e07">+</span> subscription<span style="color:#719e07">.</span>subscriberMethod<span style="color:#719e07">.</span>threadMode<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>这个方法根据对应的ThreadMode,在对应的线程中调用 <code>invokeSubcriber()</code> 方法 , 这个方法就是让粘性事件的@Subcriber注解的方法执行的地方 :</p>
+<p>##invokeSubcriber() :</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>    <span style="color:#586e75">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">     * 通过反射调用订阅者中的@Subcribe方法
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">     * @param subscription
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">     * @param event
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">     */</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#dc322f">void</span> <span style="color:#268bd2">invokeSubscriber</span><span style="color:#719e07">(</span>Subscription subscription<span style="color:#719e07">,</span> Object event<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">try</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#586e75">//
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>            subscription<span style="color:#719e07">.</span>subscriberMethod<span style="color:#719e07">.</span>method<span style="color:#719e07">.</span>invoke<span style="color:#719e07">(</span>subscription<span style="color:#719e07">.</span>subscriber<span style="color:#719e07">,</span> event<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">}</span> <span style="color:#719e07">catch</span> <span style="color:#719e07">(</span>InvocationTargetException e<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            handleSubscriberException<span style="color:#719e07">(</span>subscription<span style="color:#719e07">,</span> event<span style="color:#719e07">,</span> e<span style="color:#719e07">.</span>getCause<span style="color:#719e07">());</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">}</span> <span style="color:#719e07">catch</span> <span style="color:#719e07">(</span>IllegalAccessException e<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">throw</span> <span style="color:#719e07">new</span> IllegalStateException<span style="color:#719e07">(</span><span style="color:#2aa198">&#34;Unexpected exception&#34;</span><span style="color:#719e07">,</span> e<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>从以上流程可以看出 订阅者调用了 <code>register()</code> 之后 ,对粘性事件的处理情况 , 流程图如下 :</p>
+<p><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/11/15/16e6e50aa978d397~tplv-t2oaga2asx-image.image" alt="image.png"></p>
+<p>那么普通事件是如何处理的呢 ?</p>
+<p>我们看一下 <code>post()</code> 方法做了什么 :</p>
+<h3 id="2post">2.post()</h3>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#586e75">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">     * Posts the given event to the event bus.
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">     */</span>
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">post</span><span style="color:#719e07">(</span>Object event<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#586e75">//获取当前线程的发送状态
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    PostingThreadState postingState <span style="color:#719e07">=</span> currentPostingThreadState<span style="color:#719e07">.</span>get<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#586e75">//获取当前线程的事件序列
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    List<span style="color:#719e07">&lt;</span>Object<span style="color:#719e07">&gt;</span> eventQueue <span style="color:#719e07">=</span> postingState<span style="color:#719e07">.</span>eventQueue<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#586e75">//把事件添加到序列中
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    eventQueue<span style="color:#719e07">.</span>add<span style="color:#719e07">(</span>event<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#586e75">//如果当前线程尚未处于发送状态
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#719e07">if</span> <span style="color:#719e07">(!</span>postingState<span style="color:#719e07">.</span>isPosting<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        postingState<span style="color:#719e07">.</span>isMainThread <span style="color:#719e07">=</span> isMainThread<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">//标志当前线程处于发送事件状态
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>        postingState<span style="color:#719e07">.</span>isPosting <span style="color:#719e07">=</span> <span style="color:#cb4b16">true</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">//正处于发送状态时是不能取消的
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>        <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>postingState<span style="color:#719e07">.</span>canceled<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">throw</span> <span style="color:#719e07">new</span> EventBusException<span style="color:#719e07">(</span><span style="color:#2aa198">&#34;Internal error. Abort state was not reset&#34;</span><span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">try</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#586e75">//将事件序列中的事件挨个发送
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>            <span style="color:#719e07">while</span> <span style="color:#719e07">(!</span>eventQueue<span style="color:#719e07">.</span>isEmpty<span style="color:#719e07">())</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                postSingleEvent<span style="color:#719e07">(</span>eventQueue<span style="color:#719e07">.</span>remove<span style="color:#719e07">(</span><span style="color:#2aa198">0</span><span style="color:#719e07">),</span> postingState<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">}</span> <span style="color:#719e07">finally</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            postingState<span style="color:#719e07">.</span>isPosting <span style="color:#719e07">=</span> <span style="color:#cb4b16">false</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>            postingState<span style="color:#719e07">.</span>isMainThread <span style="color:#719e07">=</span> <span style="color:#cb4b16">false</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>EventBus中用ThreadLocal存储了每个线程的发送状态 ,</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>    <span style="color:#268bd2">private</span> <span style="color:#268bd2">final</span> ThreadLocal<span style="color:#719e07">&lt;</span>PostingThreadState<span style="color:#719e07">&gt;</span> currentPostingThreadState <span style="color:#719e07">=</span> <span style="color:#719e07">new</span> ThreadLocal<span style="color:#719e07">&lt;</span>PostingThreadState<span style="color:#719e07">&gt;()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">protected</span> PostingThreadState <span style="color:#268bd2">initialValue</span><span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">return</span> <span style="color:#719e07">new</span> PostingThreadState<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">};</span>
+</span></span></code></pre></div><p>ThreadLocal这个类是线程独立的  ， 能够保证每个线程之间的发送状态互不干扰。</p>
+<p>进入最后发送事件的函数 <code>postSingleEvent()</code>  :</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>    <span style="color:#268bd2">private</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">postSingleEvent</span><span style="color:#719e07">(</span>Object event<span style="color:#719e07">,</span> PostingThreadState postingState<span style="color:#719e07">)</span> <span style="color:#268bd2">throws</span> Error <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        Class<span style="color:#719e07">&lt;?&gt;</span> eventClass <span style="color:#719e07">=</span> event<span style="color:#719e07">.</span>getClass<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#dc322f">boolean</span> subscriptionFound <span style="color:#719e07">=</span> <span style="color:#cb4b16">false</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">//是否开启了事件继承
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>        <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>eventInheritance<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#586e75">//寻找当前事件类的素有父类,接口
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>            List<span style="color:#719e07">&lt;</span>Class<span style="color:#719e07">&lt;?&gt;&gt;</span> eventTypes <span style="color:#719e07">=</span> lookupAllEventTypes<span style="color:#719e07">(</span>eventClass<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#dc322f">int</span> countTypes <span style="color:#719e07">=</span> eventTypes<span style="color:#719e07">.</span>size<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">for</span> <span style="color:#719e07">(</span><span style="color:#dc322f">int</span> h <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span><span style="color:#719e07">;</span> h <span style="color:#719e07">&lt;</span> countTypes<span style="color:#719e07">;</span> h<span style="color:#719e07">++)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                Class<span style="color:#719e07">&lt;?&gt;</span> clazz <span style="color:#719e07">=</span> eventTypes<span style="color:#719e07">.</span>get<span style="color:#719e07">(</span>h<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#586e75">//有多个订阅者时,只要有一个发送成功,则左边为true
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>                subscriptionFound <span style="color:#719e07">|=</span> postSingleEventForEventType<span style="color:#719e07">(</span>event<span style="color:#719e07">,</span> postingState<span style="color:#719e07">,</span> clazz<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">}</span> <span style="color:#719e07">else</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#586e75">//发送单个事件
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>            subscriptionFound <span style="color:#719e07">=</span> postSingleEventForEventType<span style="color:#719e07">(</span>event<span style="color:#719e07">,</span> postingState<span style="color:#719e07">,</span> eventClass<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">//如果当前事件还没有订阅者订阅
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>        <span style="color:#719e07">if</span> <span style="color:#719e07">(!</span>subscriptionFound<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>logNoSubscriberMessages<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                logger<span style="color:#719e07">.</span>log<span style="color:#719e07">(</span>Level<span style="color:#719e07">.</span>FINE<span style="color:#719e07">,</span> <span style="color:#2aa198">&#34;No subscribers registered for event &#34;</span> <span style="color:#719e07">+</span> eventClass<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>sendNoSubscriberEvent <span style="color:#719e07">&amp;&amp;</span> eventClass <span style="color:#719e07">!=</span> NoSubscriberEvent<span style="color:#719e07">.</span>class <span style="color:#719e07">&amp;&amp;</span>
+</span></span><span style="display:flex;"><span>                    eventClass <span style="color:#719e07">!=</span> SubscriberExceptionEvent<span style="color:#719e07">.</span>class<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#586e75">//发送一个没有订阅者的事件，这个事件可以由我们来接收
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>                post<span style="color:#719e07">(</span><span style="color:#719e07">new</span> NoSubscriberEvent<span style="color:#719e07">(</span><span style="color:#719e07">this</span><span style="color:#719e07">,</span> event<span style="color:#719e07">));</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>进入 <code>postSingleEventForEventType()</code> :</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>    <span style="color:#268bd2">private</span> <span style="color:#dc322f">boolean</span> <span style="color:#268bd2">postSingleEventForEventType</span><span style="color:#719e07">(</span>Object event<span style="color:#719e07">,</span> PostingThreadState postingState<span style="color:#719e07">,</span> Class<span style="color:#719e07">&lt;?&gt;</span> eventClass<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        CopyOnWriteArrayList<span style="color:#719e07">&lt;</span>Subscription<span style="color:#719e07">&gt;</span> subscriptions<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">//获取订阅了这个事件的&lt;订阅者,订阅方法&gt;列表
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>        <span style="color:#268bd2">synchronized</span> <span style="color:#719e07">(</span><span style="color:#719e07">this</span><span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            subscriptions <span style="color:#719e07">=</span> subscriptionsByEventType<span style="color:#719e07">.</span>get<span style="color:#719e07">(</span>eventClass<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">//如果这个事件有订阅者
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>        <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>subscriptions <span style="color:#719e07">!=</span> <span style="color:#cb4b16">null</span> <span style="color:#719e07">&amp;&amp;</span> <span style="color:#719e07">!</span>subscriptions<span style="color:#719e07">.</span>isEmpty<span style="color:#719e07">())</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">for</span> <span style="color:#719e07">(</span>Subscription subscription <span style="color:#719e07">:</span> subscriptions<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                postingState<span style="color:#719e07">.</span>event <span style="color:#719e07">=</span> event<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>                postingState<span style="color:#719e07">.</span>subscription <span style="color:#719e07">=</span> subscription<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#dc322f">boolean</span> aborted <span style="color:#719e07">=</span> <span style="color:#cb4b16">false</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">try</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#586e75">//将事件分发给订阅者 , 在分析register()时分析过。
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>                    postToSubscription<span style="color:#719e07">(</span>subscription<span style="color:#719e07">,</span> event<span style="color:#719e07">,</span> postingState<span style="color:#719e07">.</span>isMainThread<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                    aborted <span style="color:#719e07">=</span> postingState<span style="color:#719e07">.</span>canceled<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">}</span> <span style="color:#719e07">finally</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                    postingState<span style="color:#719e07">.</span>event <span style="color:#719e07">=</span> <span style="color:#cb4b16">null</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>                    postingState<span style="color:#719e07">.</span>subscription <span style="color:#719e07">=</span> <span style="color:#cb4b16">null</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>                    postingState<span style="color:#719e07">.</span>canceled <span style="color:#719e07">=</span> <span style="color:#cb4b16">false</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>aborted<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#719e07">break</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">return</span> <span style="color:#cb4b16">true</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">return</span> <span style="color:#cb4b16">false</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>可以看到,最后的把事件发送给订阅者的函数 <code>postToSubcription()</code> 与 <code>register()</code> 流程中最后发送粘性事件给订阅者的一样 , 这里就不介绍了。</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>    <span style="color:#268bd2">private</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">postToSubscription</span><span style="color:#719e07">(</span>Subscription subscription<span style="color:#719e07">,</span> Object event<span style="color:#719e07">,</span> <span style="color:#dc322f">boolean</span> isMainThread<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">//根据对应的ThreadMode,在对应的线程中执行
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>        <span style="color:#719e07">switch</span> <span style="color:#719e07">(</span>subscription<span style="color:#719e07">.</span>subscriberMethod<span style="color:#719e07">.</span>threadMode<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">case</span> POSTING<span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>                invokeSubscriber<span style="color:#719e07">(</span>subscription<span style="color:#719e07">,</span> event<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">break</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">case</span> MAIN<span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>isMainThread<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                    invokeSubscriber<span style="color:#719e07">(</span>subscription<span style="color:#719e07">,</span> event<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">}</span> <span style="color:#719e07">else</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                    mainThreadPoster<span style="color:#719e07">.</span>enqueue<span style="color:#719e07">(</span>subscription<span style="color:#719e07">,</span> event<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">break</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">case</span> MAIN_ORDERED<span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>mainThreadPoster <span style="color:#719e07">!=</span> <span style="color:#cb4b16">null</span><span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                    mainThreadPoster<span style="color:#719e07">.</span>enqueue<span style="color:#719e07">(</span>subscription<span style="color:#719e07">,</span> event<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">}</span> <span style="color:#719e07">else</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#586e75">// temporary: technically not correct as poster not decoupled from subscriber
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>                    invokeSubscriber<span style="color:#719e07">(</span>subscription<span style="color:#719e07">,</span> event<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">break</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">case</span> BACKGROUND<span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>isMainThread<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                    backgroundPoster<span style="color:#719e07">.</span>enqueue<span style="color:#719e07">(</span>subscription<span style="color:#719e07">,</span> event<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">}</span> <span style="color:#719e07">else</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>                    invokeSubscriber<span style="color:#719e07">(</span>subscription<span style="color:#719e07">,</span> event<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">break</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">case</span> ASYNC<span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>                asyncPoster<span style="color:#719e07">.</span>enqueue<span style="color:#719e07">(</span>subscription<span style="color:#719e07">,</span> event<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">break</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">default</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">throw</span> <span style="color:#719e07">new</span> IllegalStateException<span style="color:#719e07">(</span><span style="color:#2aa198">&#34;Unknown thread mode: &#34;</span> <span style="color:#719e07">+</span> subscription<span style="color:#719e07">.</span>subscriberMethod<span style="color:#719e07">.</span>threadMode<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span></code></pre></div><p><code>post()</code> 的总体流程图如下 :</p>
+<p><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/11/15/16e6e50aa9be6ae2~tplv-t2oaga2asx-image.image" alt="image.png"></p>
+<blockquote>
+<p>References :</p>
+<ul>
+<li>
+<a href="http://greenrobot.org/eventbus/" target="_blank" rel="noopener">http://greenrobot.org/eventbus/</a></li>
+<li>
+<a href="https://www.jianshu.com/p/f057c460c77e" target="_blank" rel="noopener">https://www.jianshu.com/p/f057c460c77e</a></li>
+<li>
+<a href="https://github.com/greenrobot/EventBus" target="_blank" rel="noopener">https://github.com/greenrobot/EventBus</a></li>
+</ul>
+</blockquote>
+
+        </div>
+        
+
+<footer>
+  <p class="meta">
+    <span class="byline author vcard">Posted by <span class="fn">Petrichor</span></span>
+    
+    <time>Jan 5, 2023</time>
+    
+      <span class="categories">
+        Tags:
+        
+          <a class="category" href="https://chenyongda2018.github.io/tags/eventbus">EventBus</a>  <a class="category" href="https://chenyongda2018.github.io/tags/android">Android</a>  
+    
+    </span>
+  </p>
+
+  
+
+  <p class="meta">
+    
+        <a class="basic-alignment left" href="https://chenyongda2018.github.io/posts/android/android%E9%A2%9C%E8%89%B2%E6%A0%BC%E5%BC%8F%E5%8C%BA%E5%88%AB/" title="Android颜色格式区别">Android颜色格式区别</a>
+    
+
+    
+  </p>
+  
+</footer>
+
+      </article>
+    </div>
+    
+
+<aside class="sidebar thirds">
+  <section class="first odd">
+
+    
+
+    <p>
+      
+    </p>
+  </section>
+
+  
+  
+
+
+
+<ul class="sidebar-nav">
+  <li class="sidebar-nav-item">
+    <a target="_blank" rel="noopener noreferrer" href="https://github.com/chenyongda2018" title="https://github.com/chenyongda2018"><i class="fa fa-github fa-3x"></i></a>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+  
+  
+  </li>
+</ul>
+
+  
+
+  
+    
+      <section class="odd">
+        
+        
+          <li>
+            <a href="https://chenyongda2018.github.io/categories/" title="分类" >分类</a>
+          </li>
+        
+      </section>
+    
+  
+
+  
+  
+  
+    
+      <section class="even">
+        <h1>Recent Posts</h1>
+        <ul id="recent_posts">
+          
+          
+        </ul>
+      </section>
+    
+  
+</aside>
+
+  </div>
+</div>
+
+    <footer role="contentinfo">
+      <p>Copyright &copy; 2023 Petrichor - <a href="https://chenyongda2018.github.io/license/">License</a> -
+        <span class="credit">Powered by <a target="_blank" href="https://gohugo.io" rel="noopener noreferrer">Hugo</a> and <a target="_blank" href="https://github.com/parsiya/hugo-octopress/" rel="noopener noreferrer">Hugo-Octopress</a> theme.
+      </p>
+    </footer>
+
+    
+    
+
+
+
+    
+    
+    
+
+    
+  </body>
+</html>
+
