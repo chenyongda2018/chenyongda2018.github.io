@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>性能优化 on Petrichor&#39;s blog</title>
+    <link>https://chenyongda2018.github.io/tags/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/</link>
+    <description>Recent content in 性能优化 on Petrichor&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 14 May 2022 15:26:58 +0800</lastBuildDate><atom:link href="https://chenyongda2018.github.io/tags/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Android内存泄漏探究</title>
+      <link>https://chenyongda2018.github.io/posts/android/android_memory_leak/</link>
+      <pubDate>Sat, 14 May 2022 15:26:58 +0800</pubDate>
+      
+      <guid>https://chenyongda2018.github.io/posts/android/android_memory_leak/</guid>
+      <description>一.什么是内存泄漏 内存泄漏（英语：Memory leak）是在计算机科学中，由于疏忽或错误造成程序未能释放已经不再使用的内存。 — — — 维基百科
+二.内存泄漏的影响 使得应用程序容易发生 OOM
+Android系统为每个应用分配的内存有限，若程序的发生的内存泄漏较多,会导致所需的内存超过系统所给的限额。 最终:OOM → Crash
+三. GC Roots 对于使用可达性分析的垃圾回收算法来说，GC roots是一个比较特别的存在，它用来帮助GC判断哪些对象可以被回收，如果这个对象被是GC roots 或者被GC roots引用就不会被回收。
+哪些可以作为GC roots?
+Class : 被系统ClassLoader加载的class,自定义的ClassLoader加载的class不是GC roots, 注意:静态变量是属于类的。 Thread: 处于活动状态的线程. Stack Local: 方法中的变量和参数. JNI Local: JNI方法中的变量和参数. JNI Global: 全局的JNI reference,也就是JNI中全局创建的引用. Monitor Used: 同步的对象,例如被 Synchronized 锁住的对象. Held by JVM: 取决于各个JVM的实现,系统的ClassLoader和JVM本身会用到的一些对象. 在开发中最常见的就是方法中的变量作为GC roots,如下代码:
+我们创建了80M大小的内存区域并用变量 b指向这块区域，然后我们调用gc。
+垃圾回收器首先进行了一次Minor GC，log中可以看到年轻代从3932K 降到了 560K，然后对象b转移到了老年代。
+随后垃圾回收器又进行了一次Full GC,老年代中的内存从81.9M 降到 439K, 也就是我们创建的80M内存被正常回收了。
+再看下面一段代码
+可以看到在Full GC时,分配的80M内存并没有被回收。
+原因: ByteArray对象被作为GC roots的变量b持有，无法被回收
+四.内存泄漏 in Android 内存泄漏的根本原因在于对象始终被GC roots引用，或者本身作为GC roots当不在使用时没有正确置空或释放。</description>
+    </item>
+    
+    <item>
+      <title>Android性能优化文章</title>
+      <link>https://chenyongda2018.github.io/posts/android/android_performance/</link>
+      <pubDate>Thu, 12 May 2022 19:43:48 +0800</pubDate>
+      
+      <guid>https://chenyongda2018.github.io/posts/android/android_performance/</guid>
+      <description>1.布局优化 深入探索Android布局优化（上） 深入探索Android布局优化（中） 深入探索Android布局优化（下） 2.绘制优化 Android性能优化之绘制优化 3.卡顿优化 深入探索Android卡顿优化（上） 深入探索Android卡顿优化（下） 4.内存优化 深入探索 Android 内存优化（炼狱级别-上） 深入探索 Android 内存优化（炼狱级别-下） 5.启动速度优化 深入探索Android启动速度优化（上） 深入探索Android启动速度优化（下） 6.包体积优化 深入探索 Android 包体积优化（匠心制作-上） 深入探索 Android 包体积优化（匠心制作-下） 包体积优化 · 工具论 · 初识包体积优化 包体积优化 · 方法论 · 揭开包体积优化神秘面纱 包体积优化 · 实战论 · 怎么做包体积优化? 包体积优化 · 彩蛋篇 · Android编译期PNG自动化转换WEBP 7.APM APM监控 · 入门篇 · Android端测监控平台建设 卡顿监测 · 方案篇 · Android卡顿监测指导原则 </description>
+    </item>
+    
+  </channel>
+</rss>

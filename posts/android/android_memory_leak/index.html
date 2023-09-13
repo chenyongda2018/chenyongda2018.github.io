@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1">
+
+  
+    
+    
+      <link href="/css/fonts.css" rel="stylesheet" type="text/css">
+    
+  
+
+  
+  <title>Android内存泄漏探究</title>
+
+  
+  
+  <link rel="stylesheet" href="/css/hugo-octopress.css">
+
+  
+  
+
+  
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+  
+
+  
+  
+    <link href="https://chenyongda2018.github.io/newfav.png" rel="icon">
+  
+
+  
+  
+
+  <meta name="description" content="" />
+  <meta name="keywords" content="">
+  <meta name="author" content="Petrichor">
+
+  
+  <meta name="generator" content="Hugo 0.115.1">
+
+  
+  
+
+  
+  
+
+
+
+</head>
+<body>
+
+
+<header role="banner">
+<hgroup>
+  
+  <h1><a href="https://chenyongda2018.github.io/">Petrichor&#39;s blog</a></h1>
+    <h2>Android developer.</h2>
+</hgroup></header>
+
+
+<nav role="navigation">
+<fieldset class="mobile-nav">
+  
+  <select onchange="location = this.value;">
+    <option value="">Navigate…</option>
+      
+        <option value="https://chenyongda2018.github.io/">» HomePage</option>
+      
+        <option value="https://chenyongda2018.github.io/">» Site&#39;s Home Page</option>
+      
+        <option value="https://www.github.com/parsiya/hugo-octopress">» This theme on Github</option>
+      
+  </select>
+</fieldset>
+
+
+<ul class="main-navigation">
+  
+  
+    
+      <li><a href="https://chenyongda2018.github.io/" title="HomePage">HomePage</a></li>
+    
+  
+    
+      <li><a href="https://chenyongda2018.github.io/" title="Site&#39;s Home Page">Site&#39;s Home Page</a></li>
+    
+  
+    
+      <li><a href="https://www.github.com/parsiya/hugo-octopress" title="This theme on Github"  target="_blank"  rel="noopener noreferrer">This theme on Github</a></li>
+    
+  
+</ul>
+
+<ul class="subscription">
+  
+    
+        <a href="https://chenyongda2018.github.io/index.xml" target="_blank" type="application/rss+xml" title="RSS" rel="noopener noreferrer"><i class="fa fa-rss-square fa-lg"></i></a>
+    
+  
+</ul>
+
+
+  <form action="https://www.google.com/search" method="get" target="_blank" rel="noopener noreferrer">
+    <fieldset role="search">
+      <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+      <input type="hidden" name="q" value="site:https://chenyongda2018.github.io/" />
+    </fieldset>
+  </form>
+
+</nav>
+
+
+<div id="main">
+  <div id="content">
+    <div>
+      <article class="hentry" role="article">
+
+        
+        
+
+<header>
+  <p class="meta">May 14, 2022
+     - 1 minute read 
+    
+
+    
+    
+      - <a class="label" href="https://chenyongda2018.github.io/categories/android/">Android </a>
+    
+  </p>
+  <h1 class="entry-title">
+     Android内存泄漏探究 
+  </h1>
+</header>
+
+
+        <div class="entry-content">
+          
+          
+          
+            <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#一什么是内存泄漏">一.什么是内存泄漏</a></li>
+        <li><a href="#二内存泄漏的影响">二.内存泄漏的影响</a></li>
+        <li><a href="#三-gc-roots">三. GC Roots</a></li>
+        <li><a href="#四内存泄漏-in-android">四.内存泄漏 in Android</a>
+          <ul>
+            <li><a href="#1handler使用不规范">1.Handler使用不规范</a></li>
+            <li><a href="#2匿名内部类">2.匿名内部类</a></li>
+            <li><a href="#3单例模式">3.单例模式</a></li>
+            <li><a href="#4注册的监听器未注销">4.注册的监听器未注销</a></li>
+            <li><a href="#5-资源对象未及时关闭">5. 资源对象未及时关闭</a></li>
+          </ul>
+        </li>
+        <li><a href="#六内存泄漏分析工具">六.内存泄漏分析工具</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+          
+          <h2 id="一什么是内存泄漏">一.什么是内存泄漏</h2>
+<p><code>内存泄漏</code>（英语：Memory leak）是在计算机科学中，由于疏忽或错误造成程序未能释放已经不再使用的内存。                                                                                                                 — — — 维基百科</p>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1gugdlcd1bij60i20b4wet02.jpg" alt="Untitled"></p>
+<h2 id="二内存泄漏的影响">二.内存泄漏的影响</h2>
+<p>使得应用程序容易发生 <code>OOM</code></p>
+<ul>
+<li>Android系统为每个应用分配的内存有限，若程序的发生的内存泄漏较多,会导致所需的内存超过系统所给的限额。</li>
+</ul>
+<p>最终:OOM → Crash</p>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1guge4uumelj609l0gy0sy02.jpg" alt="Untitled 1"></p>
+<h2 id="三-gc-roots">三. GC Roots</h2>
+<p>对于使用可达性分析的垃圾回收算法来说，GC roots是一个比较特别的存在，它用来帮助GC判断哪些对象可以被回收，如果这个对象被是GC roots 或者被GC roots引用就不会被回收。</p>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1guge6kkyjoj61060j440402.jpg" alt="Untitled 2"></p>
+<p>哪些可以作为GC roots?</p>
+<ul>
+<li><strong>Class :</strong> 被系统ClassLoader加载的class,自定义的ClassLoader加载的class不是GC roots, 注意:静态变量是属于类的。</li>
+<li>Thread: 处于活动状态的线程.</li>
+<li>Stack Local: 方法中的变量和参数.</li>
+<li>JNI Local: JNI方法中的变量和参数.</li>
+<li>JNI Global: 全局的JNI reference,也就是JNI中全局创建的引用.</li>
+<li>Monitor Used: 同步的对象,例如被 <code>Synchronized</code>  锁住的对象.</li>
+<li>Held by JVM: 取决于各个JVM的实现,系统的ClassLoader和JVM本身会用到的一些对象.</li>
+</ul>
+<p>在开发中最常见的就是方法中的变量作为GC roots,如下代码:</p>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1guge6uh97bj60w809smyg02.jpg" alt="Untitled 3"></p>
+<p>我们创建了80M大小的内存区域并用变量 b指向这块区域，然后我们调用gc。</p>
+<p>垃圾回收器首先进行了一次Minor GC，log中可以看到年轻代从3932K 降到了 560K，然后对象b转移到了老年代。</p>
+<p>随后垃圾回收器又进行了一次Full GC,老年代中的内存从81.9M 降到 439K, 也就是我们创建的80M内存被正常回收了。</p>
+<p>再看下面一段代码</p>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1guge71bss1j60wf0c1q4h02.jpg" alt="Untitled 4"></p>
+<p>可以看到在Full GC时,分配的80M内存并没有被回收。</p>
+<p>原因: ByteArray对象被作为GC roots的变量b持有，无法被回收</p>
+<h2 id="四内存泄漏-in-android">四.内存泄漏 in Android</h2>
+<p>内存泄漏的根本原因在于对象始终被GC roots引用，或者本身作为GC roots当不在使用时没有正确置空或释放。</p>
+<p>持有Activity的GC roots的引用链如下图</p>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1guge78dbhfj619c0tcn1m02.jpg" alt="Untitled 5"></p>
+<p>Activity被置空的时机:</p>
+<p>在onDestory()方法执行时,ActivityThread通过handleDestroyActivity()方法将 Activity置空</p>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1guge7dn67dj60u01bidkd02.jpg" alt="Untitled 6"></p>
+<p>那么Activity被引用者置空后，对GC roots就不可达，可以正常被回收。</p>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1guge7m3gj5j60n20erta102.jpg" alt="Untitled 7"></p>
+<h3 id="1handler使用不规范">1.Handler使用不规范</h3>
+<p>内部类/匿名内部类 隐式持有外部类的引用</p>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1guge7r5l6rj60x90u041d02.jpg" alt="Untitled 8"></p>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1guge7yp9lxj60z80u00vs02.jpg" alt="Untitled 9"></p>
+<p>Activity → Handler → Message → MessageQueue → Looper()，有Looper()存在于整个应用的生命周期，所以，如果Activity销毁时，Handler发送的消息还未得到Looper()处理，将导致Activity泄漏</p>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1guge82vvqdj60lv0eiwfe02.jpg" alt="Untitled 10"></p>
+<blockquote>
+<p>内部类静态化 + WeakReference</p>
+</blockquote>
+<ul>
+<li>若垃圾收集器发现一个对象是弱可达的(weakly reachable)， 会清除所有指向该
+对象的弱引用</li>
+</ul>
+<ol>
+<li>通过static将内部类作为独立于外部类的Class</li>
+<li>通过弱引用持有Activity,不耽误Activity回收</li>
+</ol>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1guge881auwj60wh0u077m02.jpg" alt="Untitled 11"></p>
+<ol>
+<li>及时移除未处理的消息以及callback</li>
+</ol>
+<p>消除message对Handler的引用</p>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1guge8cahvqj616z0u0q6802.jpg" alt="Untitled 12"></p>
+<h3 id="2匿名内部类">2.匿名内部类</h3>
+<ul>
+<li>AsyncTask</li>
+<li>Thread</li>
+<li>匿名接口回调</li>
+</ul>
+<p>匿名内部类与内部类都会隐式持有外部类引用</p>
+<h3 id="3单例模式">3.单例模式</h3>
+<p>单例模式的生命周期 = 整个app运行时,</p>
+<p>若需要引用context，请使用applicationContext</p>
+<h3 id="4注册的监听器未注销">4.注册的监听器未注销</h3>
+<ul>
+<li>EventBus</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">class</span> <span style="color:#268bd2">MainActivity</span> <span style="color:#719e07">:</span> AppCompatActivity<span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    override fun <span style="color:#268bd2">onCreate</span><span style="color:#719e07">(</span>savedInstanceState<span style="color:#719e07">:</span> Bundle<span style="color:#719e07">?)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">super</span><span style="color:#719e07">.</span>onCreate<span style="color:#719e07">(</span>savedInstanceState<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>        EventBus<span style="color:#719e07">.</span>getInstance<span style="color:#719e07">().</span>register<span style="color:#719e07">(</span><span style="color:#719e07">this</span><span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>在Activity销毁时需unregister(this)</p>
+<ul>
+<li>SensorManger</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#dc322f">void</span> <span style="color:#268bd2">registerListener</span><span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>       SensorManager sensorManager <span style="color:#719e07">=</span> <span style="color:#719e07">(</span>SensorManager<span style="color:#719e07">)</span> getSystemService<span style="color:#719e07">(</span>SENSOR_SERVICE<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>       Sensor sensor <span style="color:#719e07">=</span> sensorManager<span style="color:#719e07">.</span>getDefaultSensor<span style="color:#719e07">(</span>Sensor<span style="color:#719e07">.</span>TYPE_ALL<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>       sensorManager<span style="color:#719e07">.</span>registerListener<span style="color:#719e07">(</span><span style="color:#719e07">this</span><span style="color:#719e07">,</span> sensor<span style="color:#719e07">,</span> SensorManager<span style="color:#719e07">.</span>SENSOR_DELAY_FASTEST<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>View smButton <span style="color:#719e07">=</span> findViewById<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>id<span style="color:#719e07">.</span>sm_button<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>smButton<span style="color:#719e07">.</span>setOnClickListener<span style="color:#719e07">(</span><span style="color:#719e07">new</span> View<span style="color:#719e07">.</span>OnClickListener<span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">@Override</span> <span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onClick</span><span style="color:#719e07">(</span>View v<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        registerListener<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>        nextActivity<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">});</span>
+</span></span></code></pre></div><p>在Activity销毁时需SensorManger.unregisterListener(this)</p>
+<ul>
+<li>
+<p>ContentObserver</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>getContentResolver<span style="color:#719e07">().</span>registerContentObserver<span style="color:#719e07">(</span>
+</span></span><span style="display:flex;"><span>            SOME_URI<span style="color:#719e07">,</span> 
+</span></span><span style="display:flex;"><span>            <span style="color:#cb4b16">true</span><span style="color:#719e07">,</span> 
+</span></span><span style="display:flex;"><span>            yourObserver<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>getContentResolver<span style="color:#719e07">().</span>unregisterContentObserver<span style="color:#719e07">(</span>yourObserver<span style="color:#719e07">);</span>
+</span></span></code></pre></div></li>
+</ul>
+<h3 id="5-资源对象未及时关闭">5. 资源对象未及时关闭</h3>
+<ul>
+<li>file</li>
+<li>cursor</li>
+<li>bitmap</li>
+<li>&hellip;</li>
+</ul>
+<h2 id="六内存泄漏分析工具">六.内存泄漏分析工具</h2>
+<ul>
+<li>
+<p>Android Studio Monitor</p>
+</li>
+<li>
+<p>LeakCanary</p>
+</li>
+</ul>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1guge8huplvj60vj0u0q6f02.jpg" alt="Untitled 13"></p>
+
+        </div>
+        
+
+<footer>
+  <p class="meta">
+    <span class="byline author vcard">Posted by <span class="fn">Petrichor</span></span>
+    
+    <time>May 14, 2022</time>
+    
+      <span class="categories">
+        Tags:
+        
+          <a class="category" href="https://chenyongda2018.github.io/tags/android">Android</a>  <a class="category" href="https://chenyongda2018.github.io/tags/%e6%80%a7%e8%83%bd%e4%bc%98%e5%8c%96">性能优化</a>  <a class="category" href="https://chenyongda2018.github.io/tags/%e5%86%85%e5%ad%98%e6%b3%84%e6%bc%8f">内存泄漏</a>  
+    
+    </span>
+  </p>
+
+  
+
+  <p class="meta">
+    
+        <a class="basic-alignment left" href="https://chenyongda2018.github.io/posts/android/android_performance/" title="Android性能优化文章">Android性能优化文章</a>
+    
+
+    
+  </p>
+  
+</footer>
+
+      </article>
+    </div>
+    
+
+<aside class="sidebar thirds">
+  <section class="first odd">
+
+    
+
+    <p>
+      
+    </p>
+  </section>
+
+  
+  
+
+
+
+<ul class="sidebar-nav">
+  <li class="sidebar-nav-item">
+    <a target="_blank" rel="noopener noreferrer" href="https://github.com/chenyongda2018" title="https://github.com/chenyongda2018"><i class="fa fa-github fa-3x"></i></a>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+  
+  
+  </li>
+</ul>
+
+  
+
+  
+    
+      <section class="odd">
+        
+        
+          <li>
+            <a href="https://chenyongda2018.github.io/categories/" title="category" >category</a>
+          </li>
+        
+          <li>
+            <a href="https://chenyongda2018.github.io/about" title="About me" >About me</a>
+          </li>
+        
+      </section>
+    
+  
+
+  
+  
+  
+    
+      <section class="even">
+        <h1>Recent Posts</h1>
+        <ul id="recent_posts">
+          
+          
+        </ul>
+      </section>
+    
+  
+</aside>
+
+  </div>
+</div>
+
+    <footer role="contentinfo">
+      <p>Copyright &copy; 2023 Petrichor - <a href="https://chenyongda2018.github.io/license/">License</a> -
+        <span class="credit">Powered by <a target="_blank" href="https://gohugo.io" rel="noopener noreferrer">Hugo</a> and <a target="_blank" href="https://github.com/parsiya/hugo-octopress/" rel="noopener noreferrer">Hugo-Octopress</a> theme.
+      </p>
+    </footer>
+
+    
+    
+
+
+
+    
+    
+    
+
+    
+  </body>
+</html>
+

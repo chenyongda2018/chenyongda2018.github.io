@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Petrichor&#39;s blog</title>
+    <link>https://chenyongda2018.github.io/posts/</link>
+    <description>Recent content in Posts on Petrichor&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 14 May 2022 15:26:58 +0800</lastBuildDate><atom:link href="https://chenyongda2018.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Android内存泄漏探究</title>
+      <link>https://chenyongda2018.github.io/posts/android/android_memory_leak/</link>
+      <pubDate>Sat, 14 May 2022 15:26:58 +0800</pubDate>
+      
+      <guid>https://chenyongda2018.github.io/posts/android/android_memory_leak/</guid>
+      <description>一.什么是内存泄漏 内存泄漏（英语：Memory leak）是在计算机科学中，由于疏忽或错误造成程序未能释放已经不再使用的内存。 — — — 维基百科
+二.内存泄漏的影响 使得应用程序容易发生 OOM
+Android系统为每个应用分配的内存有限，若程序的发生的内存泄漏较多,会导致所需的内存超过系统所给的限额。 最终:OOM → Crash
+三. GC Roots 对于使用可达性分析的垃圾回收算法来说，GC roots是一个比较特别的存在，它用来帮助GC判断哪些对象可以被回收，如果这个对象被是GC roots 或者被GC roots引用就不会被回收。
+哪些可以作为GC roots?
+Class : 被系统ClassLoader加载的class,自定义的ClassLoader加载的class不是GC roots, 注意:静态变量是属于类的。 Thread: 处于活动状态的线程. Stack Local: 方法中的变量和参数. JNI Local: JNI方法中的变量和参数. JNI Global: 全局的JNI reference,也就是JNI中全局创建的引用. Monitor Used: 同步的对象,例如被 Synchronized 锁住的对象. Held by JVM: 取决于各个JVM的实现,系统的ClassLoader和JVM本身会用到的一些对象. 在开发中最常见的就是方法中的变量作为GC roots,如下代码:
+我们创建了80M大小的内存区域并用变量 b指向这块区域，然后我们调用gc。
+垃圾回收器首先进行了一次Minor GC，log中可以看到年轻代从3932K 降到了 560K，然后对象b转移到了老年代。
+随后垃圾回收器又进行了一次Full GC,老年代中的内存从81.9M 降到 439K, 也就是我们创建的80M内存被正常回收了。
+再看下面一段代码
+可以看到在Full GC时,分配的80M内存并没有被回收。
+原因: ByteArray对象被作为GC roots的变量b持有，无法被回收
+四.内存泄漏 in Android 内存泄漏的根本原因在于对象始终被GC roots引用，或者本身作为GC roots当不在使用时没有正确置空或释放。</description>
+    </item>
+    
+    <item>
+      <title>Android性能优化文章</title>
+      <link>https://chenyongda2018.github.io/posts/android/android_performance/</link>
+      <pubDate>Thu, 12 May 2022 19:43:48 +0800</pubDate>
+      
+      <guid>https://chenyongda2018.github.io/posts/android/android_performance/</guid>
+      <description>1.布局优化 深入探索Android布局优化（上） 深入探索Android布局优化（中） 深入探索Android布局优化（下） 2.绘制优化 Android性能优化之绘制优化 3.卡顿优化 深入探索Android卡顿优化（上） 深入探索Android卡顿优化（下） 4.内存优化 深入探索 Android 内存优化（炼狱级别-上） 深入探索 Android 内存优化（炼狱级别-下） 5.启动速度优化 深入探索Android启动速度优化（上） 深入探索Android启动速度优化（下） 6.包体积优化 深入探索 Android 包体积优化（匠心制作-上） 深入探索 Android 包体积优化（匠心制作-下） 包体积优化 · 工具论 · 初识包体积优化 包体积优化 · 方法论 · 揭开包体积优化神秘面纱 包体积优化 · 实战论 · 怎么做包体积优化? 包体积优化 · 彩蛋篇 · Android编译期PNG自动化转换WEBP 7.APM APM监控 · 入门篇 · Android端测监控平台建设 卡顿监测 · 方案篇 · Android卡顿监测指导原则 </description>
+    </item>
+    
+    <item>
+      <title>Kotlin Lambda</title>
+      <link>https://chenyongda2018.github.io/posts/android/kotlin_lamdba/</link>
+      <pubDate>Sat, 16 Apr 2022 15:48:16 +0800</pubDate>
+      
+      <guid>https://chenyongda2018.github.io/posts/android/kotlin_lamdba/</guid>
+      <description>Kotlin lambda Kotlin中，充斥着各种各样的Lambda 表达式，这是Kotlin最方便的特性之一
+了解Kotlin 中的lambda，首先得知道Kotlin中的高阶函数
+1.高阶函数 在Java中，如果有一个a方法，要去调用b方法，那么在里面直接调用即可。
+int a() { return b(1); } a(); 接着,如果我不想把调用b方法的参数写死，希望动态设置方法b的参数。
+int a(int param) { return b(param); } a(1); a(2); 这些在Java中很轻松就能做到，不过&amp;hellip; 如果我们想动态设置的不是方法参数，而是方法本身呢，比如在方法a内有一处对别的方法的调用，这个方法可能是方法b,方法c,方法d&amp;hellip;,该方法的参数类型是int,返回值类型也是int。方法a在执行时，具体需要调用哪个方法，能否动态设置? 也就是说能否将一个方法作为参数传给a?
+通过接口
+public interface Wrapper { int method(int param); } 将这个接口类型Wrapper 作为方法a的参数
+int a(Wrapper wrapper) { return wrapper.method(1); } a(wrapper1); a(wrapper2); 举个我们常见的例子
+在Android里View的点击事件
+public class View { OnClickListener mOnClickListener; ... public void onTouchEvent(MotionEvent e) { ... mOnClickListener.onClick(this); ... } } OnClickListener就是一个接口，点击事件的内容全在onClick()方法里
+public interface OnClickListener { void onClick(View v); } 我们在给View设置点击事件时，传的就是一个OnClickListener,本质上这样传递的是一个稍后会被调用的onClick()方法,一般称之为回调,不过由于Java中不允许直接传递方法，所以需要用接口包装一下。</description>
+    </item>
+    
+    <item>
+      <title>Glide学习笔记</title>
+      <link>https://chenyongda2018.github.io/posts/android/glide_study/</link>
+      <pubDate>Thu, 14 Nov 2019 20:13:19 +0800</pubDate>
+      
+      <guid>https://chenyongda2018.github.io/posts/android/glide_study/</guid>
+      <description>一.使用 1.配置依赖 在 app 层 build.gradle 中添加依赖 : dependencies { ... implementation &amp;#39;com.github.bumptech.glide:glide:4.9.0&amp;#39; annotationProcessor &amp;#39;com.github.bumptech.glide:compiler:4.9.0&amp;#39; annotationProcessor &amp;#39;androidx.annotation:annotation:1.1.0&amp;#39; ... } 添加必要权限 : &amp;lt;uses-permission android:name=&amp;#34;android.permission.INTERNET&amp;#34;/&amp;gt; &amp;lt;uses-permission android:name=&amp;#34;android.permission.ACCESS_NETWORK_STATE&amp;#34;/&amp;gt; &amp;lt;uses-permission android:name=&amp;#34;android.permission.READ_EXTERNAL_STORAGE&amp;#34; /&amp;gt; &amp;lt;uses-permission android:name=&amp;#34;android.permission.WRITE_EXTERNAL_STORAGE&amp;#34; /&amp;gt; 2.初步上手 代码 : Glide.with(context) .asBitmap() //把动图当作静止图片处理,也就是只显示gif图的第一帧 .load(&amp;#34;https://pic2.zhimg.com/v2-c4970ee756c55333b7b871c5b617d9ed_b.gif&amp;#34;)//图片url .placeholder(R.mipmap.ic_launcher) //占位符,在加载图片完成之前显示的图片 .error(R.drawable.ic_launcher_background) //加载失败时显示的图片 .fitCenter() //当图片长宽大于ImageView时,缩放图片 .fallback(R.mipmap.ic_launcher) //图片url为Null时显示的图片 .into(image1); // 放入到ImageView中 效果图 :
+🎈Tips : fitCenter()与CenterCrop()区别 : fitCenter() : 效果如上图,缩放原图至ImageView大小。 CenterCrop():如下图,保持原图不变，只根据ImageView大小显示对应部分。 3.配合RecyclerView显示图片列表 1.需要加载的图片url数据源
+String[] mImageList = { &amp;#34;https://gss0.bdstatic.com/94o3dSag_xI4khGkpoWK1HF6hhy/baike/crop%3D0%2C231%2C438%&amp;#34; + &amp;#34;2C219%3BeWH%3D800%2C400/sign=b9c61bb42b3fb80e189e3b970be1031c/d50735fae6cd7b89267e2d06052442a7d9330e20.jpg&amp;#34;, &amp;#34;https://s3.ifanr.com/wp-content/uploads/2018/02/https_2F2Fhk.hypebeast.com2Ffiles2F20182F012Fdragon-ball-super-ending-anime-details-01-1.jpg&amp;#34;, &amp;#34;https://gss2.bdstatic.com/-fo3dSag_xI4khGkpoWK1HF6hhy/baike/s%3D220/sign=999dccfe8082b90139adc431438ca97e/a1ec08fa513d26970f8fef845ffbb2fb4216d88f.jpg&amp;#34;, &amp;#34;http://img5.</description>
+    </item>
+    
+  </channel>
+</rss>

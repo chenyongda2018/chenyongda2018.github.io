@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1">
+
+  
+    
+    
+      <link href="/css/fonts.css" rel="stylesheet" type="text/css">
+    
+  
+
+  
+  <title>Glide学习笔记</title>
+
+  
+  
+  <link rel="stylesheet" href="/css/hugo-octopress.css">
+
+  
+  
+
+  
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+  
+
+  
+  
+    <link href="https://chenyongda2018.github.io/newfav.png" rel="icon">
+  
+
+  
+  
+
+  <meta name="description" content="" />
+  <meta name="keywords" content="">
+  <meta name="author" content="Petrichor">
+
+  
+  <meta name="generator" content="Hugo 0.115.1">
+
+  
+  
+
+  
+  
+
+
+
+</head>
+<body>
+
+
+<header role="banner">
+<hgroup>
+  
+  <h1><a href="https://chenyongda2018.github.io/">Petrichor&#39;s blog</a></h1>
+    <h2>Android developer.</h2>
+</hgroup></header>
+
+
+<nav role="navigation">
+<fieldset class="mobile-nav">
+  
+  <select onchange="location = this.value;">
+    <option value="">Navigate…</option>
+      
+        <option value="https://chenyongda2018.github.io/">» HomePage</option>
+      
+        <option value="https://chenyongda2018.github.io/">» Site&#39;s Home Page</option>
+      
+        <option value="https://www.github.com/parsiya/hugo-octopress">» This theme on Github</option>
+      
+  </select>
+</fieldset>
+
+
+<ul class="main-navigation">
+  
+  
+    
+      <li><a href="https://chenyongda2018.github.io/" title="HomePage">HomePage</a></li>
+    
+  
+    
+      <li><a href="https://chenyongda2018.github.io/" title="Site&#39;s Home Page">Site&#39;s Home Page</a></li>
+    
+  
+    
+      <li><a href="https://www.github.com/parsiya/hugo-octopress" title="This theme on Github"  target="_blank"  rel="noopener noreferrer">This theme on Github</a></li>
+    
+  
+</ul>
+
+<ul class="subscription">
+  
+    
+        <a href="https://chenyongda2018.github.io/index.xml" target="_blank" type="application/rss+xml" title="RSS" rel="noopener noreferrer"><i class="fa fa-rss-square fa-lg"></i></a>
+    
+  
+</ul>
+
+
+  <form action="https://www.google.com/search" method="get" target="_blank" rel="noopener noreferrer">
+    <fieldset role="search">
+      <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+      <input type="hidden" name="q" value="site:https://chenyongda2018.github.io/" />
+    </fieldset>
+  </form>
+
+</nav>
+
+
+<div id="main">
+  <div id="content">
+    <div>
+      <article class="hentry" role="article">
+
+        
+        
+
+<header>
+  <p class="meta">Nov 14, 2019
+     - 8 minute read 
+    
+
+    
+    
+      - <a class="label" href="https://chenyongda2018.github.io/categories/android/">Android </a>
+    
+  </p>
+  <h1 class="entry-title">
+     Glide学习笔记 
+  </h1>
+</header>
+
+
+        <div class="entry-content">
+          
+          
+          
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#一使用">一.使用</a>
+      <ul>
+        <li><a href="#1配置依赖">1.配置依赖</a></li>
+        <li><a href="#2初步上手">2.初步上手</a></li>
+        <li><a href="#3配合recyclerview显示图片列表">3.配合RecyclerView显示图片列表</a></li>
+        <li><a href="#5缓存">5.缓存</a></li>
+        <li><a href="#6使用缩略图thumbnail">6.使用缩略图(Thumbnail)</a></li>
+        <li><a href="#7target">7.Target</a></li>
+        <li><a href="#8过渡动画transitions">8.过渡动画(Transitions)</a></li>
+        <li><a href="#9自定义module">9.自定义Module</a></li>
+      </ul>
+    </li>
+    <li><a href="#二源码解析">二.源码解析</a>
+      <ul>
+        <li><a href="#1glidewith--glide的生命周期管理">1.Glide.with() : Glide的生命周期管理</a></li>
+        <li><a href="#2loadurl-">2.load(url) : </a></li>
+        <li><a href="#3into">3.into()</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+          
+          <h1 id="一使用">一.使用</h1>
+<h2 id="1配置依赖">1.配置依赖</h2>
+<p>在 <code>app</code> 层 <code>build.gradle</code> 中添加依赖 : </p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span>dependencies {
+</span></span><span style="display:flex;"><span>    ...
+</span></span><span style="display:flex;"><span>    implementation &#39;com.github.bumptech.glide:glide:4.9.0&#39;
+</span></span><span style="display:flex;"><span>    annotationProcessor &#39;com.github.bumptech.glide:compiler:4.9.0&#39;
+</span></span><span style="display:flex;"><span>    annotationProcessor &#39;androidx.annotation:annotation:1.1.0&#39;
+</span></span><span style="display:flex;"><span>    ...
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>添加必要权限 : </p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#268bd2">&lt;uses-permission</span> android:name=<span style="color:#2aa198">&#34;android.permission.INTERNET&#34;</span><span style="color:#268bd2">/&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">&lt;uses-permission</span> android:name=<span style="color:#2aa198">&#34;android.permission.ACCESS_NETWORK_STATE&#34;</span><span style="color:#268bd2">/&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">&lt;uses-permission</span> android:name=<span style="color:#2aa198">&#34;android.permission.READ_EXTERNAL_STORAGE&#34;</span> <span style="color:#268bd2">/&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">&lt;uses-permission</span> android:name=<span style="color:#2aa198">&#34;android.permission.WRITE_EXTERNAL_STORAGE&#34;</span> <span style="color:#268bd2">/&gt;</span>
+</span></span></code></pre></div><h2 id="2初步上手">2.初步上手</h2>
+<p>代码 : </p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>Glide<span style="color:#719e07">.</span>with<span style="color:#719e07">(</span>context<span style="color:#719e07">)</span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>asBitmap<span style="color:#719e07">()</span> <span style="color:#586e75">//把动图当作静止图片处理,也就是只显示gif图的第一帧
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#719e07">.</span>load<span style="color:#719e07">(</span><span style="color:#2aa198">&#34;https://pic2.zhimg.com/v2-c4970ee756c55333b7b871c5b617d9ed_b.gif&#34;</span><span style="color:#719e07">)</span><span style="color:#586e75">//图片url
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#719e07">.</span>placeholder<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>mipmap<span style="color:#719e07">.</span>ic_launcher<span style="color:#719e07">)</span>  <span style="color:#586e75">//占位符,在加载图片完成之前显示的图片
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#719e07">.</span>error<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>drawable<span style="color:#719e07">.</span>ic_launcher_background<span style="color:#719e07">)</span> <span style="color:#586e75">//加载失败时显示的图片
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#719e07">.</span>fitCenter<span style="color:#719e07">()</span> <span style="color:#586e75">//当图片长宽大于ImageView时,缩放图片
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#719e07">.</span>fallback<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>mipmap<span style="color:#719e07">.</span>ic_launcher<span style="color:#719e07">)</span> <span style="color:#586e75">//图片url为Null时显示的图片
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#719e07">.</span>into<span style="color:#719e07">(</span>image1<span style="color:#719e07">);</span> <span style="color:#586e75">// 放入到ImageView中
+</span></span></span></code></pre></div><p>效果图 :</p>
+<!-- raw HTML omitted -->
+<p>🎈Tips : fitCenter()与CenterCrop()区别 : </p>
+<ul>
+<li>fitCenter() : 效果如上图,缩放原图至ImageView大小。</li>
+<li>CenterCrop():如下图,保持原图不变，只根据ImageView大小显示对应部分。</li>
+</ul>
+<!-- raw HTML omitted -->
+<h2 id="3配合recyclerview显示图片列表">3.配合RecyclerView显示图片列表</h2>
+<p>1.需要加载的图片url数据源</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>String<span style="color:#719e07">[]</span> mImageList <span style="color:#719e07">=</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#2aa198">&#34;https://gss0.bdstatic.com/94o3dSag_xI4khGkpoWK1HF6hhy/baike/crop%3D0%2C231%2C438%&#34;</span> <span style="color:#719e07">+</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#2aa198">&#34;2C219%3BeWH%3D800%2C400/sign=b9c61bb42b3fb80e189e3b970be1031c/d50735fae6cd7b89267e2d06052442a7d9330e20.jpg&#34;</span><span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#2aa198">&#34;https://s3.ifanr.com/wp-content/uploads/2018/02/https_2F2Fhk.hypebeast.com2Ffiles2F20182F012Fdragon-ball-super-ending-anime-details-01-1.jpg&#34;</span><span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#2aa198">&#34;https://gss2.bdstatic.com/-fo3dSag_xI4khGkpoWK1HF6hhy/baike/s%3D220/sign=999dccfe8082b90139adc431438ca97e/a1ec08fa513d26970f8fef845ffbb2fb4216d88f.jpg&#34;</span><span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#2aa198">&#34;http://img5.mtime.cn/CMS/News/2019/05/28/223631.52706895_620X620.jpg&#34;</span><span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#2aa198">&#34;http://newsimg.5054399.com/uploads/userup/1902/2F95FQ953.jpg&#34;</span><span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#2aa198">&#34;http://x0.ifengimg.com/cmpp/2019_37/63ef72f4f79be26_size61_w1278_h716.jpg&#34;</span><span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#2aa198">&#34;https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJehCL30Zj-jAI8xxZ1eQI6mf9DuqaC6LXEOzF-Li8-Y1YlSnJ&amp;s&#34;</span><span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#2aa198">&#34;https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTzaN89LyHy1IzuibIhUdvJjEiCdrn8R84BnUi4O6hlPtmJZWe&amp;s&#34;</span><span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#2aa198">&#34;https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGFNu4QL1YIazFeV-hVtIv686UNFqJwjReiObeCmAZiFvl7CHJ&amp;s&#34;</span><span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#2aa198">&#34;https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyMlTlY90LK_A_nbv8egC6yZkhvd4WmAHOoMzwVuGaH8VJKQga&amp;s&#34;</span><span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#2aa198">&#34;https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNfpqnbeGqjIObnVpLipvUve0QGjT3PANsVoAEsKSvvmFdozMD&amp;s&#34;</span><span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#2aa198">&#34;https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTjTT47tCkv6wy93-JIno1Egv-0QQQ5rvKmSTZ9gZ5Jd64VPY2o&amp;s&#34;</span><span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#2aa198">&#34;https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGFNu4QL1YIazFeV-hVtIv686UNFqJwjReiObeCmAZiFvl7CHJ&amp;s&#34;</span><span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">};</span>
+</span></span></code></pre></div><p>2.item的布局</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#268bd2">&lt;LinearLayout</span> xmlns:android=<span style="color:#2aa198">&#34;http://schemas.android.com/apk/res/android&#34;</span>
+</span></span><span style="display:flex;"><span>    xmlns:app=<span style="color:#2aa198">&#34;http://schemas.android.com/apk/res-auto&#34;</span>
+</span></span><span style="display:flex;"><span>    xmlns:tools=<span style="color:#2aa198">&#34;http://schemas.android.com/tools&#34;</span>
+</span></span><span style="display:flex;"><span>    android:layout_width=<span style="color:#2aa198">&#34;match_parent&#34;</span>
+</span></span><span style="display:flex;"><span>    android:layout_height=<span style="color:#2aa198">&#34;wrap_content&#34;</span><span style="color:#268bd2">&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">&lt;ImageView</span>
+</span></span><span style="display:flex;"><span>        android:id=<span style="color:#2aa198">&#34;@+id/imageView&#34;</span>
+</span></span><span style="display:flex;"><span>        android:layout_width=<span style="color:#2aa198">&#34;wrap_content&#34;</span>
+</span></span><span style="display:flex;"><span>        android:layout_height=<span style="color:#2aa198">&#34;150dp&#34;</span>
+</span></span><span style="display:flex;"><span>        android:layout_margin=<span style="color:#2aa198">&#34;10dp&#34;</span>
+</span></span><span style="display:flex;"><span>        android:layout_weight=<span style="color:#2aa198">&#34;1&#34;</span>
+</span></span><span style="display:flex;"><span>        tools:srcCompat=<span style="color:#2aa198">&#34;@tools:sample/avatars&#34;</span> <span style="color:#268bd2">/&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">&lt;/LinearLayout&gt;</span>
+</span></span></code></pre></div><p>3.adapter</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">public</span> <span style="color:#268bd2">class</span> <span style="color:#268bd2">ImageListAdapter</span> <span style="color:#268bd2">extends</span> RecyclerView<span style="color:#719e07">.</span>Adapter<span style="color:#719e07">&lt;</span>ImageListAdapter<span style="color:#719e07">.</span>ViewHolder<span style="color:#719e07">&gt;</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">private</span> Context mContext<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">private</span> String<span style="color:#719e07">[]</span> mImageList<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">private</span> LayoutInflater mInflater<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    RequestOptions mOptions <span style="color:#719e07">=</span> <span style="color:#719e07">new</span> RequestOptions<span style="color:#719e07">()</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">.</span>placeholder<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>mipmap<span style="color:#719e07">.</span>ic_launcher<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">.</span>error<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>drawable<span style="color:#719e07">.</span>ic_launcher_background<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">public</span> <span style="color:#268bd2">ImageListAdapter</span><span style="color:#719e07">(</span>Context mContext<span style="color:#719e07">,</span> String<span style="color:#719e07">[]</span> mImageList<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">this</span><span style="color:#719e07">.</span>mContext <span style="color:#719e07">=</span> mContext<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">this</span><span style="color:#719e07">.</span>mImageList <span style="color:#719e07">=</span> mImageList<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>        mInflater <span style="color:#719e07">=</span> LayoutInflater<span style="color:#719e07">.</span>from<span style="color:#719e07">(</span>mContext<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">public</span> <span style="color:#268bd2">class</span> <span style="color:#268bd2">ViewHolder</span> <span style="color:#268bd2">extends</span> RecyclerView<span style="color:#719e07">.</span>ViewHolder <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">public</span> ImageView imageView<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">public</span> <span style="color:#268bd2">ViewHolder</span><span style="color:#719e07">(</span><span style="color:#268bd2">@NonNull</span> View itemView<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">super</span><span style="color:#719e07">(</span>itemView<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>            imageView <span style="color:#719e07">=</span> <span style="color:#719e07">(</span>ImageView<span style="color:#719e07">)</span> itemView<span style="color:#719e07">.</span>findViewById<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>id<span style="color:#719e07">.</span>imageView<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">@NonNull</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">public</span> ImageListAdapter<span style="color:#719e07">.</span>ViewHolder <span style="color:#268bd2">onCreateViewHolder</span><span style="color:#719e07">(</span><span style="color:#268bd2">@NonNull</span> ViewGroup parent<span style="color:#719e07">,</span> <span style="color:#dc322f">int</span> viewType<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>       View view <span style="color:#719e07">=</span> mInflater<span style="color:#719e07">.</span>inflate<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>layout<span style="color:#719e07">.</span>main_activity_list_item<span style="color:#719e07">,</span>parent<span style="color:#719e07">,</span><span style="color:#cb4b16">false</span><span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>       <span style="color:#719e07">return</span> <span style="color:#719e07">new</span> ViewHolder<span style="color:#719e07">(</span>view<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onBindViewHolder</span><span style="color:#719e07">(</span><span style="color:#268bd2">@NonNull</span> ImageListAdapter<span style="color:#719e07">.</span>ViewHolder holder<span style="color:#719e07">,</span> <span style="color:#dc322f">int</span> position<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        Glide<span style="color:#719e07">.</span>with<span style="color:#719e07">(</span>mContext<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">.</span>load<span style="color:#719e07">(</span>mImageList<span style="color:#719e07">[</span>position<span style="color:#719e07">])</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">.</span>apply<span style="color:#719e07">(</span>mOptions<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">.</span>into<span style="color:#719e07">(</span>holder<span style="color:#719e07">.</span>imageView<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">public</span> <span style="color:#dc322f">int</span> <span style="color:#268bd2">getItemCount</span><span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">return</span> mImageList<span style="color:#719e07">.</span>length<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
+</span></span></code></pre></div><ol start="4">
+<li>在activity中绑定Recyclerview和数据源</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>RecyclerView<span style="color:#719e07">.</span>LayoutManager linearLayoutManager <span style="color:#719e07">=</span> <span style="color:#719e07">new</span> LinearLayoutManager<span style="color:#719e07">(</span>getApplicationContext<span style="color:#719e07">());</span>
+</span></span><span style="display:flex;"><span>ImageListAdapter adapter <span style="color:#719e07">=</span> <span style="color:#719e07">new</span> ImageListAdapter<span style="color:#719e07">(</span><span style="color:#719e07">this</span><span style="color:#719e07">,</span>mImageList<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>mRecyclerView <span style="color:#719e07">=</span> findViewById<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>id<span style="color:#719e07">.</span>recyclerView<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>mRecyclerView<span style="color:#719e07">.</span>setLayoutManager<span style="color:#719e07">(</span>linearLayoutManager<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>mRecyclerView<span style="color:#719e07">.</span>setAdapter<span style="color:#719e07">(</span>adapter<span style="color:#719e07">);</span>
+</span></span></code></pre></div><p>效果图:</p>
+<!-- raw HTML omitted -->
+<h2 id="5缓存">5.缓存</h2>
+<ul>
+<li>内存缓存 :</li>
+</ul>
+<p>通过 skipMemoryCache(true)可以设置不进行内存缓存     </p>
+<ul>
+<li>磁盘缓存 :</li>
+</ul>
+<p>diskCacheStrategy(DiskCacheStrategy)
+参数中有四个选项 : </p>
+<ul>
+<li>
+<p>DiskCacheStrategy.ALL : 既缓存原图也缓存处理图</p>
+</li>
+<li>
+<p>DiskCacheStrategy.NONE : 啥都不缓存 = 禁用磁盘缓存</p>
+</li>
+<li>
+<p>DiskCacheStrategy.SOURCE : 只缓存原图</p>
+</li>
+<li>
+<p>DiskCacheStrategy.RESULT : 只缓存处理图</p>
+</li>
+<li>
+<p>BitmapPool : 避免反复创建同样尺寸的bitmap而维护的一个bitmap池.</p>
+</li>
+</ul>
+<p>🎈Tips :Glide的读取缓存顺序是 : 先从内存中读取缓存,若没有再从磁盘中读取,若没有再从load中加载。</p>
+<ul>
+<li>设置Glide只从缓存中加载图片，否则加载失败。</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>Glide<span style="color:#719e07">.</span>with<span style="color:#719e07">(</span>fragment<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">.</span>load<span style="color:#719e07">(</span>url<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">.</span>onlyRetrieveFromCache<span style="color:#719e07">(</span><span style="color:#cb4b16">true</span><span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">.</span>into<span style="color:#719e07">(</span>imageView<span style="color:#719e07">);</span>
+</span></span></code></pre></div><ul>
+<li>清理内存缓存</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>Glide<span style="color:#719e07">.</span>get<span style="color:#719e07">(</span>context<span style="color:#719e07">).</span>clearMemory<span style="color:#719e07">();</span> <span style="color:#586e75">//需要在主线程运行
+</span></span></span></code></pre></div><ul>
+<li>清理磁盘缓存(需要在子线程运行)</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#719e07">new</span> AsyncTask<span style="color:#719e07">&lt;</span>Void<span style="color:#719e07">,</span> Void<span style="color:#719e07">,</span> Void<span style="color:#719e07">&gt;</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">protected</span> Void <span style="color:#268bd2">doInBackground</span><span style="color:#719e07">(</span>Void<span style="color:#719e07">...</span> params<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    Glide<span style="color:#719e07">.</span>get<span style="color:#719e07">(</span>applicationContext<span style="color:#719e07">).</span>clearDiskCache<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> <span style="color:#cb4b16">null</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
+</span></span></code></pre></div><ul>
+<li>Glide对资源的重用机制</li>
+</ul>
+<p>Glide通过 <code>引用计数法</code> 来判断一个资源是否正在被使用 :</p>
+<ul>
+<li>当一个资源通过 <code>into()</code> 方法加载时,它的 <code>引用计数</code> 就会+1</li>
+<li>当承载资源A的 <code>View</code> 或者 <code>Target</code> 调用了 <code>clear()</code> 或者又调用了 <code>into()</code> 加载了别的资源时, A资源的 <code>引用计数</code> -1。</li>
+</ul>
+<p>当一个资源的 计数为0时，就会被释放，Glide可以重用该资源。</p>
+<h2 id="6使用缩略图thumbnail">6.使用缩略图(Thumbnail)</h2>
+<p>1.当你已经有图片的缩略图的资源时,可以直接用url/uri加载</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>GlideApp<span style="color:#719e07">.</span>with<span style="color:#719e07">(</span>mContext<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>asDrawable<span style="color:#719e07">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>load<span style="color:#719e07">(</span>原图url<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>thumbnail<span style="color:#719e07">(</span>Glide<span style="color:#719e07">.</span>with<span style="color:#719e07">(</span>mContext<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>               <span style="color:#719e07">.</span>load<span style="color:#719e07">(</span>缩略图url<span style="color:#719e07">))</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>into<span style="color:#719e07">(</span>holder<span style="color:#719e07">.</span>imageView<span style="color:#719e07">);</span>
+</span></span></code></pre></div><p>2.没有缩略图的资源时，也可以直接传入想要缩小的倍数</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>Glide<span style="color:#719e07">.</span>with<span style="color:#719e07">(</span>mContext<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>asDrawable<span style="color:#719e07">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>load<span style="color:#719e07">(</span>mImageList<span style="color:#719e07">[</span>position<span style="color:#719e07">])</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>thumbnail<span style="color:#719e07">(</span><span style="color:#2aa198">0.1f</span><span style="color:#719e07">)</span>  <span style="color:#586e75">//缩略图大小为原来的 1/10
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#719e07">.</span>into<span style="color:#719e07">(</span>holder<span style="color:#719e07">.</span>imageView<span style="color:#719e07">);</span>
+</span></span></code></pre></div><h2 id="7target">7.Target</h2>
+<p>Target对象用来保存每一个Glide请求。如:</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>Target<span style="color:#719e07">&lt;</span>Drawable<span style="color:#719e07">&gt;</span> target <span style="color:#719e07">=</span> Glide<span style="color:#719e07">.</span>with<span style="color:#719e07">(</span>mContext<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>asDrawable<span style="color:#719e07">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>load<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>drawable<span style="color:#719e07">.</span>ic_launcher_foreground<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>into<span style="color:#719e07">(</span>holder<span style="color:#719e07">.</span>imageView<span style="color:#719e07">);</span>
+</span></span></code></pre></div><p>这样做的目的是可以有效的对glide请求进行管理，取消请求，清理资源。</p>
+<ul>
+<li>清理之前的请求 : </li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>Target<span style="color:#719e07">&lt;</span>Drawable<span style="color:#719e07">&gt;</span> target <span style="color:#719e07">=</span> Glide<span style="color:#719e07">.</span>with<span style="color:#719e07">(</span>mContext<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>asDrawable<span style="color:#719e07">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>load<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>drawable<span style="color:#719e07">.</span>ic_launcher_foreground<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>into<span style="color:#719e07">(</span>holder<span style="color:#719e07">.</span>imageView<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Glide<span style="color:#719e07">.</span>with<span style="color:#719e07">(</span>fragment<span style="color:#719e07">).</span>clear<span style="color:#719e07">(</span>target<span style="color:#719e07">);</span>     <span style="color:#586e75">//清理之前的加载,节省资源
+</span></span></span></code></pre></div><p> 当使用这个target再发出新的加载请求时,glide也会对上一次的加载进行清理，释放资源。</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>Target<span style="color:#719e07">&lt;</span>Drawable<span style="color:#719e07">&gt;</span> target <span style="color:#719e07">=</span> Glide<span style="color:#719e07">.</span>with<span style="color:#719e07">(</span>mContext<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>asDrawable<span style="color:#719e07">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>load<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>drawable<span style="color:#719e07">.</span>ic_launcher_foreground<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>into<span style="color:#719e07">(</span>holder<span style="color:#719e07">.</span>imageView<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Glide<span style="color:#719e07">.</span>with<span style="color:#719e07">(</span>mContext<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>load<span style="color:#719e07">(</span>mImageList<span style="color:#719e07">[</span>position<span style="color:#719e07">])</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>fitCenter<span style="color:#719e07">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>into<span style="color:#719e07">(</span>target<span style="color:#719e07">);</span>
+</span></span></code></pre></div><h2 id="8过渡动画transitions">8.过渡动画(Transitions)</h2>
+<p>根据官方文档描述 , 过渡动画只能作用于一个请求中的(不能作用于先后2个不同的请求) : </p>
+<ul>
+<li>从占位符-&gt;原图的过程</li>
+<li>从缩略图-&gt;原图的过程</li>
+</ul>
+<p>示例:
+可以发现占位图到原图之间的渐变效果
+<!-- raw HTML omitted --></p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>Glide<span style="color:#719e07">.</span>with<span style="color:#719e07">(</span>mContext<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>load<span style="color:#719e07">(</span>mImageList<span style="color:#719e07">[</span>position<span style="color:#719e07">])</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>transition<span style="color:#719e07">(</span>withCrossFade<span style="color:#719e07">(</span><span style="color:#2aa198">600</span><span style="color:#719e07">))</span>  <span style="color:#586e75">//设置渐变的持续时长600ms
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#719e07">.</span>placeholder<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>drawable<span style="color:#719e07">.</span>ic_launcher_foreground<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>centerCrop<span style="color:#719e07">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>into<span style="color:#719e07">(</span>holder<span style="color:#719e07">.</span>imageView<span style="color:#719e07">);</span>
+</span></span></code></pre></div><h2 id="9自定义module">9.自定义Module</h2>
+<p>通过自定义module可以方便我们根据项目的实际需求来定制化glide。</p>
+<ol>
+<li>首先新建一个类继承 <code>AppGlideModule</code> ,并用 <code>@GlideModule</code> 注解:</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#586e75">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"> * 通过继承AppGlideModule来自定义Glide
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"> * @author chenyongda
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">@GlideModule</span>
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">public</span> <span style="color:#268bd2">class</span> <span style="color:#268bd2">MyGlideApp</span> <span style="color:#268bd2">extends</span> AppGlideModule <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
+</span></span></code></pre></div><ol start="2">
+<li>再重新 <code>ReBuild</code> 一下项目 ,将代码中之前的 <code>Glide.with()</code> 换成 <code>GlideApp.with()</code> :</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>GlideApp<span style="color:#719e07">.</span>with<span style="color:#719e07">(</span>mContext<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>load<span style="color:#719e07">(</span>mImageList<span style="color:#719e07">[</span>position<span style="color:#719e07">])</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>placeholder<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>mipmap<span style="color:#719e07">.</span>ic_launcher<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>error<span style="color:#719e07">(</span>R<span style="color:#719e07">.</span>drawable<span style="color:#719e07">.</span>ic_launcher_background<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">.</span>into<span style="color:#719e07">(</span>holder<span style="color:#719e07">.</span>imageView<span style="color:#719e07">);</span>
+</span></span></code></pre></div><ol start="3">
+<li>在applyIOptions()中进行自定义配置:</li>
+</ol>
+<p>比如,我们想让glide默认情况下不进行任何缓存。</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span> <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">applyOptions</span><span style="color:#719e07">(</span><span style="color:#268bd2">@NonNull</span> Context context<span style="color:#719e07">,</span> <span style="color:#268bd2">@NonNull</span> GlideBuilder builder<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#586e75">//不缓存图片
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    RequestOptions options <span style="color:#719e07">=</span> <span style="color:#719e07">new</span> RequestOptions<span style="color:#719e07">()</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">//不进行内存缓存
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>        <span style="color:#719e07">.</span>skipMemoryCache<span style="color:#719e07">(</span><span style="color:#cb4b16">true</span><span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">//不进行磁盘缓存
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>        <span style="color:#719e07">.</span>diskCacheStrategy<span style="color:#719e07">(</span>DiskCacheStrategy<span style="color:#719e07">.</span>NONE<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>    builder<span style="color:#719e07">.</span>setDefaultRequestOptions<span style="color:#719e07">(</span>options<span style="color:#719e07">);</span> <span style="color:#586e75">//设置为默认配置
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span><span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>在 <code>applyOptions()</code> 函数中还可以对缓存根据需要进行自定义</p>
+<p>自定义内存缓存：</p>
+<p>最大缓存20m的图片</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">applyOptions</span><span style="color:#719e07">(</span>Context context<span style="color:#719e07">,</span> GlideBuilder builder<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#dc322f">int</span> memoryCacheSizeBytes <span style="color:#719e07">=</span> <span style="color:#2aa198">1024</span> <span style="color:#719e07">*</span> <span style="color:#2aa198">1024</span> <span style="color:#719e07">*</span> <span style="color:#2aa198">20</span><span style="color:#719e07">;</span> <span style="color:#586e75">// 20mb
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    builder<span style="color:#719e07">.</span>setMemoryCache<span style="color:#719e07">(</span><span style="color:#719e07">new</span> LruResourceCache<span style="color:#719e07">(</span>memoryCacheSizeBytes<span style="color:#719e07">));</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span></code></pre></div><h1 id="二源码解析">二.源码解析</h1>
+<h2 id="1glidewith--glide的生命周期管理">1.Glide.with() : Glide的生命周期管理</h2>
+<p>进入Glide.with()方法 :</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">@NonNull</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">public</span> <span style="color:#268bd2">static</span> RequestManager <span style="color:#268bd2">with</span><span style="color:#719e07">(</span><span style="color:#268bd2">@NonNull</span> Context context<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> getRetriever<span style="color:#719e07">(</span>context<span style="color:#719e07">).</span>get<span style="color:#719e07">(</span>context<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>首先看一下 <code>getRetriever()</code> 方法:</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">@NonNull</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">private</span> <span style="color:#268bd2">static</span> RequestManagerRetriever <span style="color:#268bd2">getRetriever</span><span style="color:#719e07">(</span><span style="color:#268bd2">@Nullable</span> Context context<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#586e75">// Context could be null for other reasons (ie the user passes in null), but in practice it will
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#586e75">// only occur due to errors with the Fragment lifecycle.
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    Preconditions<span style="color:#719e07">.</span>checkNotNull<span style="color:#719e07">(</span>
+</span></span><span style="display:flex;"><span>        context<span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#2aa198">&#34;You cannot start a load on a not yet attached View or a Fragment where getActivity() &#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">+</span> <span style="color:#2aa198">&#34;returns null (which usually occurs when getActivity() is called before the Fragment &#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">+</span> <span style="color:#2aa198">&#34;is attached or after the Fragment is destroyed).&#34;</span><span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> Glide<span style="color:#719e07">.</span>get<span style="color:#719e07">(</span>context<span style="color:#719e07">).</span>getRequestManagerRetriever<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>通过注释了解到 :这个方法先对context进行判空,也就是当view还没加载时或者fragment还没与activity建立联系时。</p>
+<p>看一下 <code>Glide.get(context)</code> 方法 : </p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>  <span style="color:#586e75">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">   * Get the singleton.
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">   *
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">   * @return the singleton
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">   */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">@NonNull</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">public</span> <span style="color:#268bd2">static</span> Glide <span style="color:#268bd2">get</span><span style="color:#719e07">(</span><span style="color:#268bd2">@NonNull</span> Context context<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>glide <span style="color:#719e07">==</span> <span style="color:#cb4b16">null</span><span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#268bd2">synchronized</span> <span style="color:#719e07">(</span>Glide<span style="color:#719e07">.</span>class<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>glide <span style="color:#719e07">==</span> <span style="color:#cb4b16">null</span><span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>          checkAndInitializeGlide<span style="color:#719e07">(</span>context<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> glide<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>这是一个DCL双重检验锁的单例模式 。</p>
+<p><code>checkAndInitializeGlide()</code> 方法 :  </p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">private</span> <span style="color:#268bd2">static</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">checkAndInitializeGlide</span><span style="color:#719e07">(</span><span style="color:#268bd2">@NonNull</span> Context context<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#586e75">// In the thread running initGlide(), one or more classes may call Glide.get(context).
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#586e75">// Without this check, those calls could trigger infinite recursion.
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>isInitializing<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">throw</span> <span style="color:#719e07">new</span> IllegalStateException<span style="color:#719e07">(</span><span style="color:#2aa198">&#34;You cannot call Glide.get() in registerComponents(),&#34;</span>
+</span></span><span style="display:flex;"><span>                                        <span style="color:#719e07">+</span> <span style="color:#2aa198">&#34; use the provided Glide instance instead&#34;</span><span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>    isInitializing <span style="color:#719e07">=</span> <span style="color:#cb4b16">true</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>    initializeGlide<span style="color:#719e07">(</span>context<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>    isInitializing <span style="color:#719e07">=</span> <span style="color:#cb4b16">false</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>这个方法用来保证glide在同一时刻只能有一个线程在初始化它。</p>
+<p>RequestManagerRetriever : 
+这个类是 Glide 的一个辅助类，用来创建一个新的 <code>RequestManager</code> 对象或者获得一个已存在的 acitivity/fragment , 那 <code>RequestManager</code>将请求与activity/fragment等组件建立联系。</p>
+<p>再看一下 RequestMangerRetriever类的get()方法 : </p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>  <span style="color:#268bd2">@NonNull</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">public</span> RequestManager <span style="color:#268bd2">get</span><span style="color:#719e07">(</span><span style="color:#268bd2">@NonNull</span> Context context<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>context <span style="color:#719e07">==</span> <span style="color:#cb4b16">null</span><span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#719e07">throw</span> <span style="color:#719e07">new</span> IllegalArgumentException<span style="color:#719e07">(</span><span style="color:#2aa198">&#34;You cannot start a load on a null Context&#34;</span><span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span> <span style="color:#719e07">else</span> <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>Util<span style="color:#719e07">.</span>isOnMainThread<span style="color:#719e07">()</span> <span style="color:#719e07">&amp;&amp;</span> <span style="color:#719e07">!(</span>context <span style="color:#719e07">instanceof</span> Application<span style="color:#719e07">))</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>context <span style="color:#719e07">instanceof</span> FragmentActivity<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">return</span> get<span style="color:#719e07">((</span>FragmentActivity<span style="color:#719e07">)</span> context<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#719e07">}</span> <span style="color:#719e07">else</span> <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>context <span style="color:#719e07">instanceof</span> Activity<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">return</span> get<span style="color:#719e07">((</span>Activity<span style="color:#719e07">)</span> context<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#719e07">}</span> <span style="color:#719e07">else</span> <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>context <span style="color:#719e07">instanceof</span> ContextWrapper<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">return</span> get<span style="color:#719e07">(((</span>ContextWrapper<span style="color:#719e07">)</span> context<span style="color:#719e07">).</span>getBaseContext<span style="color:#719e07">());</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> getApplicationManager<span style="color:#719e07">(</span>context<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>这个方法通过将我们传入的 context ，转换为与 application/activity/fragment建立联系的 <code>ReuqestManger</code> 类 ,加入我们传入的是 activity,点进第 9 行代码 :</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span> <span style="color:#268bd2">@NonNull</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">public</span> RequestManager <span style="color:#268bd2">get</span><span style="color:#719e07">(</span><span style="color:#268bd2">@NonNull</span> Activity activity<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>Util<span style="color:#719e07">.</span>isOnBackgroundThread<span style="color:#719e07">())</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#586e75">//当我们在子线程用glide,glide会把请求与整个app的生命周期建立联系.
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>      <span style="color:#719e07">return</span> get<span style="color:#719e07">(</span>activity<span style="color:#719e07">.</span>getApplicationContext<span style="color:#719e07">());</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span> <span style="color:#719e07">else</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>      assertNotDestroyed<span style="color:#719e07">(</span>activity<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#586e75">//用于创建fragment
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>      android<span style="color:#719e07">.</span>app<span style="color:#719e07">.</span>FragmentManager fm <span style="color:#719e07">=</span> activity<span style="color:#719e07">.</span>getFragmentManager<span style="color:#719e07">();</span> 
+</span></span><span style="display:flex;"><span>      <span style="color:#719e07">return</span> fragmentGet<span style="color:#719e07">(</span>
+</span></span><span style="display:flex;"><span>          activity<span style="color:#719e07">,</span> fm<span style="color:#719e07">,</span> <span style="color:#586e75">/*parentHint=*/</span> <span style="color:#cb4b16">null</span><span style="color:#719e07">,</span> isActivityVisible<span style="color:#719e07">(</span>activity<span style="color:#719e07">));</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>点进第8行的 <code>fragmentGet()</code> :</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">private</span> RequestManager <span style="color:#268bd2">fragmentGet</span><span style="color:#719e07">(</span><span style="color:#268bd2">@NonNull</span> Context context<span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#268bd2">@NonNull</span> android<span style="color:#719e07">.</span>app<span style="color:#719e07">.</span>FragmentManager fm<span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#268bd2">@Nullable</span> android<span style="color:#719e07">.</span>app<span style="color:#719e07">.</span>Fragment parentHint<span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#dc322f">boolean</span> isParentVisible<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#586e75">//创建一个隐藏的Fragment
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    RequestManagerFragment current <span style="color:#719e07">=</span> getRequestManagerFragment<span style="color:#719e07">(</span>fm<span style="color:#719e07">,</span> parentHint<span style="color:#719e07">,</span> isParentVisible<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>    RequestManager requestManager <span style="color:#719e07">=</span> current<span style="color:#719e07">.</span>getRequestManager<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#586e75">//如果获得的RequestManager为空的话就创建一个。
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>requestManager <span style="color:#719e07">==</span> <span style="color:#cb4b16">null</span><span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>      Glide glide <span style="color:#719e07">=</span> Glide<span style="color:#719e07">.</span>get<span style="color:#719e07">(</span>context<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>      requestManager <span style="color:#719e07">=</span>
+</span></span><span style="display:flex;"><span>          factory<span style="color:#719e07">.</span>build<span style="color:#719e07">(</span>
+</span></span><span style="display:flex;"><span>              glide<span style="color:#719e07">,</span> current<span style="color:#719e07">.</span>getGlideLifecycle<span style="color:#719e07">(),</span> current<span style="color:#719e07">.</span>getRequestManagerTreeNode<span style="color:#719e07">(),</span> context<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>      	<span style="color:#586e75">//把RequestManager赋给Fragment
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>        current<span style="color:#719e07">.</span>setRequestManager<span style="color:#719e07">(</span>requestManager<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> requestManager<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>到这里可以发现 Glide与activity建立联系的关键在于:</p>
+<ol>
+<li>创建了一个无UI的Fragment </li>
+<li>创建了一个 <code>RequestManager</code> ,并通过 <code>current.getGlideLifecycle()</code> 将fragment的 <code>ActivityFragmentLifecycle</code> 成员传给了 <code>RequestManager</code> 。</li>
+<li>无UI的Fragment通过 <code>setRequestManager()</code> 与 <code>RequestManager</code> 建立联系。</li>
+</ol>
+<p>第12行代码中创建 <code>RequestManager</code> 对象时 调用了 <code>RequestManager</code> 的构造方法 : </p>
+<p>构造方法的22行调用了<code>ActivityFragmentLifecycle</code> 的 addListener()方法将 <code>RequestManager</code> 添加到自己的监听器列表中。</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>  RequestManager<span style="color:#719e07">(</span>
+</span></span><span style="display:flex;"><span>      Glide glide<span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>      Lifecycle lifecycle<span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>      RequestManagerTreeNode treeNode<span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>      RequestTracker requestTracker<span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>      ConnectivityMonitorFactory factory<span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>      Context context<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">this</span><span style="color:#719e07">.</span>glide <span style="color:#719e07">=</span> glide<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">this</span><span style="color:#719e07">.</span>lifecycle <span style="color:#719e07">=</span> lifecycle<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">this</span><span style="color:#719e07">.</span>treeNode <span style="color:#719e07">=</span> treeNode<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">this</span><span style="color:#719e07">.</span>requestTracker <span style="color:#719e07">=</span> requestTracker<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">this</span><span style="color:#719e07">.</span>context <span style="color:#719e07">=</span> context<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    connectivityMonitor <span style="color:#719e07">=</span>
+</span></span><span style="display:flex;"><span>        factory<span style="color:#719e07">.</span>build<span style="color:#719e07">(</span>
+</span></span><span style="display:flex;"><span>            context<span style="color:#719e07">.</span>getApplicationContext<span style="color:#719e07">(),</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">new</span> RequestManagerConnectivityListener<span style="color:#719e07">(</span>requestTracker<span style="color:#719e07">));</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>Util<span style="color:#719e07">.</span>isOnBackgroundThread<span style="color:#719e07">())</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>      mainHandler<span style="color:#719e07">.</span>post<span style="color:#719e07">(</span>addSelfToLifecycle<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span> <span style="color:#719e07">else</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#586e75">//将 RequestManager 添加到自己的监听器列表中。
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>      lifecycle<span style="color:#719e07">.</span>addListener<span style="color:#719e07">(</span><span style="color:#719e07">this</span><span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>    lifecycle<span style="color:#719e07">.</span>addListener<span style="color:#719e07">(</span>connectivityMonitor<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    defaultRequestListeners <span style="color:#719e07">=</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">new</span> CopyOnWriteArrayList<span style="color:#719e07">&lt;&gt;(</span>glide<span style="color:#719e07">.</span>getGlideContext<span style="color:#719e07">().</span>getDefaultRequestListeners<span style="color:#719e07">());</span>
+</span></span><span style="display:flex;"><span>    setRequestOptions<span style="color:#719e07">(</span>glide<span style="color:#719e07">.</span>getGlideContext<span style="color:#719e07">().</span>getDefaultRequestOptions<span style="color:#719e07">());</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    glide<span style="color:#719e07">.</span>registerRequestManager<span style="color:#719e07">(</span><span style="color:#719e07">this</span><span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>为了看清楚Glide是如何与组件activity/fragment建立生命周期联系，我们先从刚刚的无UI的Fragment-&gt;
+<code>RequestManagerFragment</code> 这个类的生命周期看起 :</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">public</span> <span style="color:#268bd2">class</span> <span style="color:#268bd2">RequestManagerFragment</span> <span style="color:#268bd2">extends</span> Fragment <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">private</span> <span style="color:#268bd2">static</span> <span style="color:#268bd2">final</span> String TAG <span style="color:#719e07">=</span> <span style="color:#2aa198">&#34;SupportRMFragment&#34;</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">private</span> <span style="color:#268bd2">final</span> ActivityFragmentLifecycle lifecycle<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onStart</span><span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">super</span><span style="color:#719e07">.</span>onStart<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>    lifecycle<span style="color:#719e07">.</span>onStart<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onStop</span><span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">super</span><span style="color:#719e07">.</span>onStop<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>    lifecycle<span style="color:#719e07">.</span>onStop<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onDestroy</span><span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">super</span><span style="color:#719e07">.</span>onDestroy<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>    lifecycle<span style="color:#719e07">.</span>onDestroy<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>    unregisterFragmentWithRoot<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>    	
+</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>这个fragment中的生命周期方法中,又调用了对应的 <code>ActivityFragmentLifecycle</code> 的方法 : </p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">class</span> <span style="color:#268bd2">ActivityFragmentLifecycle</span> <span style="color:#268bd2">implements</span> Lifecycle <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">private</span> <span style="color:#268bd2">final</span> Set<span style="color:#719e07">&lt;</span>LifecycleListener<span style="color:#719e07">&gt;</span> lifecycleListeners <span style="color:#719e07">=</span>
+</span></span><span style="display:flex;"><span>      Collections<span style="color:#719e07">.</span>newSetFromMap<span style="color:#719e07">(</span><span style="color:#719e07">new</span> WeakHashMap<span style="color:#719e07">&lt;</span>LifecycleListener<span style="color:#719e07">,</span> Boolean<span style="color:#719e07">&gt;());</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">private</span> <span style="color:#dc322f">boolean</span> isStarted<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">private</span> <span style="color:#dc322f">boolean</span> isDestroyed
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">addListener</span><span style="color:#719e07">(</span><span style="color:#268bd2">@NonNull</span> LifecycleListener listener<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    lifecycleListeners<span style="color:#719e07">.</span>add<span style="color:#719e07">(</span>listener<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>isDestroyed<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>      listener<span style="color:#719e07">.</span>onDestroy<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span> <span style="color:#719e07">else</span> <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>isStarted<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>      listener<span style="color:#719e07">.</span>onStart<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span> <span style="color:#719e07">else</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>      listener<span style="color:#719e07">.</span>onStop<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">removeListener</span><span style="color:#719e07">(</span><span style="color:#268bd2">@NonNull</span> LifecycleListener listener<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    lifecycleListeners<span style="color:#719e07">.</span>remove<span style="color:#719e07">(</span>listener<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">void</span> <span style="color:#268bd2">onStart</span><span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    isStarted <span style="color:#719e07">=</span> <span style="color:#cb4b16">true</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">for</span> <span style="color:#719e07">(</span>LifecycleListener lifecycleListener <span style="color:#719e07">:</span> Util<span style="color:#719e07">.</span>getSnapshot<span style="color:#719e07">(</span>lifecycleListeners<span style="color:#719e07">))</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>      lifecycleListener<span style="color:#719e07">.</span>onStart<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">void</span> <span style="color:#268bd2">onStop</span><span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    isStarted <span style="color:#719e07">=</span> <span style="color:#cb4b16">false</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">for</span> <span style="color:#719e07">(</span>LifecycleListener lifecycleListener <span style="color:#719e07">:</span> Util<span style="color:#719e07">.</span>getSnapshot<span style="color:#719e07">(</span>lifecycleListeners<span style="color:#719e07">))</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>      lifecycleListener<span style="color:#719e07">.</span>onStop<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">void</span> <span style="color:#268bd2">onDestroy</span><span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    isDestroyed <span style="color:#719e07">=</span> <span style="color:#cb4b16">true</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">for</span> <span style="color:#719e07">(</span>LifecycleListener lifecycleListener <span style="color:#719e07">:</span> Util<span style="color:#719e07">.</span>getSnapshot<span style="color:#719e07">(</span>lifecycleListeners<span style="color:#719e07">))</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>      lifecycleListener<span style="color:#719e07">.</span>onDestroy<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>      
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
+</span></span></code></pre></div><p><code>ActivityFragmentLifecycle</code> 中有一个 <code>Set&lt;LifecycleListener&gt;</code> 类型的集合,而 <code>RequestManager</code> 也正好实现了 <code>LifecycleListener</code> 这个接口 ,看一下 <code>RequestManager</code> 中的 <code>onStart()</code> 方法 : </p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>  <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">public</span> <span style="color:#268bd2">synchronized</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onStart</span><span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#586e75">//处理请求
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    resumeRequests<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>    targetTracker<span style="color:#719e07">.</span>onStart<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">public</span> <span style="color:#268bd2">synchronized</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onStop</span><span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    pauseRequests<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>    targetTracker<span style="color:#719e07">.</span>onStop<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">public</span> <span style="color:#268bd2">synchronized</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">resumeRequests</span><span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    requestTracker<span style="color:#719e07">.</span>resumeRequests<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">...</span>
+</span></span></code></pre></div><p><img src="https://cdn.nlark.com/yuque/0/2019/webp/334982/1573460183383-c4cb601a-7b5e-4fa5-8f61-60ac75603667.webp#align=left&amp;display=inline&amp;height=238&amp;originHeight=238&amp;originWidth=1078&amp;search=&amp;size=0&amp;status=done&amp;width=1078" alt="">
+所以现在可以看出,Glide与组件的生命周期相关联的方法是基于类似链式的结构。</p>
+<ol>
+<li>Activity的生命周期会引起无UI的Fragment的生命周期变化.</li>
+<li>Fragment的生命周期会会调用自己成员变量 <code>ActivityFragmentLifecycle</code> 中对应的onXXX()方法.</li>
+<li><code>ActivityFragmentLifecycle</code> 的onXXX()方法内部又调用了 <code>RequestManager</code> 的方法。</li>
+</ol>
+<h2 id="2loadurl-">2.load(url) : </h2>
+<p>在load()这一环节需要我们传入需要加载的图片的链接.</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>  <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">public</span> RequestBuilder<span style="color:#719e07">&lt;</span>Drawable<span style="color:#719e07">&gt;</span> <span style="color:#268bd2">load</span><span style="color:#719e07">(</span><span style="color:#268bd2">@Nullable</span> String string<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> asDrawable<span style="color:#719e07">().</span>load<span style="color:#719e07">(</span>string<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>load方法默认调用了 <code>asDrawable()</code> 方法 : </p>
+<p>方法主要作用是创建一个加载 <code>Drawable</code> 资源类型的 <code>RequestBuilder</code> 。</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>  <span style="color:#268bd2">public</span> RequestBuilder<span style="color:#719e07">&lt;</span>Drawable<span style="color:#719e07">&gt;</span> <span style="color:#268bd2">asDrawable</span><span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> as<span style="color:#719e07">(</span>Drawable<span style="color:#719e07">.</span>class<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">public</span> <span style="color:#719e07">&lt;</span>ResourceType<span style="color:#719e07">&gt;</span> RequestBuilder<span style="color:#719e07">&lt;</span>ResourceType<span style="color:#719e07">&gt;</span> <span style="color:#268bd2">as</span><span style="color:#719e07">(</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#268bd2">@NonNull</span> Class<span style="color:#719e07">&lt;</span>ResourceType<span style="color:#719e07">&gt;</span> resourceClass<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> <span style="color:#719e07">new</span> RequestBuilder<span style="color:#719e07">&lt;&gt;(</span>glide<span style="color:#719e07">,</span> <span style="color:#719e07">this</span><span style="color:#719e07">,</span> resourceClass<span style="color:#719e07">,</span> context<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>查看一下 <code>load()</code> 方法 : </p>
+<p>将String字符串赋予model变量</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>  <span style="color:#268bd2">public</span> RequestBuilder<span style="color:#719e07">&lt;</span>TranscodeType<span style="color:#719e07">&gt;</span> <span style="color:#268bd2">load</span><span style="color:#719e07">(</span><span style="color:#268bd2">@Nullable</span> String string<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> loadGeneric<span style="color:#719e07">(</span>string<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">private</span> RequestBuilder<span style="color:#719e07">&lt;</span>TranscodeType<span style="color:#719e07">&gt;</span> <span style="color:#268bd2">loadGeneric</span><span style="color:#719e07">(</span><span style="color:#268bd2">@Nullable</span> Object model<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">this</span><span style="color:#719e07">.</span>model <span style="color:#719e07">=</span> model<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>    isModelSet <span style="color:#719e07">=</span> <span style="color:#cb4b16">true</span><span style="color:#719e07">;</span><span style="color:#586e75">//这个变量表示已经调用过load(),在into()中会再次用到此变量。
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#719e07">return</span> <span style="color:#719e07">this</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>而这个model变量将在后面的 <code>into()</code> 中使用。</p>
+<h2 id="3into">3.into()</h2>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">public</span> ViewTarget<span style="color:#719e07">&lt;</span>ImageView<span style="color:#719e07">,</span> TranscodeType<span style="color:#719e07">&gt;</span> <span style="color:#268bd2">into</span><span style="color:#719e07">(</span><span style="color:#268bd2">@NonNull</span> ImageView view<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#586e75">//判断当前是否是在主线程,因为这里涉及到改变UI
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    Util<span style="color:#719e07">.</span>assertMainThread<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#586e75">//检查ImageView是否为空
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    Preconditions<span style="color:#719e07">.</span>checkNotNull<span style="color:#719e07">(</span>view<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    BaseRequestOptions<span style="color:#719e07">&lt;?&gt;</span> requestOptions <span style="color:#719e07">=</span> <span style="color:#719e07">this</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">if</span> <span style="color:#719e07">(!</span>requestOptions<span style="color:#719e07">.</span>isTransformationSet<span style="color:#719e07">()</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">&amp;&amp;</span> requestOptions<span style="color:#719e07">.</span>isTransformationAllowed<span style="color:#719e07">()</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">&amp;&amp;</span> view<span style="color:#719e07">.</span>getScaleType<span style="color:#719e07">()</span> <span style="color:#719e07">!=</span> <span style="color:#cb4b16">null</span><span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#586e75">// Clone in this method so that if we use this RequestBuilder to load into a View and then
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>      <span style="color:#586e75">// into a different target, we don&#39;t retain the transformation applied based on the previous
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>      <span style="color:#586e75">// View&#39;s scale type.
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>      <span style="color:#719e07">switch</span> <span style="color:#719e07">(</span>view<span style="color:#719e07">.</span>getScaleType<span style="color:#719e07">())</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">case</span> CENTER_CROP<span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>          requestOptions <span style="color:#719e07">=</span> requestOptions<span style="color:#719e07">.</span>clone<span style="color:#719e07">().</span>optionalCenterCrop<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#719e07">break</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">case</span> CENTER_INSIDE<span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>          requestOptions <span style="color:#719e07">=</span> requestOptions<span style="color:#719e07">.</span>clone<span style="color:#719e07">().</span>optionalCenterInside<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#719e07">break</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">case</span> FIT_CENTER<span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">case</span> FIT_START<span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">case</span> FIT_END<span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>          requestOptions <span style="color:#719e07">=</span> requestOptions<span style="color:#719e07">.</span>clone<span style="color:#719e07">().</span>optionalFitCenter<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#719e07">break</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">case</span> FIT_XY<span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>          requestOptions <span style="color:#719e07">=</span> requestOptions<span style="color:#719e07">.</span>clone<span style="color:#719e07">().</span>optionalCenterInside<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#719e07">break</span><span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">case</span> CENTER<span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">case</span> MATRIX<span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">default</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#586e75">// Do nothing.
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>      <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> into<span style="color:#719e07">(</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">//由ImageView构建出Target
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>        glideContext<span style="color:#719e07">.</span>buildImageViewTarget<span style="color:#719e07">(</span>view<span style="color:#719e07">,</span> transcodeClass<span style="color:#719e07">),</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">/*targetListener=*/</span> <span style="color:#cb4b16">null</span><span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>        requestOptions<span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>        Executors<span style="color:#719e07">.</span>mainThreadExecutor<span style="color:#719e07">());</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>这里的into()方法只是根据ImageView的比例类型，对 <code>RequestOptions</code> 进行配置。</p>
+<p>36行的into()方法中用 <code>GlideContext</code> 的 <code>buildImageViewTarget()</code> 用 ImageView 构建出 Target.</p>
+<p>看一下这个方法 :</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>  <span style="color:#268bd2">@NonNull</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">public</span> <span style="color:#719e07">&lt;</span>X<span style="color:#719e07">&gt;</span> ViewTarget<span style="color:#719e07">&lt;</span>ImageView<span style="color:#719e07">,</span> X<span style="color:#719e07">&gt;</span> <span style="color:#268bd2">buildImageViewTarget</span><span style="color:#719e07">(</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#268bd2">@NonNull</span> ImageView imageView<span style="color:#719e07">,</span> <span style="color:#268bd2">@NonNull</span> Class<span style="color:#719e07">&lt;</span>X<span style="color:#719e07">&gt;</span> transcodeClass<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> imageViewTargetFactory<span style="color:#719e07">.</span>buildTarget<span style="color:#719e07">(</span>imageView<span style="color:#719e07">,</span> transcodeClass<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">public</span> <span style="color:#268bd2">class</span> <span style="color:#268bd2">ImageViewTargetFactory</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">@NonNull</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">@SuppressWarnings</span><span style="color:#719e07">(</span><span style="color:#2aa198">&#34;unchecked&#34;</span><span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">public</span> <span style="color:#719e07">&lt;</span>Z<span style="color:#719e07">&gt;</span> ViewTarget<span style="color:#719e07">&lt;</span>ImageView<span style="color:#719e07">,</span> Z<span style="color:#719e07">&gt;</span> <span style="color:#268bd2">buildTarget</span><span style="color:#719e07">(</span><span style="color:#268bd2">@NonNull</span> ImageView view<span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#268bd2">@NonNull</span> Class<span style="color:#719e07">&lt;</span>Z<span style="color:#719e07">&gt;</span> clazz<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>Bitmap<span style="color:#719e07">.</span>class<span style="color:#719e07">.</span>equals<span style="color:#719e07">(</span>clazz<span style="color:#719e07">))</span> <span style="color:#719e07">{</span>      <span style="color:#586e75">//Bitmap类型的ViewTarget
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>      <span style="color:#719e07">return</span> <span style="color:#719e07">(</span>ViewTarget<span style="color:#719e07">&lt;</span>ImageView<span style="color:#719e07">,</span> Z<span style="color:#719e07">&gt;)</span> <span style="color:#719e07">new</span> BitmapImageViewTarget<span style="color:#719e07">(</span>view<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span> <span style="color:#719e07">else</span> <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>Drawable<span style="color:#719e07">.</span>class<span style="color:#719e07">.</span>isAssignableFrom<span style="color:#719e07">(</span>clazz<span style="color:#719e07">))</span> <span style="color:#719e07">{</span>          <span style="color:#586e75">//Drawable类型的ViewTarget
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>      <span style="color:#719e07">return</span> <span style="color:#719e07">(</span>ViewTarget<span style="color:#719e07">&lt;</span>ImageView<span style="color:#719e07">,</span> Z<span style="color:#719e07">&gt;)</span> <span style="color:#719e07">new</span> DrawableImageViewTarget<span style="color:#719e07">(</span>view<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span> <span style="color:#719e07">else</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#719e07">throw</span> <span style="color:#719e07">new</span> IllegalArgumentException<span style="color:#719e07">(</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#2aa198">&#34;Unhandled class: &#34;</span> <span style="color:#719e07">+</span> clazz <span style="color:#719e07">+</span> <span style="color:#2aa198">&#34;, try .as*(Class).transcode(ResourceTranscoder)&#34;</span><span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>可以看出 <code>ImageViewTargetFactory</code> 这个类就是用来把 <code>ImageView</code> 转化为2种(Bitmap,Drawable) 类型的 ViewTarget的。</p>
+<blockquote>
+<p>而我们之前在分析 <code>load()</code> 方法时看到默认情况下把资源当作 Drawable 类型处理 , 所以一般情况下都是生成的 <code>DrawableImageViewTarget</code> 。</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>  <span style="color:#268bd2">@Override</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">public</span> RequestBuilder<span style="color:#719e07">&lt;</span>Drawable<span style="color:#719e07">&gt;</span> <span style="color:#268bd2">load</span><span style="color:#719e07">(</span><span style="color:#268bd2">@Nullable</span> String string<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> asDrawable<span style="color:#719e07">().</span>load<span style="color:#719e07">(</span>string<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span></code></pre></div></blockquote>
+<p>继续深入之前的 into() 方法。</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>  <span style="color:#268bd2">private</span> <span style="color:#719e07">&lt;</span>Y <span style="color:#268bd2">extends</span> Target<span style="color:#719e07">&lt;</span>TranscodeType<span style="color:#719e07">&gt;&gt;</span> Y <span style="color:#268bd2">into</span><span style="color:#719e07">(</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#268bd2">@NonNull</span> Y target<span style="color:#719e07">,</span> <span style="color:#586e75">//把创建的Target传进来
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>      <span style="color:#268bd2">@Nullable</span> RequestListener<span style="color:#719e07">&lt;</span>TranscodeType<span style="color:#719e07">&gt;</span> targetListener<span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>      BaseRequestOptions<span style="color:#719e07">&lt;?&gt;</span> options<span style="color:#719e07">,</span>
+</span></span><span style="display:flex;"><span>      Executor callbackExecutor<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#586e75">//Target不能为空
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    Preconditions<span style="color:#719e07">.</span>checkNotNull<span style="color:#719e07">(</span>target<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#586e75">// isModelSet在load()被调用过才会为true
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#719e07">if</span> <span style="color:#719e07">(!</span>isModelSet<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#719e07">throw</span> <span style="color:#719e07">new</span> IllegalArgumentException<span style="color:#719e07">(</span><span style="color:#2aa198">&#34;You must call #load() before calling #into()&#34;</span><span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#586e75">//创建Request对象 , 稍后解析
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    Request request <span style="color:#719e07">=</span> buildRequest<span style="color:#719e07">(</span>target<span style="color:#719e07">,</span> targetListener<span style="color:#719e07">,</span> options<span style="color:#719e07">,</span> callbackExecutor<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#586e75">//获取此ImageView的之前的请求对象
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    Request previous <span style="color:#719e07">=</span> target<span style="color:#719e07">.</span>getRequest<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#586e75">//如果此次的请求和之前的请求相同并且启用了内存缓存
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#719e07">if</span> <span style="color:#719e07">(</span>request<span style="color:#719e07">.</span>isEquivalentTo<span style="color:#719e07">(</span>previous<span style="color:#719e07">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">&amp;&amp;</span> <span style="color:#719e07">!</span>isSkipMemoryCacheWithCompletePreviousRequest<span style="color:#719e07">(</span>options<span style="color:#719e07">,</span> previous<span style="color:#719e07">))</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#586e75">//回收请求资源
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>      request<span style="color:#719e07">.</span>recycle<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>     <span style="color:#586e75">//若上一次的请求没有在加载，则再执行这个请求
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>      <span style="color:#719e07">if</span> <span style="color:#719e07">(!</span>Preconditions<span style="color:#719e07">.</span>checkNotNull<span style="color:#719e07">(</span>previous<span style="color:#719e07">).</span>isRunning<span style="color:#719e07">())</span> <span style="color:#719e07">{</span>
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        previous<span style="color:#719e07">.</span>begin<span style="color:#719e07">();</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#719e07">return</span> target<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#586e75">//若这次请求与上次不同,则取消上一次请求
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    requestManager<span style="color:#719e07">.</span>clear<span style="color:#719e07">(</span>target<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>    target<span style="color:#719e07">.</span>setRequest<span style="color:#719e07">(</span>request<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>    requestManager<span style="color:#719e07">.</span>track<span style="color:#719e07">(</span>target<span style="color:#719e07">,</span> request<span style="color:#719e07">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> target<span style="color:#719e07">;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
+</span></span></code></pre></div>
+        </div>
+        
+
+<footer>
+  <p class="meta">
+    <span class="byline author vcard">Posted by <span class="fn">Petrichor</span></span>
+    
+    <time>Nov 14, 2019</time>
+    
+      <span class="categories">
+        Tags:
+        
+          <a class="category" href="https://chenyongda2018.github.io/tags/android">Android</a>  <a class="category" href="https://chenyongda2018.github.io/tags/glide">Glide</a>  
+    
+    </span>
+  </p>
+
+  
+
+  <p class="meta">
+    
+
+    
+      <a class="basic-alignment right" href="https://chenyongda2018.github.io/posts/android/kotlin_lamdba/" title="Kotlin Lambda">Kotlin Lambda</a>
+    
+  </p>
+  
+</footer>
+
+      </article>
+    </div>
+    
+
+<aside class="sidebar thirds">
+  <section class="first odd">
+
+    
+
+    <p>
+      
+    </p>
+  </section>
+
+  
+  
+
+
+
+<ul class="sidebar-nav">
+  <li class="sidebar-nav-item">
+    <a target="_blank" rel="noopener noreferrer" href="https://github.com/chenyongda2018" title="https://github.com/chenyongda2018"><i class="fa fa-github fa-3x"></i></a>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+  
+  
+  </li>
+</ul>
+
+  
+
+  
+    
+      <section class="odd">
+        
+        
+          <li>
+            <a href="https://chenyongda2018.github.io/categories/" title="category" >category</a>
+          </li>
+        
+          <li>
+            <a href="https://chenyongda2018.github.io/about" title="About me" >About me</a>
+          </li>
+        
+      </section>
+    
+  
+
+  
+  
+  
+    
+      <section class="even">
+        <h1>Recent Posts</h1>
+        <ul id="recent_posts">
+          
+          
+        </ul>
+      </section>
+    
+  
+</aside>
+
+  </div>
+</div>
+
+    <footer role="contentinfo">
+      <p>Copyright &copy; 2023 Petrichor - <a href="https://chenyongda2018.github.io/license/">License</a> -
+        <span class="credit">Powered by <a target="_blank" href="https://gohugo.io" rel="noopener noreferrer">Hugo</a> and <a target="_blank" href="https://github.com/parsiya/hugo-octopress/" rel="noopener noreferrer">Hugo-Octopress</a> theme.
+      </p>
+    </footer>
+
+    
+    
+
+
+
+    
+    
+    
+
+    
+  </body>
+</html>
+

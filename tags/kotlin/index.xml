@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Kotlin on Petrichor&#39;s blog</title>
+    <link>https://chenyongda2018.github.io/tags/kotlin/</link>
+    <description>Recent content in Kotlin on Petrichor&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 16 Apr 2022 15:48:16 +0800</lastBuildDate><atom:link href="https://chenyongda2018.github.io/tags/kotlin/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Kotlin Lambda</title>
+      <link>https://chenyongda2018.github.io/posts/android/kotlin_lamdba/</link>
+      <pubDate>Sat, 16 Apr 2022 15:48:16 +0800</pubDate>
+      
+      <guid>https://chenyongda2018.github.io/posts/android/kotlin_lamdba/</guid>
+      <description>Kotlin lambda Kotlin中，充斥着各种各样的Lambda 表达式，这是Kotlin最方便的特性之一
+了解Kotlin 中的lambda，首先得知道Kotlin中的高阶函数
+1.高阶函数 在Java中，如果有一个a方法，要去调用b方法，那么在里面直接调用即可。
+int a() { return b(1); } a(); 接着,如果我不想把调用b方法的参数写死，希望动态设置方法b的参数。
+int a(int param) { return b(param); } a(1); a(2); 这些在Java中很轻松就能做到，不过&amp;hellip; 如果我们想动态设置的不是方法参数，而是方法本身呢，比如在方法a内有一处对别的方法的调用，这个方法可能是方法b,方法c,方法d&amp;hellip;,该方法的参数类型是int,返回值类型也是int。方法a在执行时，具体需要调用哪个方法，能否动态设置? 也就是说能否将一个方法作为参数传给a?
+通过接口
+public interface Wrapper { int method(int param); } 将这个接口类型Wrapper 作为方法a的参数
+int a(Wrapper wrapper) { return wrapper.method(1); } a(wrapper1); a(wrapper2); 举个我们常见的例子
+在Android里View的点击事件
+public class View { OnClickListener mOnClickListener; ... public void onTouchEvent(MotionEvent e) { ... mOnClickListener.onClick(this); ... } } OnClickListener就是一个接口，点击事件的内容全在onClick()方法里
+public interface OnClickListener { void onClick(View v); } 我们在给View设置点击事件时，传的就是一个OnClickListener,本质上这样传递的是一个稍后会被调用的onClick()方法,一般称之为回调,不过由于Java中不允许直接传递方法，所以需要用接口包装一下。</description>
+    </item>
+    
+  </channel>
+</rss>
