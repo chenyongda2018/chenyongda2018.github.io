@@ -6,8 +6,15 @@
     <description>Recent content in Posts on Petrichor&#39;s blog</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 05 Jan 2023 20:29:31 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 05 Jul 2025 22:40:43 +0800</lastBuildDate>
     <atom:link href="https://chenyongda2018.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Android约束布局使用技巧</title>
+      <link>https://chenyongda2018.github.io/posts/android/android%E7%BA%A6%E6%9D%9F%E5%B8%83%E5%B1%80%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7/</link>
+      <pubDate>Sat, 05 Jul 2025 22:40:43 +0800</pubDate>
+      <guid>https://chenyongda2018.github.io/posts/android/android%E7%BA%A6%E6%9D%9F%E5%B8%83%E5%B1%80%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7/</guid>
+      <description>&lt;p&gt;test&lt;/p&gt;</description>
+    </item>
     <item>
       <title>EventBus使用详解及源码解析</title>
       <link>https://chenyongda2018.github.io/posts/android/eventbus%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3%E5%8F%8A%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/</link>
