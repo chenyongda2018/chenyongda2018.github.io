@@ -4,107 +4,86 @@
     <title>Tags on Petrichor&#39;s blog</title>
     <link>https://chenyongda2018.github.io/tags/</link>
     <description>Recent content in Tags on Petrichor&#39;s blog</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 05 Jan 2023 20:29:31 +0800</lastBuildDate><atom:link href="https://chenyongda2018.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 05 Jan 2023 20:29:31 +0800</lastBuildDate>
+    <atom:link href="https://chenyongda2018.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Android</title>
       <link>https://chenyongda2018.github.io/tags/android/</link>
       <pubDate>Thu, 05 Jan 2023 20:29:31 +0800</pubDate>
-      
       <guid>https://chenyongda2018.github.io/tags/android/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>EventBus</title>
       <link>https://chenyongda2018.github.io/tags/eventbus/</link>
       <pubDate>Thu, 05 Jan 2023 20:29:31 +0800</pubDate>
-      
       <guid>https://chenyongda2018.github.io/tags/eventbus/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>Bitmap</title>
       <link>https://chenyongda2018.github.io/tags/bitmap/</link>
       <pubDate>Tue, 13 Sep 2022 19:10:54 +0800</pubDate>
-      
       <guid>https://chenyongda2018.github.io/tags/bitmap/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>内存泄漏</title>
       <link>https://chenyongda2018.github.io/tags/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F/</link>
       <pubDate>Sat, 14 May 2022 15:26:58 +0800</pubDate>
-      
       <guid>https://chenyongda2018.github.io/tags/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>性能优化</title>
       <link>https://chenyongda2018.github.io/tags/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/</link>
       <pubDate>Sat, 14 May 2022 15:26:58 +0800</pubDate>
-      
       <guid>https://chenyongda2018.github.io/tags/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>Kotlin</title>
       <link>https://chenyongda2018.github.io/tags/kotlin/</link>
       <pubDate>Sat, 16 Apr 2022 15:48:16 +0800</pubDate>
-      
       <guid>https://chenyongda2018.github.io/tags/kotlin/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>Java</title>
       <link>https://chenyongda2018.github.io/tags/java/</link>
       <pubDate>Mon, 13 Apr 2020 20:22:27 +0800</pubDate>
-      
       <guid>https://chenyongda2018.github.io/tags/java/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>JVM</title>
       <link>https://chenyongda2018.github.io/tags/jvm/</link>
       <pubDate>Mon, 13 Apr 2020 20:22:27 +0800</pubDate>
-      
       <guid>https://chenyongda2018.github.io/tags/jvm/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>Glide</title>
       <link>https://chenyongda2018.github.io/tags/glide/</link>
       <pubDate>Thu, 14 Nov 2019 20:13:19 +0800</pubDate>
-      
       <guid>https://chenyongda2018.github.io/tags/glide/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>OCR</title>
       <link>https://chenyongda2018.github.io/tags/ocr/</link>
       <pubDate>Fri, 10 May 2019 20:25:04 +0800</pubDate>
-      
       <guid>https://chenyongda2018.github.io/tags/ocr/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>Handler</title>
       <link>https://chenyongda2018.github.io/tags/handler/</link>
       <pubDate>Fri, 19 Apr 2019 20:27:16 +0800</pubDate>
-      
       <guid>https://chenyongda2018.github.io/tags/handler/</guid>
       <description></description>
     </item>
-    
   </channel>
 </rss>

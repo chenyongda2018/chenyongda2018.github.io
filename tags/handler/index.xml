@@ -4,37 +4,16 @@
     <title>Handler on Petrichor&#39;s blog</title>
     <link>https://chenyongda2018.github.io/tags/handler/</link>
     <description>Recent content in Handler on Petrichor&#39;s blog</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 19 Apr 2019 20:27:16 +0800</lastBuildDate><atom:link href="https://chenyongda2018.github.io/tags/handler/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 19 Apr 2019 20:27:16 +0800</lastBuildDate>
+    <atom:link href="https://chenyongda2018.github.io/tags/handler/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Android消息机制全面解析</title>
       <link>https://chenyongda2018.github.io/posts/android/android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90/</link>
       <pubDate>Fri, 19 Apr 2019 20:27:16 +0800</pubDate>
-      
       <guid>https://chenyongda2018.github.io/posts/android/android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90/</guid>
-      <description>(1),Android消息机制概述 Android中的消息机制主要指 Handler的运行机制 以及 MessageQueue，Looper的工作过程 ，三者相互协作，保证着消息的接收，发送，处理，执行。
-​ 图片来自郭神的《第一行代码》
-先简单的介绍一下 Android 中 消息机制大家庭的主要成员 :
-Handler : 是Android消息机制的上层接口，最为大家常用，相当于Android消息机制的入口，我们通过使用Handler发送消息来引起消息机制的循环。通常用于:在子线程执行完耗时任务完后，更新UI。
-MessageQueue : 存储 消息(Message) 对象的消息队列，实则是单链表结构.
-Looper : 用于无限的从 MessageQueue中取出消息，相当于消息的永动机，如果有新的消息，则处理执行，若没有，则就一直等待，堵塞。Looper** 所在的线程是 创建 Handler 时所在的线程。
-主线程创建Handler时，会自动创建一个Looper,但是子线程并不会自动创建Looper
-ThreadLocal : 在每个线程互不干扰的存储，提供数据，以此来获取当前线程的Looper
-ActivityThread : Android 的主线程，也叫UI线程，主线程被创建时 自动初始化主线程的 Looper对象。
-问题 : 大家都知道只有在UI线程才能对UI元素进行操作，在子线程更改UI就会报错，为什么？ 看完《Android艺术开发探索》 这本书的第10章之后我也才明白
-Android中的UI控件不是线程安全的，如果在子线程中也能修改UI元素，那多线程的时，共同访问同一个UI元素，就会导致这个UI元素处于我们不可预知的状态，这个线程让它往左一点，那个线程让它往右一点，UI该听谁的，好tm乱。。 干脆我就只听主线程的把。 问题 : 那为什么不通过对访问UI控件的子线程加上锁机制呢 ？ 这个很简单了，如果为不同的线程访问同一UI元素加上锁机制，那我们程序员写相关代码的时候会变得超级麻烦。。。 改个UI还得考虑它是不是已经被别的线程占用了，被占用了，还得让那个线程释放锁。。。线程再多一点的话，大大地加大了程序员地工作量.
-而且加上锁机制无疑会由于线程堵塞地原因降低访问UI的效率，帧率降低，体验也会不友好。
-让UI元素只能再主线程访问就会省下很多事，创建一个Handler就行了。
-下面从整体概述一下 消息机制的整个工作过程 :
-Handler 创建时会采用当前线程的 Looper来构建内部的消息循环系统，如果Handler在子线程，则一开始是没有Looper对象的(解决方法稍后介绍)，主线程ActivityThread默认有一个Looper。
-Handler创建完毕，通过 post方法传入Runnable对象，或者通过sendMessage(Message msg)发送消息。
-post()方法里也是通过调用send()实现的
-send()方法被调用后，调用 MessageQueue的enqueueMessage()方法将消息发送到消息队列中，等待被处理。
-Looper对象运行在Handler所在的线程，从MessageQueue消息队列中不断地取出消息，处理，所以业务逻辑(通常是更新UI)就运行在Looper的线程中。
-接下来从局部来分析消息机制的每个成员。
-(2),ThreadLocal 工作原理 1, 什么是ThreadLocal？ ThreadLocal是一个线程内部的数据存储类，通过它可以在指定的线程中获得存储数据，获得数据，线程之间的ThreadLocal相互独立，且无法获得另一个线程的TheadLocal.</description>
+      <description>&lt;h2 id=&#34;1android消息机制概述&#34;&gt;(1),Android消息机制概述&lt;/h2&gt;&#xA;&lt;p&gt;Android中的消息机制主要指 &lt;strong&gt;Handler的运行机制&lt;/strong&gt; 以及 &lt;strong&gt;MessageQueue，Looper的工作过程&lt;/strong&gt; ，三者相互协作，保证着消息的接收，发送，处理，执行。&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/4/28/16a645eb49972a0d~tplv-t2oaga2asx-image.image&#34; alt=&#34; &#34;&gt;&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;​                                                            图片来自郭神的《第一行代码》&lt;/p&gt;&lt;/blockquote&gt;&#xA;&lt;p&gt;先简单的介绍一下 Android 中 消息机制大家庭的主要成员 :&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;&lt;strong&gt;Handler&lt;/strong&gt; : 是Android消息机制的上层接口，最为大家常用，相当于Android消息机制的入口，我们通过使用&lt;code&gt;Handler&lt;/code&gt;发送消息来引起消息机制的循环。通常用于:在子线程执行完耗时任务完后，更新UI。&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;&lt;strong&gt;MessageQueue&lt;/strong&gt; : 存储 &lt;strong&gt;消息(Message)&lt;/strong&gt; 对象的消息队列，实则是单链表结构.&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;&lt;strong&gt;Looper&lt;/strong&gt; : 用于无限的从 &lt;code&gt;MessageQueue&lt;/code&gt;中取出消息，相当于消息的永动机，如果有新的消息，则处理执行，若没有，则就一直等待，堵塞。Looper** 所在的线程是 创建 &lt;code&gt;Handler&lt;/code&gt; 时所在的线程。&lt;/p&gt;&#xA;&lt;p&gt;主线程创建Handler时，会自动创建一个Looper,&lt;strong&gt;但是子线程并不会自动创建Looper&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;&lt;strong&gt;ThreadLocal&lt;/strong&gt; : 在每个线程互不干扰的存储，提供数据，以此来获取当前线程的&lt;code&gt;Looper&lt;/code&gt;&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;&lt;strong&gt;ActivityThread&lt;/strong&gt; : Android 的主线程，也叫UI线程，主线程被创建时 自动初始化主线程的 &lt;code&gt;Looper&lt;/code&gt;对象。&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h4 id=&#34;问题--大家都知道只有在ui线程才能对ui元素进行操作在子线程更改ui就会报错为什么&#34;&gt;问题 : 大家都知道只有在UI线程才能对UI元素进行操作，在子线程更改UI就会报错，为什么？&lt;/h4&gt;&#xA;&lt;p&gt;看完&lt;a href=&#34;https://book.douban.com/subject/26599538/&#34;&gt;《Android艺术开发探索》&lt;/a&gt; 这本书的第10章之后我也才明白&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;Android中的UI控件不是线程安全的，如果在子线程中也能修改UI元素，那多线程的时，共同访问同一个UI元素，就会导致这个UI元素处于我们不可预知的状态，这个线程让它往左一点，那个线程让它往右一点，UI该听谁的，好tm乱。。 干脆我就只听主线程的把。&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;h4 id=&#34;问题--那为什么不通过对访问ui控件的子线程加上锁机制呢-&#34;&gt;问题 : 那为什么不通过对访问UI控件的子线程加上锁机制呢 ？&lt;/h4&gt;&#xA;&lt;p&gt;这个很简单了，如果为不同的线程访问同一UI元素加上锁机制，那我们程序员写相关代码的时候会变得超级麻烦。。。 改个UI还得考虑它是不是已经被别的线程占用了，被占用了，还得让那个线程释放锁。。。线程再多一点的话，大大地加大了程序员地工作量.&lt;/p&gt;&#xA;&lt;p&gt;而且加上锁机制无疑会由于线程堵塞地原因降低访问UI的效率，帧率降低，体验也会不友好。&lt;/p&gt;&#xA;&lt;p&gt;让UI元素只能再主线程访问就会省下很多事，创建一个&lt;code&gt;Handler&lt;/code&gt;就行了。&lt;/p&gt;&#xA;&lt;p&gt;下面从整体概述一下 消息机制的整个工作过程 :&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;&lt;code&gt;Handler &lt;/code&gt;创建时会采用当前线程的 &lt;code&gt;Looper&lt;/code&gt;来构建内部的消息循环系统，如果Handler在子线程，则一开始是没有&lt;code&gt;Looper&lt;/code&gt;对象的(解决方法稍后介绍)，主线程&lt;code&gt;ActivityThread&lt;/code&gt;默认有一个Looper。&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;&lt;code&gt;Handler&lt;/code&gt;创建完毕，通过 &lt;code&gt;post&lt;/code&gt;方法传入&lt;code&gt;Runnable&lt;/code&gt;对象，或者通过&lt;code&gt;sendMessage(Message msg)&lt;/code&gt;发送消息。&lt;/p&gt;&#xA;&lt;p&gt;&lt;code&gt;post()&lt;/code&gt;方法里也是通过调用&lt;code&gt;send()&lt;/code&gt;实现的&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;&lt;code&gt;send()&lt;/code&gt;方法被调用后，调用 MessageQueue的enqueueMessage()方法将消息发送到消息队列中，等待被处理。&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;&lt;code&gt;Looper&lt;/code&gt;对象运行在&lt;code&gt;Handler&lt;/code&gt;所在的线程，从&lt;code&gt;MessageQueue消息队列&lt;/code&gt;中不断地取出消息，处理，所以业务逻辑(通常是更新UI)就运行在Looper的线程中。&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;h3&gt;&lt;/h3&gt;&#xA;&lt;p&gt;接下来从局部来分析消息机制的每个成员。&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

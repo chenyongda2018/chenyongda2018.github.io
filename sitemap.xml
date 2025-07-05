@@ -2,10 +2,10 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://chenyongda2018.github.io/tags/android/</loc>
+    <loc>https://chenyongda2018.github.io/categories/android/</loc>
     <lastmod>2023-01-05T20:29:31+08:00</lastmod>
   </url><url>
-    <loc>https://chenyongda2018.github.io/categories/android/</loc>
+    <loc>https://chenyongda2018.github.io/tags/android/</loc>
     <lastmod>2023-01-05T20:29:31+08:00</lastmod>
   </url><url>
     <loc>https://chenyongda2018.github.io/categories/</loc>
@@ -50,10 +50,10 @@
     <loc>https://chenyongda2018.github.io/posts/android/kotlin_lamdba/</loc>
     <lastmod>2022-04-16T15:48:16+08:00</lastmod>
   </url><url>
-    <loc>https://chenyongda2018.github.io/tags/java/</loc>
+    <loc>https://chenyongda2018.github.io/categories/java/</loc>
     <lastmod>2020-04-13T20:22:27+08:00</lastmod>
   </url><url>
-    <loc>https://chenyongda2018.github.io/categories/java/</loc>
+    <loc>https://chenyongda2018.github.io/tags/java/</loc>
     <lastmod>2020-04-13T20:22:27+08:00</lastmod>
   </url><url>
     <loc>https://chenyongda2018.github.io/tags/jvm/</loc>
@@ -71,10 +71,10 @@
     <loc>https://chenyongda2018.github.io/posts/android/glide_study/</loc>
     <lastmod>2019-11-14T20:13:19+08:00</lastmod>
   </url><url>
-    <loc>https://chenyongda2018.github.io/tags/ocr/</loc>
+    <loc>https://chenyongda2018.github.io/categories/ocr/</loc>
     <lastmod>2019-05-10T20:25:04+08:00</lastmod>
   </url><url>
-    <loc>https://chenyongda2018.github.io/categories/ocr/</loc>
+    <loc>https://chenyongda2018.github.io/tags/ocr/</loc>
     <lastmod>2019-05-10T20:25:04+08:00</lastmod>
   </url><url>
     <loc>https://chenyongda2018.github.io/posts/android/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%9C%A8android%E4%B8%AD%E8%B0%83%E7%94%A8%E7%99%BE%E5%BA%A6%E7%9A%84ocr%E6%8E%A5%E5%8F%A3%E7%9A%84%E7%BB%8F%E5%8E%86/</loc>
