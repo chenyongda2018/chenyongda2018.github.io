@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Tag2 on Petrichor&#39;s blog</title>
+    <link>http://localhost:1313/tags/tag2/</link>
+    <description>Recent content in Tag2 on Petrichor&#39;s blog</description>
+    <generator>Hugo -- 0.147.4</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 06 Jul 2025 00:14:27 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/tag2/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Android约束布局使用技巧</title>
+      <link>http://localhost:1313/posts/android/android%E7%BA%A6%E6%9D%9F%E5%B8%83%E5%B1%80%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7/</link>
+      <pubDate>Sun, 06 Jul 2025 00:14:27 +0800</pubDate>
+      <guid>http://localhost:1313/posts/android/android%E7%BA%A6%E6%9D%9F%E5%B8%83%E5%B1%80%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7/</guid>
+      <description>&lt;p&gt;test&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

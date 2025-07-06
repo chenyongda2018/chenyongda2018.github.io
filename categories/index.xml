@@ -1,18 +1,37 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Categories on Petrichor&#39;s blog</title>
     <link>https://chenyongda2018.github.io/categories/</link>
     <description>Recent content in Categories on Petrichor&#39;s blog</description>
-    <generator>Hugo</generator>
+    <image>
+      <title>Petrichor&#39;s blog</title>
+      <url>https://chenyongda2018.github.io/images/profile.jpg</url>
+      <link>https://chenyongda2018.github.io/images/profile.jpg</link>
+    </image>
+    <generator>Hugo -- 0.147.4</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 05 Jul 2025 22:40:43 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 06 Jul 2025 17:07:12 +0800</lastBuildDate>
     <atom:link href="https://chenyongda2018.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Andorid</title>
+      <link>https://chenyongda2018.github.io/categories/andorid/</link>
+      <pubDate>Sun, 06 Jul 2025 17:07:12 +0800</pubDate>
+      <guid>https://chenyongda2018.github.io/categories/andorid/</guid>
+      <description></description>
+    </item>
     <item>
       <title>Android</title>
       <link>https://chenyongda2018.github.io/categories/android/</link>
-      <pubDate>Sat, 05 Jul 2025 22:40:43 +0800</pubDate>
+      <pubDate>Sun, 06 Jul 2025 00:14:27 +0800</pubDate>
       <guid>https://chenyongda2018.github.io/categories/android/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>View</title>
+      <link>https://chenyongda2018.github.io/categories/view/</link>
+      <pubDate>Sun, 06 Jul 2025 00:14:27 +0800</pubDate>
+      <guid>https://chenyongda2018.github.io/categories/view/</guid>
       <description></description>
     </item>
     <item>

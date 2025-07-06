@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Java on Petrichor&#39;s blog</title>
     <link>https://chenyongda2018.github.io/tags/java/</link>
     <description>Recent content in Java on Petrichor&#39;s blog</description>
-    <generator>Hugo</generator>
+    <image>
+      <title>Petrichor&#39;s blog</title>
+      <url>https://chenyongda2018.github.io/images/profile.jpg</url>
+      <link>https://chenyongda2018.github.io/images/profile.jpg</link>
+    </image>
+    <generator>Hugo -- 0.147.4</generator>
     <language>en-us</language>
     <lastBuildDate>Mon, 13 Apr 2020 20:22:27 +0800</lastBuildDate>
     <atom:link href="https://chenyongda2018.github.io/tags/java/index.xml" rel="self" type="application/rss+xml" />
@@ -13,14 +18,68 @@
       <link>https://chenyongda2018.github.io/posts/java/jvm%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%9B%9E%E6%94%B6%E7%AD%96%E7%95%A5%E9%80%89%E6%8B%A9-jvm%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B02/</link>
       <pubDate>Mon, 13 Apr 2020 20:22:27 +0800</pubDate>
       <guid>https://chenyongda2018.github.io/posts/java/jvm%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%9B%9E%E6%94%B6%E7%AD%96%E7%95%A5%E9%80%89%E6%8B%A9-jvm%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B02/</guid>
-      <description>&lt;blockquote&gt;&#xA;&lt;p&gt;Java体系中的自动内存管理主要包括了2个方面:&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;自动地给对象分配内存。&lt;/li&gt;&#xA;&lt;li&gt;自动地回收分配给对象地内存。&lt;/li&gt;&#xA;&lt;/ol&gt;&lt;/blockquote&gt;&#xA;&lt;p&gt;本文也围绕这两个点展开&#xA;&lt;!-- raw HTML omitted --&gt;&lt;!-- raw HTML omitted --&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;一-内存分配规则&#34;&gt;一. 内存分配规则&lt;/h2&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/6/24/16b8975973c1114c~tplv-t2oaga2asx-image.image&#34; alt=&#34;&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;!-- raw HTML omitted --&gt;&lt;!-- raw HTML omitted --&gt;&lt;/p&gt;&#xA;&lt;h3 id=&#34;1优先在eden区分配&#34;&gt;1.优先在Eden区分配&lt;/h3&gt;&#xA;&lt;p&gt;大多数情况下，JVM会在 &lt;code&gt;Eden&lt;/code&gt; 区优先分配对象，如果 &lt;code&gt;Eden&lt;/code&gt; 没有足够的空间，则进行一次 &lt;code&gt;Minor GC&lt;/code&gt; 。通过参数 &lt;code&gt;-XX:+PrintGCDetails&lt;/code&gt; 可以让虚拟机在进行垃圾回收时打印日志，方便我们看到回收前后的内存占用情况。&lt;/p&gt;&#xA;&lt;p&gt;例: 假如现在内存大小指定如下:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;新生代 -&amp;gt;10M&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Eden区 -&amp;gt; 8M&lt;/li&gt;&#xA;&lt;li&gt;from区 -&amp;gt; 1M&lt;/li&gt;&#xA;&lt;li&gt;to 区 -&amp;gt; 1M&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;老年代 -&amp;gt; 10M&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;然后我们又先后在代码中创建4个对象:&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#dc322f&#34;&gt;byte&lt;/span&gt;&lt;span style=&#34;color:#719e07&#34;&gt;[]&lt;/span&gt; byte1 &lt;span style=&#34;color:#719e07&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#719e07&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#dc322f&#34;&gt;byte&lt;/span&gt;&lt;span style=&#34;color:#719e07&#34;&gt;[&lt;/span&gt;2MB&lt;span style=&#34;color:#719e07&#34;&gt;]&lt;/span&gt;;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#dc322f&#34;&gt;byte&lt;/span&gt;&lt;span style=&#34;color:#719e07&#34;&gt;[]&lt;/span&gt; byte2 &lt;span style=&#34;color:#719e07&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#719e07&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#dc322f&#34;&gt;byte&lt;/span&gt;&lt;span style=&#34;color:#719e07&#34;&gt;[&lt;/span&gt;2MB&lt;span style=&#34;color:#719e07&#34;&gt;]&lt;/span&gt;;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#dc322f&#34;&gt;byte&lt;/span&gt;&lt;span style=&#34;color:#719e07&#34;&gt;[]&lt;/span&gt; byte3 &lt;span style=&#34;color:#719e07&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#719e07&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#dc322f&#34;&gt;byte&lt;/span&gt;&lt;span style=&#34;color:#719e07&#34;&gt;[&lt;/span&gt;2MB&lt;span style=&#34;color:#719e07&#34;&gt;]&lt;/span&gt;;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#dc322f&#34;&gt;byte&lt;/span&gt;&lt;span style=&#34;color:#719e07&#34;&gt;[]&lt;/span&gt; byte4 &lt;span style=&#34;color:#719e07&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#719e07&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#dc322f&#34;&gt;byte&lt;/span&gt;&lt;span style=&#34;color:#719e07&#34;&gt;[&lt;/span&gt;4MB&lt;span style=&#34;color:#719e07&#34;&gt;]&lt;/span&gt;;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;当创建完第三个对象后，Eden区已经用掉了6M的空间来存放 byte1,byte2,byte3 三个对象，再创建第四个对象时,Eden区加上一个from区已经放不下了，如先前所述，此时会触发一次 &lt;code&gt;MinorGC&lt;/code&gt; ,将三个2MB的对象转移到老年代中，腾出Eden区的空间给 第四个对象。&lt;/p&gt;&#xA;&lt;p&gt;所以，执行后的内存情况如下:&lt;/p&gt;</description>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;Java体系中的自动内存管理主要包括了2个方面:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;自动地给对象分配内存。&lt;/li&gt;
+&lt;li&gt;自动地回收分配给对象地内存。&lt;/li&gt;
+&lt;/ol&gt;&lt;/blockquote&gt;
+&lt;p&gt;本文也围绕这两个点展开
+&lt;!-- raw HTML omitted --&gt;&lt;!-- raw HTML omitted --&gt;&lt;/p&gt;
+&lt;h2 id=&#34;一-内存分配规则&#34;&gt;一. 内存分配规则&lt;/h2&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/6/24/16b8975973c1114c~tplv-t2oaga2asx-image.image&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;!-- raw HTML omitted --&gt;&lt;!-- raw HTML omitted --&gt;&lt;/p&gt;
+&lt;h3 id=&#34;1优先在eden区分配&#34;&gt;1.优先在Eden区分配&lt;/h3&gt;
+&lt;p&gt;大多数情况下，JVM会在 &lt;code&gt;Eden&lt;/code&gt; 区优先分配对象，如果 &lt;code&gt;Eden&lt;/code&gt; 没有足够的空间，则进行一次 &lt;code&gt;Minor GC&lt;/code&gt; 。通过参数 &lt;code&gt;-XX:+PrintGCDetails&lt;/code&gt; 可以让虚拟机在进行垃圾回收时打印日志，方便我们看到回收前后的内存占用情况。&lt;/p&gt;
+&lt;p&gt;例: 假如现在内存大小指定如下:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;新生代 -&amp;gt;10M
+&lt;ul&gt;
+&lt;li&gt;Eden区 -&amp;gt; 8M&lt;/li&gt;
+&lt;li&gt;from区 -&amp;gt; 1M&lt;/li&gt;
+&lt;li&gt;to 区 -&amp;gt; 1M&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;老年代 -&amp;gt; 10M&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;然后我们又先后在代码中创建4个对象:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;byte&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[]&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;byte1&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;new&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;byte&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;2MB&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;byte&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[]&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;byte2&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;new&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;byte&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;2MB&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;byte&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[]&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;byte3&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;new&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;byte&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;2MB&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;byte&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[]&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;byte4&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;new&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;byte&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;4MB&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;当创建完第三个对象后，Eden区已经用掉了6M的空间来存放 byte1,byte2,byte3 三个对象，再创建第四个对象时,Eden区加上一个from区已经放不下了，如先前所述，此时会触发一次 &lt;code&gt;MinorGC&lt;/code&gt; ,将三个2MB的对象转移到老年代中，腾出Eden区的空间给 第四个对象。&lt;/p&gt;</description>
     </item>
     <item>
       <title>对象回收判定与垃圾回收算法 JVM学习笔记[1]</title>
       <link>https://chenyongda2018.github.io/posts/java/%E5%AF%B9%E8%B1%A1%E5%9B%9E%E6%94%B6%E5%88%A4%E5%AE%9A%E4%B8%8E%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%AE%97%E6%B3%95-jvm%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B01/</link>
       <pubDate>Mon, 13 Jan 2020 20:21:09 +0800</pubDate>
       <guid>https://chenyongda2018.github.io/posts/java/%E5%AF%B9%E8%B1%A1%E5%9B%9E%E6%94%B6%E5%88%A4%E5%AE%9A%E4%B8%8E%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%AE%97%E6%B3%95-jvm%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B01/</guid>
-      <description>&lt;p&gt;&lt;!-- raw HTML omitted --&gt;&lt;!-- raw HTML omitted --&gt;&lt;/p&gt;&#xA;&lt;h1 id=&#34;本章要探究的问题-&#34;&gt;本章要探究的问题 :&lt;/h1&gt;&#xA;&lt;p&gt;GC在回收内存时 :&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;怎么判断哪些内存需要回收 ？&lt;/li&gt;&#xA;&lt;li&gt;什么时候回收？&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;p&gt;在几个线程私有的运行时区域:&lt;!-- raw HTML omitted --&gt;&lt;img src=&#34;https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/6/17/16b64d8a41ca08fb~tplv-t2oaga2asx-image.image&#34; alt=&#34;image.png&#34;&gt;&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;虚拟机栈&lt;/li&gt;&#xA;&lt;li&gt;程序计数器&lt;/li&gt;&#xA;&lt;li&gt;本地方法栈&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;它们的内存分配和回收&lt;strong&gt;大多&lt;/strong&gt;都具有确定性，随着线程的创建而产生，随着线程的停止而被回收。栈帧中的内存大小基本在类的结构确定下来时就已知。&lt;/p&gt;&#xA;&lt;p&gt;而在线程共有的 &lt;code&gt;Java堆(Heap)&lt;/code&gt; 和 &lt;code&gt;方法区(Class(Method) Area)&lt;/code&gt; 这两个区域则不同：&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/6/17/16b64d8a42c57ecf~tplv-t2oaga2asx-image.image&#34; alt=&#34;image.png&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;比如，一个接口有不同的实现类(类的信息在方法区中)，这几个实现类的内存大小肯定不一，没法在运行前就已知需要多大的内存，只有在运行期间才知道创建的对象的大小。&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;&lt;!-- raw HTML omitted --&gt;&lt;!-- raw HTML omitted --&gt;&lt;/p&gt;&#xA;&lt;h2&gt;&lt;/h2&gt;&#xA;&lt;p&gt;&lt;!-- raw HTML omitted --&gt;&lt;!-- raw HTML omitted --&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;一哪些内存需要回收&#34;&gt;一，哪些内存需要回收？&lt;/h2&gt;&#xA;&lt;p&gt;在知道哪些内存需要回收之前，我们要知道怎么判断一个对象是否还存活，当它不再存活时，就回收它。&lt;!-- raw HTML omitted --&gt;而 &lt;code&gt;引用计数算法&lt;/code&gt; 就是用来判断对象是否存活的一个算法。&lt;/p&gt;&#xA;&lt;p&gt;&lt;!-- raw HTML omitted --&gt;&lt;!-- raw HTML omitted --&gt;&lt;/p&gt;&#xA;&lt;h3 id=&#34;1引用计数算法reference-counting&#34;&gt;1，引用计数算法（Reference Counting）&lt;/h3&gt;&#xA;&lt;p&gt;算法描述：给对象添加一个引用计数器，当有一个地方引用了它，计数器+1，当引用失效，计数器-1，在任何时刻，计数器为0时此对象将不能再被使用。&lt;/p&gt;</description>
+      <description>&lt;p&gt;&lt;!-- raw HTML omitted --&gt;&lt;!-- raw HTML omitted --&gt;&lt;/p&gt;
+&lt;h1 id=&#34;本章要探究的问题-&#34;&gt;本章要探究的问题 :&lt;/h1&gt;
+&lt;p&gt;GC在回收内存时 :&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;怎么判断哪些内存需要回收 ？&lt;/li&gt;
+&lt;li&gt;什么时候回收？&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;在几个线程私有的运行时区域:&lt;!-- raw HTML omitted --&gt;&lt;img alt=&#34;image.png&#34; loading=&#34;lazy&#34; src=&#34;https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/6/17/16b64d8a41ca08fb~tplv-t2oaga2asx-image.image&#34;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;虚拟机栈&lt;/li&gt;
+&lt;li&gt;程序计数器&lt;/li&gt;
+&lt;li&gt;本地方法栈&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;它们的内存分配和回收&lt;strong&gt;大多&lt;/strong&gt;都具有确定性，随着线程的创建而产生，随着线程的停止而被回收。栈帧中的内存大小基本在类的结构确定下来时就已知。&lt;/p&gt;
+&lt;p&gt;而在线程共有的 &lt;code&gt;Java堆(Heap)&lt;/code&gt; 和 &lt;code&gt;方法区(Class(Method) Area)&lt;/code&gt; 这两个区域则不同：&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;image.png&#34; loading=&#34;lazy&#34; src=&#34;https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/6/17/16b64d8a42c57ecf~tplv-t2oaga2asx-image.image&#34;&gt;&lt;/p&gt;
+&lt;p&gt;比如，一个接口有不同的实现类(类的信息在方法区中)，这几个实现类的内存大小肯定不一，没法在运行前就已知需要多大的内存，只有在运行期间才知道创建的对象的大小。&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;!-- raw HTML omitted --&gt;&lt;!-- raw HTML omitted --&gt;&lt;/p&gt;
+&lt;h2&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;!-- raw HTML omitted --&gt;&lt;!-- raw HTML omitted --&gt;&lt;/p&gt;
+&lt;h2 id=&#34;一哪些内存需要回收&#34;&gt;一，哪些内存需要回收？&lt;/h2&gt;
+&lt;p&gt;在知道哪些内存需要回收之前，我们要知道怎么判断一个对象是否还存活，当它不再存活时，就回收它。&lt;!-- raw HTML omitted --&gt;而 &lt;code&gt;引用计数算法&lt;/code&gt; 就是用来判断对象是否存活的一个算法。&lt;/p&gt;
+&lt;p&gt;&lt;!-- raw HTML omitted --&gt;&lt;!-- raw HTML omitted --&gt;&lt;/p&gt;
+&lt;h3 id=&#34;1引用计数算法reference-counting&#34;&gt;1，引用计数算法（Reference Counting）&lt;/h3&gt;
+&lt;p&gt;算法描述：给对象添加一个引用计数器，当有一个地方引用了它，计数器+1，当引用失效，计数器-1，在任何时刻，计数器为0时此对象将不能再被使用。&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

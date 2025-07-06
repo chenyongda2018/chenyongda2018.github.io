@@ -1,443 +1,205 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>Kotlin Lambda | Petrichor's blog</title>
+<meta name=keywords content="Android,Kotlin"><meta name=description content="Kotlin lambda
+Kotlin中，充斥着各种各样的Lambda 表达式，这是Kotlin最方便的特性之一
+了解Kotlin 中的lambda，首先得知道Kotlin中的高阶函数
 
-  
-  <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1">
+1.高阶函数
+在Java中，如果有一个a方法，要去调用b方法，那么在里面直接调用即可。
+int a() {
+  return b(1);
+}
+a();
+接着,如果我不想把调用b方法的参数写死，希望动态设置方法b的参数。
+int a(int param) {
+  return b(param);
+}
+a(1);
+a(2);
+这些在Java中很轻松就能做到，不过&mldr;
+如果我们想动态设置的不是方法参数，而是方法本身呢，比如在方法a内有一处对别的方法的调用，这个方法可能是方法b,方法c,方法d&mldr;,该方法的参数类型是int,返回值类型也是int。方法a在执行时，具体需要调用哪个方法，能否动态设置? 也就是说能否将一个方法作为参数传给a?
+通过接口
+public interface Wrapper {
+  int method(int param);
+}
+将这个接口类型Wrapper 作为方法a的参数
+int a(Wrapper wrapper) {
+  return wrapper.method(1);
+}
+a(wrapper1);
+a(wrapper2);
+举个我们常见的例子
+在Android里View的点击事件
+public class View {
+  OnClickListener mOnClickListener;
+  ...
+  public void onTouchEvent(MotionEvent e) {
+    ...
+    mOnClickListener.onClick(this);
+    ...
+  }
+}
+OnClickListener就是一个接口，点击事件的内容全在onClick()方法里"><meta name=author content="Petrichor"><link rel=canonical href=https://chenyongda2018.github.io/posts/android/kotlin_lamdba/><meta name=google-site-verification content="XYZabc"><meta name=yandex-verification content="XYZabc"><meta name=msvalidate.01 content="XYZabc"><link crossorigin=anonymous href=/assets/css/stylesheet.2211ca3164be7830024f6aad2b3a2e520843a64f8f048445c3401c1249aa051d.css integrity="sha256-IhHKMWS+eDACT2qtKzouUghDpk+PBIRFw0AcEkmqBR0=" rel="preload stylesheet" as=style><link rel=icon href=https://chenyongda2018.github.io/newfav.png><link rel=icon type=image/png sizes=16x16 href=https://chenyongda2018.github.io/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://chenyongda2018.github.io/favicon-32x32.png><link rel=apple-touch-icon href=https://chenyongda2018.github.io/apple-touch-icon.png><link rel=mask-icon href=https://chenyongda2018.github.io/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://chenyongda2018.github.io/posts/android/kotlin_lamdba/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta property="og:url" content="https://chenyongda2018.github.io/posts/android/kotlin_lamdba/"><meta property="og:site_name" content="Petrichor's blog"><meta property="og:title" content="Kotlin Lambda"><meta property="og:description" content="Kotlin lambda Kotlin中，充斥着各种各样的Lambda 表达式，这是Kotlin最方便的特性之一
+了解Kotlin 中的lambda，首先得知道Kotlin中的高阶函数
+1.高阶函数 在Java中，如果有一个a方法，要去调用b方法，那么在里面直接调用即可。
+int a() { return b(1); } a(); 接着,如果我不想把调用b方法的参数写死，希望动态设置方法b的参数。
+int a(int param) { return b(param); } a(1); a(2); 这些在Java中很轻松就能做到，不过… 如果我们想动态设置的不是方法参数，而是方法本身呢，比如在方法a内有一处对别的方法的调用，这个方法可能是方法b,方法c,方法d…,该方法的参数类型是int,返回值类型也是int。方法a在执行时，具体需要调用哪个方法，能否动态设置? 也就是说能否将一个方法作为参数传给a?
+通过接口
+public interface Wrapper { int method(int param); } 将这个接口类型Wrapper 作为方法a的参数
+int a(Wrapper wrapper) { return wrapper.method(1); } a(wrapper1); a(wrapper2); 举个我们常见的例子
+在Android里View的点击事件
+public class View { OnClickListener mOnClickListener; ... public void onTouchEvent(MotionEvent e) { ... mOnClickListener.onClick(this); ... } } OnClickListener就是一个接口，点击事件的内容全在onClick()方法里"><meta property="og:locale" content="en-us"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2022-04-16T15:48:16+08:00"><meta property="article:modified_time" content="2022-04-16T15:48:16+08:00"><meta property="article:tag" content="Android"><meta property="article:tag" content="Kotlin"><meta property="og:image" content="https://chenyongda2018.github.io/images/profile.jpg"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://chenyongda2018.github.io/images/profile.jpg"><meta name=twitter:title content="Kotlin Lambda"><meta name=twitter:description content="Kotlin lambda
+Kotlin中，充斥着各种各样的Lambda 表达式，这是Kotlin最方便的特性之一
+了解Kotlin 中的lambda，首先得知道Kotlin中的高阶函数
 
-  
-    
-    
-      <link href="/css/fonts.css" rel="stylesheet" type="text/css">
-    
-  
-
-  
-  <title>Kotlin Lambda</title>
-
-  
-  
-  <link rel="stylesheet" href="/css/hugo-octopress.css">
-
-  
-  
-
-  
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
-  
-
-  
-  
-    <link href="https://chenyongda2018.github.io/newfav.png" rel="icon">
-  
-
-  
-  
-
-  <meta name="description" content="" />
-  <meta name="keywords" content="">
-  <meta name="author" content="Petrichor">
-
-  
-  <meta name="generator" content="Hugo 0.115.1">
-
-  
-  
-
-  
-  
-
-
-
-</head>
-<body>
-
-
-<header role="banner">
-<hgroup>
-  
-  <h1><a href="https://chenyongda2018.github.io/">Petrichor&#39;s blog</a></h1>
-    <h2>Android developer.</h2>
-</hgroup></header>
-
-
-<nav role="navigation">
-<fieldset class="mobile-nav">
-  
-  <select onchange="location = this.value;">
-    <option value="">Navigate…</option>
-      
-        <option value="https://chenyongda2018.github.io/">» 主页</option>
-      
-  </select>
-</fieldset>
-
-
-<ul class="main-navigation">
-  
-  
-    
-      <li><a href="https://chenyongda2018.github.io/" title="主页">主页</a></li>
-    
-  
-</ul>
-
-<ul class="subscription">
-  
-    
-        <a href="https://chenyongda2018.github.io/index.xml" target="_blank" type="application/rss+xml" title="RSS" rel="noopener noreferrer"><i class="fa fa-rss-square fa-lg"></i></a>
-    
-  
-</ul>
-
-
-  <form action="https://www.google.com/search" method="get" target="_blank" rel="noopener noreferrer">
-    <fieldset role="search">
-      <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-      <input type="hidden" name="q" value="site:https://chenyongda2018.github.io/" />
-    </fieldset>
-  </form>
-
-</nav>
-
-
-<div id="main">
-  <div id="content">
-    <div>
-      <article class="hentry" role="article">
-
-        
-        
-
-<header>
-  <p class="meta">Apr 16, 2022
-     - 2 minute read 
-    
-
-    
-    
-      - <a class="label" href="https://chenyongda2018.github.io/categories/android/">Android </a>
-    
-  </p>
-  <h1 class="entry-title">
-     Kotlin Lambda 
-  </h1>
-</header>
-
-
-        <div class="entry-content">
-          
-          
-          
-            <nav id="TableOfContents">
-  <ul>
-    <li><a href="#kotlin-lambda">Kotlin lambda</a>
-      <ul>
-        <li><a href="#1高阶函数">1.高阶函数</a></li>
-        <li><a href="#2-lambda表达式">2. Lambda表达式</a></li>
-        <li><a href="#3-为什么kotlin中函数可以作为参数被传递">3. 为什么Kotlin中函数可以作为参数被传递?</a></li>
-        <li><a href="#4inline内联函数">4.inline内联函数</a></li>
-      </ul>
-    </li>
-  </ul>
-</nav>
-          
-          <h1 id="kotlin-lambda">Kotlin lambda</h1>
-<p>Kotlin中，充斥着各种各样的<code>Lambda</code> 表达式，这是Kotlin最方便的特性之一</p>
-<p>了解Kotlin 中的<code>lambda</code>，首先得知道Kotlin中的<code>高阶函数</code></p>
-<hr>
-<h2 id="1高阶函数">1.高阶函数</h2>
-<p>在Java中，如果有一个a方法，要去调用b方法，那么在里面直接调用即可。</p>
-<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#dc322f">int</span> <span style="color:#268bd2">a</span><span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#719e07">return</span> b<span style="color:#719e07">(</span><span style="color:#2aa198">1</span><span style="color:#719e07">);</span>
-</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
-</span></span><span style="display:flex;"><span>a<span style="color:#719e07">();</span>
-</span></span></code></pre></div><p>接着,如果我不想把调用b方法的参数写死，希望动态设置方法b的参数。</p>
-<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#dc322f">int</span> <span style="color:#268bd2">a</span><span style="color:#719e07">(</span><span style="color:#dc322f">int</span> param<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#719e07">return</span> b<span style="color:#719e07">(</span>param<span style="color:#719e07">);</span>
-</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
-</span></span><span style="display:flex;"><span>a<span style="color:#719e07">(</span><span style="color:#2aa198">1</span><span style="color:#719e07">);</span>
-</span></span><span style="display:flex;"><span>a<span style="color:#719e07">(</span><span style="color:#2aa198">2</span><span style="color:#719e07">);</span>
-</span></span></code></pre></div><p>这些在Java中很轻松就能做到，不过&hellip;
-如果我们想动态设置的不是方法参数，而是方法本身呢，比如在方法a内有一处对别的方法的调用，这个方法可能是方法b,方法c,方法d&hellip;,该方法的参数类型是int,返回值类型也是int。方法a在执行时，具体需要调用哪个方法，能否动态设置? 也就是说能否将一个方法作为参数传给a?</p>
-<p>通过接口</p>
-<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">public</span> <span style="color:#268bd2">interface</span> <span style="color:#268bd2">Wrapper</span> <span style="color:#719e07">{</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> <span style="color:#268bd2">method</span><span style="color:#719e07">(</span><span style="color:#dc322f">int</span> param<span style="color:#719e07">);</span>
-</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
-</span></span></code></pre></div><p>将这个接口类型<code>Wrapper</code> 作为方法a的参数</p>
-<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#dc322f">int</span> <span style="color:#268bd2">a</span><span style="color:#719e07">(</span>Wrapper wrapper<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#719e07">return</span> wrapper<span style="color:#719e07">.</span>method<span style="color:#719e07">(</span><span style="color:#2aa198">1</span><span style="color:#719e07">);</span>
-</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
-</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>a<span style="color:#719e07">(</span>wrapper1<span style="color:#719e07">);</span>
-</span></span><span style="display:flex;"><span>a<span style="color:#719e07">(</span>wrapper2<span style="color:#719e07">);</span>
-</span></span></code></pre></div><p>举个我们常见的例子</p>
-<p>在Android里View的点击事件</p>
-<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">public</span> <span style="color:#268bd2">class</span> <span style="color:#268bd2">View</span> <span style="color:#719e07">{</span>
-</span></span><span style="display:flex;"><span>  OnClickListener mOnClickListener<span style="color:#719e07">;</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#719e07">...</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">public</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">onTouchEvent</span><span style="color:#719e07">(</span>MotionEvent e<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#719e07">...</span>
-</span></span><span style="display:flex;"><span>    mOnClickListener<span style="color:#719e07">.</span>onClick<span style="color:#719e07">(</span><span style="color:#719e07">this</span><span style="color:#719e07">);</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#719e07">...</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
-</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
-</span></span></code></pre></div><p><code>OnClickListener</code>就是一个接口，点击事件的内容全在<code>onClick()</code>方法里</p>
-<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">public</span> <span style="color:#268bd2">interface</span> <span style="color:#268bd2">OnClickListener</span> <span style="color:#719e07">{</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">void</span> <span style="color:#268bd2">onClick</span><span style="color:#719e07">(</span>View v<span style="color:#719e07">);</span>
-</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
-</span></span></code></pre></div><p>我们在给View设置点击事件时，传的就是一个OnClickListener,本质上这样传递的是一个稍后会被调用的<code>onClick()</code>方法,一般称之为<code>回调</code>,不过由于Java中不允许直接传递方法，所以需要用接口包装一下。</p>
-<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>OnClickListener listener1 <span style="color:#719e07">=</span> <span style="color:#719e07">new</span> OnClickListener<span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">@Override</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">void</span> <span style="color:#268bd2">onClick</span><span style="color:#719e07">(</span>View v<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
-</span></span><span style="display:flex;"><span>    doSomething<span style="color:#719e07">();</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#719e07">}</span>
-</span></span><span style="display:flex;"><span><span style="color:#719e07">};</span>
-</span></span><span style="display:flex;"><span>view<span style="color:#719e07">.</span>setOnClickListener<span style="color:#719e07">(</span>listener1<span style="color:#719e07">);</span>
-</span></span></code></pre></div><p>在Kotlin里，函数是可以作为一个参数被传递的 :</p>
-<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#719e07">fun</span> <span style="color:#268bd2">setOnClickListener</span>(onClick: (View) <span style="color:#719e07">-&gt;</span> Unit) {
-</span></span><span style="display:flex;"><span>  <span style="color:#719e07">this</span>.onClick = onClick
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>                         👇传入一个匿名方法，参数类型时View,无返回值                        
-</span></span><span style="display:flex;"><span>view.setOnClickListener(<span style="color:#719e07">fun</span>(v: View): Unit) {
-</span></span><span style="display:flex;"><span>  doSomething()
-</span></span><span style="display:flex;"><span>})
-</span></span></code></pre></div><p>这种 <code>参数或者返回值是函数</code>的函数 在Kotlin中称之为<code>高阶函数(Higher-Order-Functions)</code></p>
-<h2 id="2-lambda表达式">2. Lambda表达式</h2>
-<p>在刚刚的代码中，传入的匿名函数还能进一步简化，写成<code>Lambda</code>表达式的形式</p>
-<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span>                         👇简化后的匿名方法                       
-</span></span><span style="display:flex;"><span>view.setOnClickListener( { v: View <span style="color:#719e07">-&gt;</span>
-</span></span><span style="display:flex;"><span>  doSomething()
-</span></span><span style="display:flex;"><span>} )
-</span></span></code></pre></div><p>Kotlin允许如果<code>Lambda</code> 是最后一个参数时，<code>Lambda</code>可以写在方法()的外面：</p>
-<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span>view.setOnClickListener() { v: View <span style="color:#719e07">-&gt;</span>
-</span></span><span style="display:flex;"><span>  doSomething()
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>如果该<code>Lambda</code> 是唯一的参数，则方法()可以省略</p>
-<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span>view.setOnClickListener { v: View <span style="color:#719e07">-&gt;</span>
-</span></span><span style="display:flex;"><span>  doSomething()
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>进一步，如果该<code>Lambda</code> 只有一个参数，该参数还可以省略不写, Kotlin为这种唯一参数提供了默认的名字<code>it</code></p>
-<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span>view.setOnClickListener { 
-</span></span><span style="display:flex;"><span>  doSomething()
-</span></span><span style="display:flex;"><span>  <span style="color:#719e07">it</span>.visibility = GONE
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h2 id="3-为什么kotlin中函数可以作为参数被传递">3. 为什么Kotlin中函数可以作为参数被传递?</h2>
-<p>将刚才的代码，反编译为Java:</p>
-<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>                                      👇实际传递的是FunctionN类型的对象
-</span></span><span style="display:flex;"><span><span style="color:#268bd2">public</span> <span style="color:#268bd2">static</span> <span style="color:#268bd2">final</span> String <span style="color:#268bd2">a</span><span style="color:#719e07">(</span><span style="color:#268bd2">@NotNull</span> Function1 funParam<span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
-</span></span><span style="display:flex;"><span>      Intrinsics<span style="color:#719e07">.</span>checkNotNullParameter<span style="color:#719e07">(</span>funParam<span style="color:#719e07">,</span> <span style="color:#2aa198">&#34;funParam&#34;</span><span style="color:#719e07">);</span>
-</span></span><span style="display:flex;"><span>      <span style="color:#719e07">return</span> <span style="color:#719e07">(</span>String<span style="color:#719e07">)</span>funParam<span style="color:#719e07">.</span>invoke<span style="color:#719e07">(</span><span style="color:#2aa198">1</span><span style="color:#719e07">);</span>
-</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
-</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#719e07">interface</span> <span style="color:#268bd2">FunctionN</span>&lt;<span style="color:#719e07">out</span> R&gt; : Function&lt;R&gt;, FunctionBase&lt;R&gt; {
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#719e07">operator</span> <span style="color:#719e07">fun</span> <span style="color:#268bd2">invoke</span>(<span style="color:#719e07">vararg</span> args: Any?): R
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#719e07">override</span> <span style="color:#719e07">val</span> arity: Int
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><blockquote>
-<p>所以，之所以Kotlin中方法可以被当作参数 进行传递，是因为它实际一个FunctionN类型的实实在在的对象</p>
-</blockquote>
-<p>对应关系:</p>
-<table>
-<thead>
-<tr>
-<th>表达式</th>
-<th>FunctionN</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>(String) -&gt; Unit</td>
-<td>Function1&lt;String,Int&gt;</td>
-</tr>
-<tr>
-<td>(String,Int) -&gt; Double</td>
-<td>Function2&lt;String,Int,Double&gt;</td>
-</tr>
-<tr>
-<td>&hellip;</td>
-<td>&hellip;</td>
-</tr>
-<tr>
-<td>(参数1类型,参数2类型..参数n类型) -&gt; 返回值类型</td>
-<td>FunctionN&lt;参数1类型,&hellip;,参数n类型,返回值类型&gt;</td>
-</tr>
-</tbody>
-</table>
-<h2 id="4inline内联函数">4.inline内联函数</h2>
-<p>集合操作符 filter 可以定义规则对集合进行过滤</p>
-<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span>listOf(<span style="color:#2aa198">1</span>,<span style="color:#2aa198">2</span>,<span style="color:#2aa198">3</span>,<span style="color:#2aa198">4</span>,<span style="color:#2aa198">5</span>,<span style="color:#2aa198">6</span>).filter {<span style="color:#719e07">it</span> &gt; <span style="color:#2aa198">2</span>}
-</span></span></code></pre></div><p>看一下 filter 方法的声明</p>
-<pre tabindex="0"><code class="language-kotiln" data-lang="kotiln">public inline fun &lt;T&gt; Iterable&lt;T&gt;.filter(predicate: (T) -&gt; Boolean): List&lt;T&gt; {
+1.高阶函数
+在Java中，如果有一个a方法，要去调用b方法，那么在里面直接调用即可。
+int a() {
+  return b(1);
+}
+a();
+接着,如果我不想把调用b方法的参数写死，希望动态设置方法b的参数。
+int a(int param) {
+  return b(param);
+}
+a(1);
+a(2);
+这些在Java中很轻松就能做到，不过&mldr;
+如果我们想动态设置的不是方法参数，而是方法本身呢，比如在方法a内有一处对别的方法的调用，这个方法可能是方法b,方法c,方法d&mldr;,该方法的参数类型是int,返回值类型也是int。方法a在执行时，具体需要调用哪个方法，能否动态设置? 也就是说能否将一个方法作为参数传给a?
+通过接口
+public interface Wrapper {
+  int method(int param);
+}
+将这个接口类型Wrapper 作为方法a的参数
+int a(Wrapper wrapper) {
+  return wrapper.method(1);
+}
+a(wrapper1);
+a(wrapper2);
+举个我们常见的例子
+在Android里View的点击事件
+public class View {
+  OnClickListener mOnClickListener;
+  ...
+  public void onTouchEvent(MotionEvent e) {
+    ...
+    mOnClickListener.onClick(this);
+    ...
+  }
+}
+OnClickListener就是一个接口，点击事件的内容全在onClick()方法里"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Posts","item":"https://chenyongda2018.github.io/posts/"},{"@type":"ListItem","position":2,"name":"Kotlin Lambda","item":"https://chenyongda2018.github.io/posts/android/kotlin_lamdba/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Kotlin Lambda","name":"Kotlin Lambda","description":"Kotlin lambda Kotlin中，充斥着各种各样的Lambda 表达式，这是Kotlin最方便的特性之一\n了解Kotlin 中的lambda，首先得知道Kotlin中的高阶函数\n1.高阶函数 在Java中，如果有一个a方法，要去调用b方法，那么在里面直接调用即可。\nint a() { return b(1); } a(); 接着,如果我不想把调用b方法的参数写死，希望动态设置方法b的参数。\nint a(int param) { return b(param); } a(1); a(2); 这些在Java中很轻松就能做到，不过\u0026hellip; 如果我们想动态设置的不是方法参数，而是方法本身呢，比如在方法a内有一处对别的方法的调用，这个方法可能是方法b,方法c,方法d\u0026hellip;,该方法的参数类型是int,返回值类型也是int。方法a在执行时，具体需要调用哪个方法，能否动态设置? 也就是说能否将一个方法作为参数传给a?\n通过接口\npublic interface Wrapper { int method(int param); } 将这个接口类型Wrapper 作为方法a的参数\nint a(Wrapper wrapper) { return wrapper.method(1); } a(wrapper1); a(wrapper2); 举个我们常见的例子\n在Android里View的点击事件\npublic class View { OnClickListener mOnClickListener; ... public void onTouchEvent(MotionEvent e) { ... mOnClickListener.onClick(this); ... } } OnClickListener就是一个接口，点击事件的内容全在onClick()方法里\n","keywords":["Android","Kotlin"],"articleBody":"Kotlin lambda Kotlin中，充斥着各种各样的Lambda 表达式，这是Kotlin最方便的特性之一\n了解Kotlin 中的lambda，首先得知道Kotlin中的高阶函数\n1.高阶函数 在Java中，如果有一个a方法，要去调用b方法，那么在里面直接调用即可。\nint a() { return b(1); } a(); 接着,如果我不想把调用b方法的参数写死，希望动态设置方法b的参数。\nint a(int param) { return b(param); } a(1); a(2); 这些在Java中很轻松就能做到，不过… 如果我们想动态设置的不是方法参数，而是方法本身呢，比如在方法a内有一处对别的方法的调用，这个方法可能是方法b,方法c,方法d…,该方法的参数类型是int,返回值类型也是int。方法a在执行时，具体需要调用哪个方法，能否动态设置? 也就是说能否将一个方法作为参数传给a?\n通过接口\npublic interface Wrapper { int method(int param); } 将这个接口类型Wrapper 作为方法a的参数\nint a(Wrapper wrapper) { return wrapper.method(1); } a(wrapper1); a(wrapper2); 举个我们常见的例子\n在Android里View的点击事件\npublic class View { OnClickListener mOnClickListener; ... public void onTouchEvent(MotionEvent e) { ... mOnClickListener.onClick(this); ... } } OnClickListener就是一个接口，点击事件的内容全在onClick()方法里\npublic interface OnClickListener { void onClick(View v); } 我们在给View设置点击事件时，传的就是一个OnClickListener,本质上这样传递的是一个稍后会被调用的onClick()方法,一般称之为回调,不过由于Java中不允许直接传递方法，所以需要用接口包装一下。\nOnClickListener listener1 = new OnClickListener() { @Override void onClick(View v) { doSomething(); } }; view.setOnClickListener(listener1); 在Kotlin里，函数是可以作为一个参数被传递的 :\nfun setOnClickListener(onClick: (View) -\u003e Unit) { this.onClick = onClick } 👇传入一个匿名方法，参数类型时View,无返回值 view.setOnClickListener(fun(v: View): Unit) { doSomething() }) 这种 参数或者返回值是函数的函数 在Kotlin中称之为高阶函数(Higher-Order-Functions)\n2. Lambda表达式 在刚刚的代码中，传入的匿名函数还能进一步简化，写成Lambda表达式的形式\n👇简化后的匿名方法 view.setOnClickListener( { v: View -\u003e doSomething() } ) Kotlin允许如果Lambda 是最后一个参数时，Lambda可以写在方法()的外面：\nview.setOnClickListener() { v: View -\u003e doSomething() } 如果该Lambda 是唯一的参数，则方法()可以省略\nview.setOnClickListener { v: View -\u003e doSomething() } 进一步，如果该Lambda 只有一个参数，该参数还可以省略不写, Kotlin为这种唯一参数提供了默认的名字it\nview.setOnClickListener { doSomething() it.visibility = GONE } 3. 为什么Kotlin中函数可以作为参数被传递? 将刚才的代码，反编译为Java:\n👇实际传递的是FunctionN类型的对象 public static final String a(@NotNull Function1 funParam) { Intrinsics.checkNotNullParameter(funParam, \"funParam\"); return (String)funParam.invoke(1); } interface FunctionN\u003cout R\u003e : Function\u003cR\u003e, FunctionBase\u003cR\u003e { operator fun invoke(vararg args: Any?): R override val arity: Int } 所以，之所以Kotlin中方法可以被当作参数 进行传递，是因为它实际一个FunctionN类型的实实在在的对象\n对应关系:\n表达式 FunctionN (String) -\u003e Unit Function1 (String,Int) -\u003e Double Function2 … … (参数1类型,参数2类型..参数n类型) -\u003e 返回值类型 FunctionN\u003c参数1类型,…,参数n类型,返回值类型\u003e 4.inline内联函数 集合操作符 filter 可以定义规则对集合进行过滤\nlistOf(1,2,3,4,5,6).filter {it \u003e 2} 看一下 filter 方法的声明\npublic inline fun Iterable.filter(predicate: (T) -\u003e Boolean): List { return filterTo(ArrayList(), predicate) } public inline fun \u003cT, C : MutableCollection\u003cin T\u003e\u003e Iterable\u003cT\u003e.filterTo(destination: C, predicate: (T) -\u003e Boolean): C { for (element in this) if (predicate(element)) destination.add(element) return destination } filter方法接收一个 函数类型的参数，并且返回值是boolean，符合使用lambda的场景，上面我们说过，lamdba是实现了FunctionN接口的对象。 如果集合里有成百上千个元素，那每次经过filter 都会生成匿名对象，是一个不容忽视的开销,引起性能问题。 所以,Kotlin中引入了内联函数的概念:\n内联函数回把函数的实现直接拷贝的调用处,避免创建匿名内部类。\ninline fun inlined(getString: () -\u003e String) = println(getString()) fun notInlined(getString: () -\u003e String) = println(getString()) fun test() { var testVar = \"Test\" notInlined { testVar } inlined { testVar } } 编译后的java代码:\npublic static final void test() { final ObjectRef testVar = new ObjectRef(); testVar.element = \"Test Variable\"; // notInlined: //每个闭包 lamdba 都是一个对象会额外分配内存，影响运行时间 notInlined((Function0)(new Function0(0) { public Object invoke() { return this.invoke(); } @NotNull public final String invoke() { return (String)testVar.element; } })); // inlined:会直接将方法体复制到调用处， String var3 = (String)testVar.element; System.out.println(var3); } 在 kotlin 中，因为出现了大量的带 lamdba的 高阶函数 – 「高阶函数是将函数用作参数或返回值的函数」，使得越来越多的地方出现 函数参数 不断传递的现象，每一个函数参数都会被编译成一个对象， 使得内存分配（对于函数对象和类）和虚拟调用会增加运行时间开销，通过内联化 lambda 表达式可以消除这类的开销。\n","wordCount":"358","inLanguage":"en","image":"https://chenyongda2018.github.io/images/profile.jpg","datePublished":"2022-04-16T15:48:16+08:00","dateModified":"2022-04-16T15:48:16+08:00","author":{"@type":"Person","name":"Petrichor"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://chenyongda2018.github.io/posts/android/kotlin_lamdba/"},"publisher":{"@type":"Organization","name":"Petrichor's blog","logo":{"@type":"ImageObject","url":"https://chenyongda2018.github.io/newfav.png"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://chenyongda2018.github.io/ accesskey=h title="Home (Alt + H)"><img src=https://chenyongda2018.github.io/apple-touch-icon.png alt aria-label=logo height=35>Home</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)" aria-label="Toggle theme"><svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg><svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></div><ul id=menu><li><a href=https://chenyongda2018.github.io/categories/ title=分类><span>分类</span></a></li><li><a href=https://chenyongda2018.github.io/tags/ title=标签><span>标签</span></a></li><li><a href=https://chenyongda2018.github.io/about/ title=关于><span>关于</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><div class=breadcrumbs><a href=https://chenyongda2018.github.io/>Home</a>&nbsp;»&nbsp;<a href=https://chenyongda2018.github.io/posts/>Posts</a></div><h1 class="post-title entry-hint-parent">Kotlin Lambda</h1><div class=post-meta><span title='2022-04-16 15:48:16 +0800 CST'>April 16, 2022</span>&nbsp;·&nbsp;2 min&nbsp;·&nbsp;358 words&nbsp;·&nbsp;Petrichor&nbsp;|&nbsp;<a href=https://github.com/chenyongda2018/chenyongda2018.github.io/tree/main/content/posts/android/Kotlin_lamdba.md rel="noopener noreferrer edit" target=_blank>Suggest Changes</a></div></header><div class=post-content><h1 id=kotlin-lambda>Kotlin lambda<a hidden class=anchor aria-hidden=true href=#kotlin-lambda>#</a></h1><p>Kotlin中，充斥着各种各样的<code>Lambda</code> 表达式，这是Kotlin最方便的特性之一</p><p>了解Kotlin 中的<code>lambda</code>，首先得知道Kotlin中的<code>高阶函数</code></p><hr><h2 id=1高阶函数>1.高阶函数<a hidden class=anchor aria-hidden=true href=#1高阶函数>#</a></h2><p>在Java中，如果有一个a方法，要去调用b方法，那么在里面直接调用即可。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kt>int</span><span class=w> </span><span class=nf>a</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=k>return</span><span class=w> </span><span class=n>b</span><span class=p>(</span><span class=n>1</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=n>a</span><span class=p>();</span><span class=w>
+</span></span></span></code></pre></div><p>接着,如果我不想把调用b方法的参数写死，希望动态设置方法b的参数。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kt>int</span><span class=w> </span><span class=nf>a</span><span class=p>(</span><span class=kt>int</span><span class=w> </span><span class=n>param</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=k>return</span><span class=w> </span><span class=n>b</span><span class=p>(</span><span class=n>param</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=n>a</span><span class=p>(</span><span class=n>1</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=n>a</span><span class=p>(</span><span class=n>2</span><span class=p>);</span><span class=w>
+</span></span></span></code></pre></div><p>这些在Java中很轻松就能做到，不过&mldr;
+如果我们想动态设置的不是方法参数，而是方法本身呢，比如在方法a内有一处对别的方法的调用，这个方法可能是方法b,方法c,方法d&mldr;,该方法的参数类型是int,返回值类型也是int。方法a在执行时，具体需要调用哪个方法，能否动态设置? 也就是说能否将一个方法作为参数传给a?</p><p>通过接口</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kd>public</span><span class=w> </span><span class=kd>interface</span> <span class=nc>Wrapper</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=kt>int</span><span class=w> </span><span class=nf>method</span><span class=p>(</span><span class=kt>int</span><span class=w> </span><span class=n>param</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></div><p>将这个接口类型<code>Wrapper</code> 作为方法a的参数</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kt>int</span><span class=w> </span><span class=nf>a</span><span class=p>(</span><span class=n>Wrapper</span><span class=w> </span><span class=n>wrapper</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=k>return</span><span class=w> </span><span class=n>wrapper</span><span class=p>.</span><span class=na>method</span><span class=p>(</span><span class=n>1</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=n>a</span><span class=p>(</span><span class=n>wrapper1</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=n>a</span><span class=p>(</span><span class=n>wrapper2</span><span class=p>);</span><span class=w>
+</span></span></span></code></pre></div><p>举个我们常见的例子</p><p>在Android里View的点击事件</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kd>public</span><span class=w> </span><span class=kd>class</span> <span class=nc>View</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=n>OnClickListener</span><span class=w> </span><span class=n>mOnClickListener</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=p>...</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>onTouchEvent</span><span class=p>(</span><span class=n>MotionEvent</span><span class=w> </span><span class=n>e</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>...</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>mOnClickListener</span><span class=p>.</span><span class=na>onClick</span><span class=p>(</span><span class=k>this</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>...</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></div><p><code>OnClickListener</code>就是一个接口，点击事件的内容全在<code>onClick()</code>方法里</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kd>public</span><span class=w> </span><span class=kd>interface</span> <span class=nc>OnClickListener</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=kt>void</span><span class=w> </span><span class=nf>onClick</span><span class=p>(</span><span class=n>View</span><span class=w> </span><span class=n>v</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></div><p>我们在给View设置点击事件时，传的就是一个OnClickListener,本质上这样传递的是一个稍后会被调用的<code>onClick()</code>方法,一般称之为<code>回调</code>,不过由于Java中不允许直接传递方法，所以需要用接口包装一下。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=n>OnClickListener</span><span class=w> </span><span class=n>listener1</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>OnClickListener</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nd>@Override</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=kt>void</span><span class=w> </span><span class=nf>onClick</span><span class=p>(</span><span class=n>View</span><span class=w> </span><span class=n>v</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>doSomething</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>};</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=n>view</span><span class=p>.</span><span class=na>setOnClickListener</span><span class=p>(</span><span class=n>listener1</span><span class=p>);</span><span class=w>
+</span></span></span></code></pre></div><p>在Kotlin里，函数是可以作为一个参数被传递的 :</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-kotlin data-lang=kotlin><span class=line><span class=cl><span class=k>fun</span> <span class=nf>setOnClickListener</span><span class=p>(</span><span class=n>onClick</span><span class=p>:</span> <span class=p>(</span><span class=n>View</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Unit</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=k>this</span><span class=p>.</span><span class=n>onClick</span> <span class=p>=</span> <span class=n>onClick</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>                         <span class=err>👇</span><span class=n>传入一个匿名方法</span><span class=err>，</span><span class=n>参数类型时View</span><span class=p>,</span><span class=n>无返回值</span>                        
+</span></span><span class=line><span class=cl><span class=n>view</span><span class=p>.</span><span class=n>setOnClickListener</span><span class=p>(</span><span class=k>fun</span><span class=p>(</span><span class=n>v</span><span class=p>:</span> <span class=n>View</span><span class=p>):</span> <span class=n>Unit</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=n>doSomething</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>})</span>
+</span></span></code></pre></div><p>这种 <code>参数或者返回值是函数</code>的函数 在Kotlin中称之为<code>高阶函数(Higher-Order-Functions)</code></p><h2 id=2-lambda表达式>2. Lambda表达式<a hidden class=anchor aria-hidden=true href=#2-lambda表达式>#</a></h2><p>在刚刚的代码中，传入的匿名函数还能进一步简化，写成<code>Lambda</code>表达式的形式</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-kotlin data-lang=kotlin><span class=line><span class=cl>                         <span class=err>👇</span><span class=n>简化后的匿名方法</span>                       
+</span></span><span class=line><span class=cl><span class=n>view</span><span class=p>.</span><span class=n>setOnClickListener</span><span class=p>(</span> <span class=p>{</span> <span class=n>v</span><span class=p>:</span> <span class=n>View</span> <span class=o>-&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=n>doSomething</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>}</span> <span class=p>)</span>
+</span></span></code></pre></div><p>Kotlin允许如果<code>Lambda</code> 是最后一个参数时，<code>Lambda</code>可以写在方法()的外面：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-kotlin data-lang=kotlin><span class=line><span class=cl><span class=n>view</span><span class=p>.</span><span class=n>setOnClickListener</span><span class=p>()</span> <span class=p>{</span> <span class=n>v</span><span class=p>:</span> <span class=n>View</span> <span class=o>-&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=n>doSomething</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>如果该<code>Lambda</code> 是唯一的参数，则方法()可以省略</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-kotlin data-lang=kotlin><span class=line><span class=cl><span class=n>view</span><span class=p>.</span><span class=n>setOnClickListener</span> <span class=p>{</span> <span class=n>v</span><span class=p>:</span> <span class=n>View</span> <span class=o>-&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=n>doSomething</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>进一步，如果该<code>Lambda</code> 只有一个参数，该参数还可以省略不写, Kotlin为这种唯一参数提供了默认的名字<code>it</code></p><div class=highlight><pre tabindex=0 class=chroma><code class=language-kotlin data-lang=kotlin><span class=line><span class=cl><span class=n>view</span><span class=p>.</span><span class=n>setOnClickListener</span> <span class=p>{</span> 
+</span></span><span class=line><span class=cl>  <span class=n>doSomething</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>  <span class=k>it</span><span class=p>.</span><span class=n>visibility</span> <span class=p>=</span> <span class=n>GONE</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><h2 id=3-为什么kotlin中函数可以作为参数被传递>3. 为什么Kotlin中函数可以作为参数被传递?<a hidden class=anchor aria-hidden=true href=#3-为什么kotlin中函数可以作为参数被传递>#</a></h2><p>将刚才的代码，反编译为Java:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=w>                                      </span><span class=err>👇</span><span class=n>实际传递的是FunctionN类型的对象</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>public</span><span class=w> </span><span class=kd>static</span><span class=w> </span><span class=kd>final</span><span class=w> </span><span class=n>String</span><span class=w> </span><span class=nf>a</span><span class=p>(</span><span class=nd>@NotNull</span><span class=w> </span><span class=n>Function1</span><span class=w> </span><span class=n>funParam</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=n>Intrinsics</span><span class=p>.</span><span class=na>checkNotNullParameter</span><span class=p>(</span><span class=n>funParam</span><span class=p>,</span><span class=w> </span><span class=s>&#34;funParam&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=k>return</span><span class=w> </span><span class=p>(</span><span class=n>String</span><span class=p>)</span><span class=n>funParam</span><span class=p>.</span><span class=na>invoke</span><span class=p>(</span><span class=n>1</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-kotlin data-lang=kotlin><span class=line><span class=cl><span class=k>interface</span> <span class=nc>FunctionN</span><span class=p>&lt;</span><span class=k>out</span> <span class=n>R</span><span class=p>&gt;</span> <span class=p>:</span> <span class=n>Function</span><span class=p>&lt;</span><span class=n>R</span><span class=p>&gt;,</span> <span class=n>FunctionBase</span><span class=p>&lt;</span><span class=n>R</span><span class=p>&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>operator</span> <span class=k>fun</span> <span class=nf>invoke</span><span class=p>(</span><span class=k>vararg</span> <span class=n>args</span><span class=p>:</span> <span class=n>Any</span><span class=p>?):</span> <span class=n>R</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>override</span> <span class=k>val</span> <span class=py>arity</span><span class=p>:</span> <span class=n>Int</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><blockquote><p>所以，之所以Kotlin中方法可以被当作参数 进行传递，是因为它实际一个FunctionN类型的实实在在的对象</p></blockquote><p>对应关系:</p><table><thead><tr><th>表达式</th><th>FunctionN</th></tr></thead><tbody><tr><td>(String) -> Unit</td><td>Function1&lt;String,Int></td></tr><tr><td>(String,Int) -> Double</td><td>Function2&lt;String,Int,Double></td></tr><tr><td>&mldr;</td><td>&mldr;</td></tr><tr><td>(参数1类型,参数2类型..参数n类型) -> 返回值类型</td><td>FunctionN&lt;参数1类型,&mldr;,参数n类型,返回值类型></td></tr></tbody></table><h2 id=4inline内联函数>4.inline内联函数<a hidden class=anchor aria-hidden=true href=#4inline内联函数>#</a></h2><p>集合操作符 filter 可以定义规则对集合进行过滤</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-kotlin data-lang=kotlin><span class=line><span class=cl><span class=n>listOf</span><span class=p>(</span><span class=m>1</span><span class=p>,</span><span class=m>2</span><span class=p>,</span><span class=m>3</span><span class=p>,</span><span class=m>4</span><span class=p>,</span><span class=m>5</span><span class=p>,</span><span class=m>6</span><span class=p>).</span><span class=n>filter</span> <span class=p>{</span><span class=k>it</span> <span class=p>&gt;</span> <span class=m>2</span><span class=p>}</span>
+</span></span></code></pre></div><p>看一下 filter 方法的声明</p><pre tabindex=0><code class=language-kotiln data-lang=kotiln>public inline fun &lt;T&gt; Iterable&lt;T&gt;.filter(predicate: (T) -&gt; Boolean): List&lt;T&gt; {
     return filterTo(ArrayList&lt;T&gt;(), predicate)
 }
-</code></pre><div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#719e07">public</span> <span style="color:#719e07">inline</span> <span style="color:#719e07">fun</span> &lt;<span style="color:#268bd2">T</span>, <span style="color:#268bd2">C</span> : <span style="color:#268bd2">MutableCollection</span>&lt;<span style="color:#719e07">in</span> <span style="color:#268bd2">T</span>&gt;&gt; <span style="color:#268bd2">Iterable</span>&lt;T&gt;.filterTo(destination: C, predicate: (T) <span style="color:#719e07">-&gt;</span> Boolean): C {
-</span></span><span style="display:flex;"><span>    <span style="color:#719e07">for</span> (element <span style="color:#719e07">in</span> <span style="color:#719e07">this</span>) <span style="color:#719e07">if</span> (predicate(element)) destination.add(element)
-</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> destination
-</span></span><span style="display:flex;"><span>}
+</code></pre><div class=highlight><pre tabindex=0 class=chroma><code class=language-kotlin data-lang=kotlin><span class=line><span class=cl><span class=k>public</span> <span class=k>inline</span> <span class=k>fun</span> <span class=p>&lt;</span><span class=nc>T</span><span class=p>,</span> <span class=nc>C</span> <span class=p>:</span> <span class=nc>MutableCollection</span><span class=p>&lt;</span><span class=k>in</span> <span class=nc>T</span><span class=p>&gt;&gt;</span> <span class=nf>Iterable</span><span class=p>&lt;</span><span class=n>T</span><span class=p>&gt;.</span><span class=n>filterTo</span><span class=p>(</span><span class=n>destination</span><span class=p>:</span> <span class=n>C</span><span class=p>,</span> <span class=n>predicate</span><span class=p>:</span> <span class=p>(</span><span class=n>T</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Boolean</span><span class=p>):</span> <span class=n>C</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=p>(</span><span class=n>element</span> <span class=k>in</span> <span class=k>this</span><span class=p>)</span> <span class=k>if</span> <span class=p>(</span><span class=n>predicate</span><span class=p>(</span><span class=n>element</span><span class=p>))</span> <span class=n>destination</span><span class=p>.</span><span class=n>add</span><span class=p>(</span><span class=n>element</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>destination</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
 </span></span></code></pre></div><p>filter方法接收一个 函数类型的参数，并且返回值是boolean，符合使用lambda的场景，上面我们说过，lamdba是实现了FunctionN接口的对象。
 如果集合里有成百上千个元素，那每次经过filter 都会生成匿名对象，是一个不容忽视的开销,引起性能问题。
-所以,Kotlin中引入了内联函数的概念:</p>
-<blockquote>
-<p>内联函数回把函数的实现直接拷贝的调用处,避免创建匿名内部类。</p>
-</blockquote>
-<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#719e07">inline</span> <span style="color:#719e07">fun</span> <span style="color:#268bd2">inlined</span>(getString: () <span style="color:#719e07">-&gt;</span> String) = println(getString()) 
-</span></span><span style="display:flex;"><span> 
-</span></span><span style="display:flex;"><span><span style="color:#719e07">fun</span> <span style="color:#268bd2">notInlined</span>(getString: () <span style="color:#719e07">-&gt;</span> String) = println(getString())
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#719e07">fun</span> <span style="color:#268bd2">test</span>() {
-</span></span><span style="display:flex;"><span>    <span style="color:#719e07">var</span> testVar = <span style="color:#2aa198">&#34;Test&#34;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    notInlined { testVar }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    inlined { testVar }
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>编译后的java代码:</p>
-<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#268bd2">public</span> <span style="color:#268bd2">static</span> <span style="color:#268bd2">final</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">test</span><span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">final</span> ObjectRef testVar <span style="color:#719e07">=</span> <span style="color:#719e07">new</span> ObjectRef<span style="color:#719e07">();</span>
-</span></span><span style="display:flex;"><span>    testVar<span style="color:#719e07">.</span>element <span style="color:#719e07">=</span> <span style="color:#2aa198">&#34;Test Variable&#34;</span><span style="color:#719e07">;</span>
-</span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    <span style="color:#586e75">// notInlined:
-</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#586e75">//每个闭包 lamdba 都是一个对象会额外分配内存，影响运行时间
-</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    notInlined<span style="color:#719e07">((</span>Function0<span style="color:#719e07">)(</span><span style="color:#719e07">new</span> Function0<span style="color:#719e07">(</span><span style="color:#2aa198">0</span><span style="color:#719e07">)</span> <span style="color:#719e07">{</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">public</span> Object <span style="color:#268bd2">invoke</span><span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#719e07">return</span> <span style="color:#719e07">this</span><span style="color:#719e07">.</span>invoke<span style="color:#719e07">();</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#719e07">}</span>
-</span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">@NotNull</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">public</span> <span style="color:#268bd2">final</span> String <span style="color:#268bd2">invoke</span><span style="color:#719e07">()</span> <span style="color:#719e07">{</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#719e07">return</span> <span style="color:#719e07">(</span>String<span style="color:#719e07">)</span>testVar<span style="color:#719e07">.</span>element<span style="color:#719e07">;</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#719e07">}</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#719e07">}));</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#586e75">// inlined:会直接将方法体复制到调用处，
-</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    String var3 <span style="color:#719e07">=</span> <span style="color:#719e07">(</span>String<span style="color:#719e07">)</span>testVar<span style="color:#719e07">.</span>element<span style="color:#719e07">;</span>
-</span></span><span style="display:flex;"><span>    System<span style="color:#719e07">.</span>out<span style="color:#719e07">.</span>println<span style="color:#719e07">(</span>var3<span style="color:#719e07">);</span>
-</span></span><span style="display:flex;"><span><span style="color:#719e07">}</span>
-</span></span></code></pre></div><blockquote>
-<p>在 kotlin 中，因为出现了大量的带 lamdba的 高阶函数 &ndash; 「高阶函数是将函数用作参数或返回值的函数」，使得越来越多的地方出现 函数参数 不断传递的现象，每一个函数参数都会被编译成一个对象， 使得内存分配（对于函数对象和类）和虚拟调用会增加运行时间开销，通过内联化 lambda 表达式可以消除这类的开销。</p>
-</blockquote>
-
-        </div>
-        
-
-<footer>
-  <p class="meta">
-    <span class="byline author vcard">Posted by <span class="fn">Petrichor</span></span>
-    
-    <time>Apr 16, 2022</time>
-    
-      <span class="categories">
-        Tags:
-        
-          <a class="category" href="https://chenyongda2018.github.io/tags/android">Android</a>  <a class="category" href="https://chenyongda2018.github.io/tags/kotlin">Kotlin</a>  
-    
-    </span>
-  </p>
-
-  
-
-  <p class="meta">
-    
-        <a class="basic-alignment left" href="https://chenyongda2018.github.io/posts/java/jvm%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%9B%9E%E6%94%B6%E7%AD%96%E7%95%A5%E9%80%89%E6%8B%A9-jvm%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B02/" title="JVM内存分配机制与回收策略选择 JVM学习笔记[2]">JVM内存分配机制与回收策略选择 JVM学习笔记[2]</a>
-    
-
-    
-      <a class="basic-alignment right" href="https://chenyongda2018.github.io/posts/android/android_performance/" title="Android性能优化文章">Android性能优化文章</a>
-    
-  </p>
-  
-</footer>
-
-      </article>
-    </div>
-    
-
-<aside class="sidebar thirds">
-  <section class="first odd">
-
-    
-
-    <p>
-      
-    </p>
-  </section>
-
-  
-  
-
-
-
-<ul class="sidebar-nav">
-  <li class="sidebar-nav-item">
-    <a target="_blank" rel="noopener noreferrer" href="https://github.com/chenyongda2018" title="https://github.com/chenyongda2018"><i class="fa fa-github fa-3x"></i></a>
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-  
-  
-  </li>
-</ul>
-
-  
-
-  
-    
-      <section class="odd">
-        
-        
-          <li>
-            <a href="https://chenyongda2018.github.io/categories/" title="分类" >分类</a>
-          </li>
-        
-      </section>
-    
-  
-
-  
-  
-  
-    
-      <section class="even">
-        <h1>Recent Posts</h1>
-        <ul id="recent_posts">
-          
-          
-        </ul>
-      </section>
-    
-  
-</aside>
-
-  </div>
-</div>
-
-    <footer role="contentinfo">
-      <p>Copyright &copy; 2023 Petrichor - <a href="https://chenyongda2018.github.io/license/">License</a> -
-        <span class="credit">Powered by <a target="_blank" href="https://gohugo.io" rel="noopener noreferrer">Hugo</a> and <a target="_blank" href="https://github.com/parsiya/hugo-octopress/" rel="noopener noreferrer">Hugo-Octopress</a> theme.
-      </p>
-    </footer>
-
-    
-    
-
-
-
-    
-    
-    
-
-    
-  </body>
-</html>
-
+所以,Kotlin中引入了内联函数的概念:</p><blockquote><p>内联函数回把函数的实现直接拷贝的调用处,避免创建匿名内部类。</p></blockquote><div class=highlight><pre tabindex=0 class=chroma><code class=language-kotlin data-lang=kotlin><span class=line><span class=cl><span class=k>inline</span> <span class=k>fun</span> <span class=nf>inlined</span><span class=p>(</span><span class=n>getString</span><span class=p>:</span> <span class=p>()</span> <span class=o>-&gt;</span> <span class=n>String</span><span class=p>)</span> <span class=p>=</span> <span class=n>println</span><span class=p>(</span><span class=n>getString</span><span class=p>())</span> 
+</span></span><span class=line><span class=cl> 
+</span></span><span class=line><span class=cl><span class=k>fun</span> <span class=nf>notInlined</span><span class=p>(</span><span class=n>getString</span><span class=p>:</span> <span class=p>()</span> <span class=o>-&gt;</span> <span class=n>String</span><span class=p>)</span> <span class=p>=</span> <span class=n>println</span><span class=p>(</span><span class=n>getString</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>fun</span> <span class=nf>test</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>var</span> <span class=py>testVar</span> <span class=p>=</span> <span class=s2>&#34;Test&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>notInlined</span> <span class=p>{</span> <span class=n>testVar</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>inlined</span> <span class=p>{</span> <span class=n>testVar</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>编译后的java代码:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kd>public</span><span class=w> </span><span class=kd>static</span><span class=w> </span><span class=kd>final</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>test</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>final</span><span class=w> </span><span class=n>ObjectRef</span><span class=w> </span><span class=n>testVar</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>ObjectRef</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>testVar</span><span class=p>.</span><span class=na>element</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=s>&#34;Test Variable&#34;</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// notInlined:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>//每个闭包 lamdba 都是一个对象会额外分配内存，影响运行时间</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>notInlined</span><span class=p>((</span><span class=n>Function0</span><span class=p>)(</span><span class=k>new</span><span class=w> </span><span class=n>Function0</span><span class=p>(</span><span class=n>0</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=kd>public</span><span class=w> </span><span class=n>Object</span><span class=w> </span><span class=nf>invoke</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>return</span><span class=w> </span><span class=k>this</span><span class=p>.</span><span class=na>invoke</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nd>@NotNull</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=kd>public</span><span class=w> </span><span class=kd>final</span><span class=w> </span><span class=n>String</span><span class=w> </span><span class=nf>invoke</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=k>return</span><span class=w> </span><span class=p>(</span><span class=n>String</span><span class=p>)</span><span class=n>testVar</span><span class=p>.</span><span class=na>element</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}));</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// inlined:会直接将方法体复制到调用处，</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>String</span><span class=w> </span><span class=n>var3</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=p>(</span><span class=n>String</span><span class=p>)</span><span class=n>testVar</span><span class=p>.</span><span class=na>element</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>System</span><span class=p>.</span><span class=na>out</span><span class=p>.</span><span class=na>println</span><span class=p>(</span><span class=n>var3</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></div><blockquote><p>在 kotlin 中，因为出现了大量的带 lamdba的 高阶函数 &ndash; 「高阶函数是将函数用作参数或返回值的函数」，使得越来越多的地方出现 函数参数 不断传递的现象，每一个函数参数都会被编译成一个对象， 使得内存分配（对于函数对象和类）和虚拟调用会增加运行时间开销，通过内联化 lambda 表达式可以消除这类的开销。</p></blockquote></div><footer class=post-footer><ul class=post-tags><li><a href=https://chenyongda2018.github.io/tags/android/>Android</a></li><li><a href=https://chenyongda2018.github.io/tags/kotlin/>Kotlin</a></li></ul><nav class=paginav><a class=prev href=https://chenyongda2018.github.io/posts/android/android_performance/><span class=title>« Prev</span><br><span>Android性能优化文章</span>
+</a><a class=next href=https://chenyongda2018.github.io/posts/java/jvm%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%9B%9E%E6%94%B6%E7%AD%96%E7%95%A5%E9%80%89%E6%8B%A9-jvm%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B02/><span class=title>Next »</span><br><span>JVM内存分配机制与回收策略选择 JVM学习笔记[2]</span></a></nav><ul class=share-buttons><li><a target=_blank rel="noopener noreferrer" aria-label="share Kotlin Lambda on x" href="https://x.com/intent/tweet/?text=Kotlin%20Lambda&amp;url=https%3a%2f%2fchenyongda2018.github.io%2fposts%2fandroid%2fkotlin_lamdba%2f&amp;hashtags=Android%2cKotlin"><svg viewBox="0 0 512 512" height="30" width="30" fill="currentcolor"><path d="M512 62.554V449.446C512 483.97 483.97 512 449.446 512H62.554C28.03 512 0 483.97.0 449.446V62.554C0 28.03 28.029.0 62.554.0H449.446C483.971.0 512 28.03 512 62.554zM269.951 190.75 182.567 75.216H56L207.216 272.95 63.9 436.783h61.366L235.9 310.383l96.667 126.4H456L298.367 228.367l134-153.151H371.033zM127.633 110h36.468l219.38 290.065H349.5z"/></svg></a></li><li><a target=_blank rel="noopener noreferrer" aria-label="share Kotlin Lambda on linkedin" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fchenyongda2018.github.io%2fposts%2fandroid%2fkotlin_lamdba%2f&amp;title=Kotlin%20Lambda&amp;summary=Kotlin%20Lambda&amp;source=https%3a%2f%2fchenyongda2018.github.io%2fposts%2fandroid%2fkotlin_lamdba%2f"><svg viewBox="0 0 512 512" height="30" width="30" fill="currentcolor"><path d="M449.446.0C483.971.0 512 28.03 512 62.554v386.892C512 483.97 483.97 512 449.446 512H62.554c-34.524.0-62.554-28.03-62.554-62.554V62.554c0-34.524 28.029-62.554 62.554-62.554h386.892zM160.461 423.278V197.561h-75.04v225.717h75.04zm270.539.0V293.839c0-69.333-37.018-101.586-86.381-101.586-39.804.0-57.634 21.891-67.617 37.266v-31.958h-75.021c.995 21.181.0 225.717.0 225.717h75.02V297.222c0-6.748.486-13.492 2.474-18.315 5.414-13.475 17.767-27.434 38.494-27.434 27.135.0 38.007 20.707 38.007 51.037v120.768H431zM123.448 88.722C97.774 88.722 81 105.601 81 127.724c0 21.658 16.264 39.002 41.455 39.002h.484c26.165.0 42.452-17.344 42.452-39.002-.485-22.092-16.241-38.954-41.943-39.002z"/></svg></a></li><li><a target=_blank rel="noopener noreferrer" aria-label="share Kotlin Lambda on reddit" href="https://reddit.com/submit?url=https%3a%2f%2fchenyongda2018.github.io%2fposts%2fandroid%2fkotlin_lamdba%2f&title=Kotlin%20Lambda"><svg viewBox="0 0 512 512" height="30" width="30" fill="currentcolor"><path d="M449.446.0C483.971.0 512 28.03 512 62.554v386.892C512 483.97 483.97 512 449.446 512H62.554c-34.524.0-62.554-28.03-62.554-62.554V62.554c0-34.524 28.029-62.554 62.554-62.554h386.892zM446 265.638c0-22.964-18.616-41.58-41.58-41.58-11.211.0-21.361 4.457-28.841 11.666-28.424-20.508-67.586-33.757-111.204-35.278l18.941-89.121 61.884 13.157c.756 15.734 13.642 28.29 29.56 28.29 16.407.0 29.706-13.299 29.706-29.701.0-16.403-13.299-29.702-29.706-29.702-11.666.0-21.657 6.792-26.515 16.578l-69.105-14.69c-1.922-.418-3.939-.042-5.585 1.036-1.658 1.073-2.811 2.761-3.224 4.686l-21.152 99.438c-44.258 1.228-84.046 14.494-112.837 35.232-7.468-7.164-17.589-11.591-28.757-11.591-22.965.0-41.585 18.616-41.585 41.58.0 16.896 10.095 31.41 24.568 37.918-.639 4.135-.99 8.328-.99 12.576.0 63.977 74.469 115.836 166.33 115.836s166.334-51.859 166.334-115.836c0-4.218-.347-8.387-.977-12.493 14.564-6.47 24.735-21.034 24.735-38.001zM326.526 373.831c-20.27 20.241-59.115 21.816-70.534 21.816-11.428.0-50.277-1.575-70.522-21.82-3.007-3.008-3.007-7.882.0-10.889 3.003-2.999 7.882-3.003 10.885.0 12.777 12.781 40.11 17.317 59.637 17.317 19.522.0 46.86-4.536 59.657-17.321 3.016-2.999 7.886-2.995 10.885.008 3.008 3.011 3.003 7.882-.008 10.889zm-5.23-48.781c-16.373.0-29.701-13.324-29.701-29.698.0-16.381 13.328-29.714 29.701-29.714 16.378.0 29.706 13.333 29.706 29.714.0 16.374-13.328 29.698-29.706 29.698zM160.91 295.348c0-16.381 13.328-29.71 29.714-29.71 16.369.0 29.689 13.329 29.689 29.71.0 16.373-13.32 29.693-29.689 29.693-16.386.0-29.714-13.32-29.714-29.693z"/></svg></a></li><li><a target=_blank rel="noopener noreferrer" aria-label="share Kotlin Lambda on facebook" href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2fchenyongda2018.github.io%2fposts%2fandroid%2fkotlin_lamdba%2f"><svg viewBox="0 0 512 512" height="30" width="30" fill="currentcolor"><path d="M449.446.0C483.971.0 512 28.03 512 62.554v386.892C512 483.97 483.97 512 449.446 512H342.978V319.085h66.6l12.672-82.621h-79.272v-53.617c0-22.603 11.073-44.636 46.58-44.636H425.6v-70.34s-32.71-5.582-63.982-5.582c-65.288.0-107.96 39.569-107.96 111.204v62.971h-72.573v82.621h72.573V512h-191.104c-34.524.0-62.554-28.03-62.554-62.554V62.554c0-34.524 28.029-62.554 62.554-62.554h386.892z"/></svg></a></li><li><a target=_blank rel="noopener noreferrer" aria-label="share Kotlin Lambda on whatsapp" href="https://api.whatsapp.com/send?text=Kotlin%20Lambda%20-%20https%3a%2f%2fchenyongda2018.github.io%2fposts%2fandroid%2fkotlin_lamdba%2f"><svg viewBox="0 0 512 512" height="30" width="30" fill="currentcolor"><path d="M449.446.0C483.971.0 512 28.03 512 62.554v386.892C512 483.97 483.97 512 449.446 512H62.554c-34.524.0-62.554-28.03-62.554-62.554V62.554c0-34.524 28.029-62.554 62.554-62.554h386.892zm-58.673 127.703c-33.842-33.881-78.847-52.548-126.798-52.568-98.799.0-179.21 80.405-179.249 179.234-.013 31.593 8.241 62.428 23.927 89.612l-25.429 92.884 95.021-24.925c26.181 14.28 55.659 21.807 85.658 21.816h.074c98.789.0 179.206-80.413 179.247-179.243.018-47.895-18.61-92.93-52.451-126.81zM263.976 403.485h-.06c-26.734-.01-52.954-7.193-75.828-20.767l-5.441-3.229-56.386 14.792 15.05-54.977-3.542-5.637c-14.913-23.72-22.791-51.136-22.779-79.287.033-82.142 66.867-148.971 149.046-148.971 39.793.014 77.199 15.531 105.329 43.692 28.128 28.16 43.609 65.592 43.594 105.4-.034 82.149-66.866 148.983-148.983 148.984zm81.721-111.581c-4.479-2.242-26.499-13.075-30.604-14.571-4.105-1.495-7.091-2.241-10.077 2.241-2.986 4.483-11.569 14.572-14.182 17.562-2.612 2.988-5.225 3.364-9.703 1.12-4.479-2.241-18.91-6.97-36.017-22.23C231.8 264.15 222.81 249.484 220.198 245s-.279-6.908 1.963-9.14c2.016-2.007 4.48-5.232 6.719-7.847 2.24-2.615 2.986-4.484 4.479-7.472 1.493-2.99.747-5.604-.374-7.846-1.119-2.241-10.077-24.288-13.809-33.256-3.635-8.733-7.327-7.55-10.077-7.688-2.609-.13-5.598-.158-8.583-.158-2.986.0-7.839 1.121-11.944 5.604-4.105 4.484-15.675 15.32-15.675 37.364.0 22.046 16.048 43.342 18.287 46.332 2.24 2.99 31.582 48.227 76.511 67.627 10.685 4.615 19.028 7.371 25.533 9.434 10.728 3.41 20.492 2.929 28.209 1.775 8.605-1.285 26.499-10.833 30.231-21.295 3.732-10.464 3.732-19.431 2.612-21.298-1.119-1.869-4.105-2.99-8.583-5.232z"/></svg></a></li><li><a target=_blank rel="noopener noreferrer" aria-label="share Kotlin Lambda on telegram" href="https://telegram.me/share/url?text=Kotlin%20Lambda&amp;url=https%3a%2f%2fchenyongda2018.github.io%2fposts%2fandroid%2fkotlin_lamdba%2f"><svg viewBox="2 2 28 28" height="30" width="30" fill="currentcolor"><path d="M26.49 29.86H5.5a3.37 3.37.0 01-2.47-1 3.35 3.35.0 01-1-2.47V5.48A3.36 3.36.0 013 3 3.37 3.37.0 015.5 2h21A3.38 3.38.0 0129 3a3.36 3.36.0 011 2.46V26.37a3.35 3.35.0 01-1 2.47 3.38 3.38.0 01-2.51 1.02zm-5.38-6.71a.79.79.0 00.85-.66L24.73 9.24a.55.55.0 00-.18-.46.62.62.0 00-.41-.17q-.08.0-16.53 6.11a.59.59.0 00-.41.59.57.57.0 00.43.52l4 1.24 1.61 4.83a.62.62.0 00.63.43.56.56.0 00.4-.17L16.54 20l4.09 3A.9.9.0 0021.11 23.15zM13.8 20.71l-1.21-4q8.72-5.55 8.78-5.55c.15.0.23.0.23.16a.18.18.0 010 .06s-2.51 2.3-7.52 6.8z"/></svg></a></li><li><a target=_blank rel="noopener noreferrer" aria-label="share Kotlin Lambda on ycombinator" href="https://news.ycombinator.com/submitlink?t=Kotlin%20Lambda&u=https%3a%2f%2fchenyongda2018.github.io%2fposts%2fandroid%2fkotlin_lamdba%2f"><svg width="30" height="30" viewBox="0 0 512 512" fill="currentcolor" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"><path d="M449.446.0C483.971.0 512 28.03 512 62.554V449.446C512 483.97 483.97 512 449.446 512H62.554C28.03 512 0 483.97.0 449.446V62.554C0 28.03 28.029.0 62.554.0H449.446zM183.8767 87.9921h-62.034L230.6673 292.4508V424.0079h50.6655V292.4508L390.1575 87.9921H328.1233L256 238.2489z"/></svg></a></li></ul></footer></article></main><footer class=footer><span>&copy; 2025 <a href=https://chenyongda2018.github.io/>Petrichor's blog</a></span> ·
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+        <a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentcolor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script></body></html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>Android | Petrichor&#39;s blog</title>
+<meta name="keywords" content="">
+<meta name="description" content="">
+<meta name="author" content="Petrichor">
+<link rel="canonical" href="http://localhost:1313/categories/android/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.2211ca3164be7830024f6aad2b3a2e520843a64f8f048445c3401c1249aa051d.css" integrity="sha256-IhHKMWS&#43;eDACT2qtKzouUghDpk&#43;PBIRFw0AcEkmqBR0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" type="application/rss+xml" href="http://localhost:1313/categories/android/index.xml">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/categories/android/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+</head>
+
+<body class="list" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="Petrichor&#39;s blog (Alt + H)">Petrichor&#39;s blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://localhost:1313/" title="主页">
+                    <span>主页</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main"> 
+<header class="page-header">
+  <h1>
+    Android
+  </h1>
+</header>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Glide学习笔记
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>一.使用 1.配置依赖 在 app 层 build.gradle 中添加依赖 : dependencies { ... implementation &#39;com.github.bumptech.glide:glide:4.9.0&#39; annotationProcessor &#39;com.github.bumptech.glide:compiler:4.9.0&#39; annotationProcessor &#39;androidx.annotation:annotation:1.1.0&#39; ... } 添加必要权限 : &lt;uses-permission android:name=&#34;android.permission.INTERNET&#34;/&gt; &lt;uses-permission android:name=&#34;android.permission.ACCESS_NETWORK_STATE&#34;/&gt; &lt;uses-permission android:name=&#34;android.permission.READ_EXTERNAL_STORAGE&#34; /&gt; &lt;uses-permission android:name=&#34;android.permission.WRITE_EXTERNAL_STORAGE&#34; /&gt; 2.初步上手 代码 : Glide.with(context) .asBitmap() //把动图当作静止图片处理,也就是只显示gif图的第一帧 .load(&#34;https://pic2.zhimg.com/v2-c4970ee756c55333b7b871c5b617d9ed_b.gif&#34;)//图片url .placeholder(R.mipmap.ic_launcher) //占位符,在加载图片完成之前显示的图片 .error(R.drawable.ic_launcher_background) //加载失败时显示的图片 .fitCenter() //当图片长宽大于ImageView时,缩放图片 .fallback(R.mipmap.ic_launcher) //图片url为Null时显示的图片 .into(image1); // 放入到ImageView中 效果图 :
+🎈Tips : fitCenter()与CenterCrop()区别 : fitCenter() : 效果如上图,缩放原图至ImageView大小。 CenterCrop():如下图,保持原图不变，只根据ImageView大小显示对应部分。 3.配合RecyclerView显示图片列表 1.需要加载的图片url数据源
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2019-11-14 20:13:19 +0800 CST'>November 14, 2019</span>&nbsp;·&nbsp;Petrichor</footer>
+  <a class="entry-link" aria-label="post link to Glide学习笔记" href="http://localhost:1313/posts/android/glide_study/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">记一次在Android中调用百度的OCR接口的经历
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>前言 最近实验室开了个新项目，是一个通过扫描单词后把扫描过的单词生成游戏来让小朋友记单词的APP，扫描单词这个功能需要用到OCR.
+现在常用的OCR有
+Tesseract 这个用的人比较多，而且开源，目前google正在维护，但是我尝试了一下，发现识别准确率不是特别理想。
+微软的Azure上的认知服务 识别率很高，但是收费，现在有1元体验的套餐，而且不需要验证信用卡，感兴趣的同学可以试试。
+百度的文字识别 之所以用这个是因为免费，不过有每天的限制次数，对于学生项目来说够用，还要什么自行车。
+下面进入正文
+如何在Android 中调用百度的OCR进行文字识别 1.获取百度文字识别产品服务的 Ak/Sk 1.在百度AI开放平台中进入控制台
+2.找到文字识别 产品服务
+3,创建应用
+4,填写信息，注意这里的包名一定要和项目的包名一致
+5.获得AK/SK
+6.下载license文件，在项目中如果直接用AK/SK明文调用百度的OCR，很不安全，可能会被别人反编译之后获得你的AK.SK
+license文件集成了AK/SK 放在项目中可以防止别人破解。 7.下载之后将获得的api.license文件放入main目录下的assets目录中
+2.添加百度OCR的SDK到项目中 1.下载 百度OCR的android Sdk
+2.下载的SDK压缩包将其解压，并将libs下的ocr-sdk的jar包放入项目的libs目录下 3.在main目录下新建jniLibs目录，并将libs文件夹中的其他文件放入其中
+4.在app下的build,gradle中添加
+将添加在libs下的sdk JAR包编译
+5.这里下载的压缩包中包括了百度提供的相机扫描时的UI，在拍完照有裁剪框，比较方便，这里我们可以作为module引入项目中 3.调用百度OCR 做完准备工作我们就可以开始调用百度的OCR接口了。
+首先在我们需要进行识别的页面所在的文件中创建 根据License文件初始化OCR实例的函数，并在onCreate()方法中调用
+/** * 自定义license的文件路径和文件名称，以license文件方式初始化 */ private void initAccessTokenLicenseFile() { OCR.getInstance(mActivity.getApplicationContext()).initAccessToken(new OnResultListener&lt;AccessToken&gt;() { @Override public void onResult(AccessToken accessToken) { String token = accessToken.getAccessToken(); Log.d(TAG,token); hasGotToken = true; } @Override public void onError(OCRError error) { error.printStackTrace(); alertText(&#34;自定义文件路径licence方式获取token失败&#34;, error.getMessage()); } }, &#34;aip.license&#34;, mActivity.getApplicationContext()); } ...</p>
+  </div>
+  <footer class="entry-footer"><span title='2019-05-10 20:25:04 +0800 CST'>May 10, 2019</span>&nbsp;·&nbsp;Petrichor</footer>
+  <a class="entry-link" aria-label="post link to 记一次在Android中调用百度的OCR接口的经历" href="http://localhost:1313/posts/android/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%9C%A8android%E4%B8%AD%E8%B0%83%E7%94%A8%E7%99%BE%E5%BA%A6%E7%9A%84ocr%E6%8E%A5%E5%8F%A3%E7%9A%84%E7%BB%8F%E5%8E%86/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Android消息机制全面解析
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>(1),Android消息机制概述 Android中的消息机制主要指 Handler的运行机制 以及 MessageQueue，Looper的工作过程 ，三者相互协作，保证着消息的接收，发送，处理，执行。
+​ 图片来自郭神的《第一行代码》
+先简单的介绍一下 Android 中 消息机制大家庭的主要成员 :
+Handler : 是Android消息机制的上层接口，最为大家常用，相当于Android消息机制的入口，我们通过使用Handler发送消息来引起消息机制的循环。通常用于:在子线程执行完耗时任务完后，更新UI。
+MessageQueue : 存储 消息(Message) 对象的消息队列，实则是单链表结构.
+Looper : 用于无限的从 MessageQueue中取出消息，相当于消息的永动机，如果有新的消息，则处理执行，若没有，则就一直等待，堵塞。Looper** 所在的线程是 创建 Handler 时所在的线程。
+主线程创建Handler时，会自动创建一个Looper,但是子线程并不会自动创建Looper
+ThreadLocal : 在每个线程互不干扰的存储，提供数据，以此来获取当前线程的Looper
+ActivityThread : Android 的主线程，也叫UI线程，主线程被创建时 自动初始化主线程的 Looper对象。
+问题 : 大家都知道只有在UI线程才能对UI元素进行操作，在子线程更改UI就会报错，为什么？ 看完《Android艺术开发探索》 这本书的第10章之后我也才明白
+Android中的UI控件不是线程安全的，如果在子线程中也能修改UI元素，那多线程的时，共同访问同一个UI元素，就会导致这个UI元素处于我们不可预知的状态，这个线程让它往左一点，那个线程让它往右一点，UI该听谁的，好tm乱。。 干脆我就只听主线程的把。 问题 : 那为什么不通过对访问UI控件的子线程加上锁机制呢 ？ 这个很简单了，如果为不同的线程访问同一UI元素加上锁机制，那我们程序员写相关代码的时候会变得超级麻烦。。。 改个UI还得考虑它是不是已经被别的线程占用了，被占用了，还得让那个线程释放锁。。。线程再多一点的话，大大地加大了程序员地工作量.
+而且加上锁机制无疑会由于线程堵塞地原因降低访问UI的效率，帧率降低，体验也会不友好。
+让UI元素只能再主线程访问就会省下很多事，创建一个Handler就行了。
+下面从整体概述一下 消息机制的整个工作过程 :
+Handler 创建时会采用当前线程的 Looper来构建内部的消息循环系统，如果Handler在子线程，则一开始是没有Looper对象的(解决方法稍后介绍)，主线程ActivityThread默认有一个Looper。
+Handler创建完毕，通过 post方法传入Runnable对象，或者通过sendMessage(Message msg)发送消息。
+post()方法里也是通过调用send()实现的
+send()方法被调用后，调用 MessageQueue的enqueueMessage()方法将消息发送到消息队列中，等待被处理。
+Looper对象运行在Handler所在的线程，从MessageQueue消息队列中不断地取出消息，处理，所以业务逻辑(通常是更新UI)就运行在Looper的线程中。
+接下来从局部来分析消息机制的每个成员。
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2019-04-19 20:27:16 +0800 CST'>April 19, 2019</span>&nbsp;·&nbsp;Petrichor</footer>
+  <a class="entry-link" aria-label="post link to Android消息机制全面解析" href="http://localhost:1313/posts/android/android%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90/"></a>
+</article>
+<footer class="page-footer">
+  <nav class="pagination">
+    <a class="prev" href="http://localhost:1313/categories/android/">
+      «&nbsp;Prev&nbsp;
+    </a>
+  </nav>
+</footer>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="http://localhost:1313/">Petrichor&#39;s blog</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>
