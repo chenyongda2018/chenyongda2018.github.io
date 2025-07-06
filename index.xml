@@ -11,15 +11,8 @@
     </image>
     <generator>Hugo -- 0.147.4</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 06 Jul 2025 18:07:01 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 05 Jan 2023 20:29:31 +0800</lastBuildDate>
     <atom:link href="https://chenyongda2018.github.io/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Test</title>
-      <link>https://chenyongda2018.github.io/posts/android/test/</link>
-      <pubDate>Sun, 06 Jul 2025 18:07:01 +0800</pubDate>
-      <guid>https://chenyongda2018.github.io/posts/android/test/</guid>
-      <description></description>
-    </item>
     <item>
       <title>EventBus使用详解及源码解析</title>
       <link>https://chenyongda2018.github.io/posts/android/eventbus%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3%E5%8F%8A%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/</link>
