@@ -11,8 +11,22 @@
     </image>
     <generator>Hugo -- 0.147.4</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 05 Jan 2023 20:29:31 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 06 Jul 2025 18:07:01 +0800</lastBuildDate>
     <atom:link href="https://chenyongda2018.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Tag1</title>
+      <link>https://chenyongda2018.github.io/tags/tag1/</link>
+      <pubDate>Sun, 06 Jul 2025 18:07:01 +0800</pubDate>
+      <guid>https://chenyongda2018.github.io/tags/tag1/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Tag2</title>
+      <link>https://chenyongda2018.github.io/tags/tag2/</link>
+      <pubDate>Sun, 06 Jul 2025 18:07:01 +0800</pubDate>
+      <guid>https://chenyongda2018.github.io/tags/tag2/</guid>
+      <description></description>
+    </item>
     <item>
       <title>Android</title>
       <link>https://chenyongda2018.github.io/tags/android/</link>
