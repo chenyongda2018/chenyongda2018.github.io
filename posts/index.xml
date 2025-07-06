@@ -11,30 +11,8 @@
     </image>
     <generator>Hugo -- 0.147.4</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 06 Jul 2025 17:07:12 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 05 Jan 2023 20:29:31 +0800</lastBuildDate>
     <atom:link href="https://chenyongda2018.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Test2</title>
-      <link>https://chenyongda2018.github.io/posts/android/test2/</link>
-      <pubDate>Sun, 06 Jul 2025 17:07:12 +0800</pubDate>
-      <guid>https://chenyongda2018.github.io/posts/android/test2/</guid>
-      <description>&lt;h1 id=&#34;我心中的科技之光&#34;&gt;我心中的科技之光&lt;/h1&gt;
-&lt;p&gt;在当今这个时代，科技如同璀璨的星辰，照亮了人类前行的道路。从古老的指南针到如今的卫星导航，从飞鸽传书到即时通讯，科技的每一次进步都深刻地改变着我们的生活。&lt;/p&gt;
-&lt;p&gt;科技的魅力首先体现在它的便捷性上。以智能手机为例，它就像一个贴身的百宝箱，集通讯、娱乐、办公等多种功能于一身。无论身在何处，我们只需轻轻滑动屏幕，就能与世界各地的人畅聊，获取海量的信息。出门在外，移动支付让我们告别了繁琐的现金交易，购物变得轻松又快捷。&lt;/p&gt;
-&lt;p&gt;科技也为医疗领域带来了革命性的变化。先进的医疗设备如 MRI、CT 等，能够帮助医生更准确地诊断疾病，提高治疗效果。基因编辑技术的出现，更是为治愈一些疑难杂症带来了希望。许多曾经被认为是绝症的疾病，在科技的助力下，也有了新的治疗方案。&lt;/p&gt;
-&lt;p&gt;然而，科技也是一把双刃剑。它在给我们带来便利的同时，也带来了一些问题。比如，网络诈骗、信息泄露等安全隐患，让人们的隐私受到威胁。过度依赖科技，也可能导致人与人之间的交流变得冷漠。&lt;/p&gt;
-&lt;p&gt;但我相信，只要我们正确地使用科技，发挥它的优势，规避它的风险，科技之光必将照亮我们更加美好的未来。让我们怀揣着对科技的敬畏之心，共同期待一个更加智能、更加和谐的明天。（约 500 字）&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>Android约束布局使用技巧</title>
-      <link>https://chenyongda2018.github.io/posts/android/android%E7%BA%A6%E6%9D%9F%E5%B8%83%E5%B1%80%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7/</link>
-      <pubDate>Sun, 06 Jul 2025 00:14:27 +0800</pubDate>
-      <guid>https://chenyongda2018.github.io/posts/android/android%E7%BA%A6%E6%9D%9F%E5%B8%83%E5%B1%80%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7/</guid>
-      <description>&lt;h2 id=&#34;一什么是内存泄漏&#34;&gt;一.什么是内存泄漏&lt;/h2&gt;
-&lt;p&gt;&lt;code&gt;内存泄漏&lt;/code&gt;（英语：Memory leak）是在计算机科学中，由于疏忽或错误造成程序未能释放已经不再使用的内存。                                                                                                                 — — — 维基百科&lt;/p&gt;
-&lt;p&gt;&lt;img alt=&#34;Untitled&#34; loading=&#34;lazy&#34; src=&#34;https://tva1.sinaimg.cn/large/008i3skNly1gugdlcd1bij60i20b4wet02.jpg&#34;&gt;&lt;/p&gt;
-&lt;h2 id=&#34;二内存泄漏的影响&#34;&gt;二.内存泄漏的影响&lt;/h2&gt;</description>
-    </item>
     <item>
       <title>EventBus使用详解及源码解析</title>
       <link>https://chenyongda2018.github.io/posts/android/eventbus%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3%E5%8F%8A%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/</link>
